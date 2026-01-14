@@ -11,8 +11,10 @@
     "seed-data": "docker compose exec -T backend npx convex import --schema ./convex/schema.ts --data ./seed-data.json --admin-key ${CONVEX_SELF_HOSTED_ADMIN_KEY}"
   },
   "dependencies": {
+    "convex": "^1.31.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.12.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
