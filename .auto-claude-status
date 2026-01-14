@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "001-convex-poc",
+  "state": "building",
+  "subtasks": {
+    "completed": 2,
+    "total": 23,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Project Scaffolding",
+    "id": null,
+    "total": 3
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 3,
+    "started_at": "2026-01-15T06:54:13.893498"
+  },
+  "last_update": "2026-01-15T06:58:58.427685"
+}
