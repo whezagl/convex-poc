@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "gen-admin-key": "docker compose exec -T backend ./generate_admin_key.sh",
-    "seed-data": "CONVEX_SELF_HOSTED_URL=http://localhost:3210 CONVEX_SELF_HOSTED_ADMIN_KEY=\"$CONVEX_SELF_HOSTED_ADMIN_KEY\" npx convex import --table mockData ./seed-data.json --format jsonArray --yes"
+    "seed-data": "docker compose exec -T backend sh -c 'cd /workspace && npx convex import --table mockData ./seed-data.json --format jsonArray --replace --yes'"
   },
   "dependencies": {
     "convex": "^1.31.4",
