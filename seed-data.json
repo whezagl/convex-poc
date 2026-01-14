@@ -1,19 +1,17 @@
-{
-  "mockData": [
-    {
-      "name": "Sample Item 1",
-      "value": "100",
-      "description": "First mock data item"
-    },
-    {
-      "name": "Sample Item 2",
-      "value": "200",
-      "description": "Second mock data item"
-    },
-    {
-      "name": "Sample Item 3",
-      "value": "300",
-      "description": "Third mock data item"
-    }
-  ]
-}
+[
+  {
+    "name": "Sample Item 1",
+    "value": "100",
+    "description": "First mock data item"
+  },
+  {
+    "name": "Sample Item 2",
+    "value": "200",
+    "description": "Second mock data item"
+  },
+  {
+    "name": "Sample Item 3",
+    "value": "300",
+    "description": "Third mock data item"
+  }
+]
