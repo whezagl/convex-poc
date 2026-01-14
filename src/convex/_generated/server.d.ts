@@ -60,7 +60,7 @@ export declare function query<ArgsValidator extends object, ReturnType>(
       args: ArgsValidator extends Record<string, any>
         ? ArgsValidator
         : Record<string, any>
-    ) => ReturnType;
+    ) => ReturnType | Promise<ReturnType>;
   }
 ): (...args: any[]) => Promise<ReturnType>;
 

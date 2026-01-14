@@ -7,9 +7,8 @@ import { v } from "convex/values";
  */
 export const getMockData = query({
   args: {},
-  handler: async (ctx) => {
-    const mockData = await ctx.db.query("mockData").collect();
-    return mockData;
+  handler: (ctx) => {
+    return ctx.db.query("mockData").collect();
   },
 });
 
@@ -24,9 +23,9 @@ export const updateMockData = mutation({
     value: v.optional(v.string()),
     description: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: (ctx, args) => {
     const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
+    ctx.db.patch(id, updates);
     return id;
   },
 });

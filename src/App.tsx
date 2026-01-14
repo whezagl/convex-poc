@@ -1,14 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import ViewData from "./pages/ViewData";
 
-// Placeholder page components (will be implemented in subtasks 6-1 and 7-1)
-function ViewData() {
-  return (
-    <div>
-      <h2>View Data</h2>
-      <p>View data page - Read-only display of mock data (to be implemented)</p>
-    </div>
-  );
-}
+// Placeholder for Update page (will be implemented in subtask 7-1)
 
 function UpdateData() {
   return (
