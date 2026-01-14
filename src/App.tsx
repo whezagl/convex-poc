@@ -1,25 +1,60 @@
-import { useState } from 'react'
-import './App.css'
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+// Placeholder page components (will be implemented in subtasks 6-1 and 7-1)
+function ViewData() {
   return (
-    <>
-      <h1>Convex POC</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h2>View Data</h2>
+      <p>View data page - Read-only display of mock data (to be implemented)</p>
+    </div>
+  );
 }
 
-export default App
+function UpdateData() {
+  return (
+    <div>
+      <h2>Update Data</h2>
+      <p>Update data page - Form for editing mock data (to be implemented)</p>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <nav className="navbar">
+          <h1>Convex POC</h1>
+          <ul className="nav-links">
+            <li>
+              <NavLink
+                to="/view"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                View Data
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/update"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Update Data
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<ViewData />} />
+            <Route path="/view" element={<ViewData />} />
+            <Route path="/update" element={<UpdateData />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
