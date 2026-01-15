@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Environment variables (contains actual admin key)
+.env
+
+# Docker volume data (local Docker volume data)
+convex_data/
+
+# Convex auto-generated files
+convex/_generated/
+
+# Build outputs
+dist/

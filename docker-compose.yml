@@ -1,0 +1,26 @@
+services:
+  convex-backend:
+    image: ghcr.io/get-convex/convex-backend:latest
+    ports:
+      - "3210:3210"  # CONVEX_CLOUD_ORIGIN (backend API)
+      - "3211:3211"  # CONVEX_SITE_ORIGIN (http action endpoints)
+    environment:
+      - CONVEX_CLOUD_ORIGIN=http://localhost:3210
+      - CONVEX_SITE_ORIGIN=http://localhost:3211
+    volumes:
+      - convex_data:/convex/data
+    restart: unless-stopped
+
+  convex-dashboard:
+    image: ghcr.io/get-convex/convex-dashboard:latest
+    ports:
+      - "6791:6791"
+    environment:
+      - CONVEX_SELF_HOSTED_URL=http://convex-backend:3210
+      - CONVEX_SELF_HOSTED_ADMIN_KEY=${CONVEX_ADMIN_KEY}
+    depends_on:
+      - convex-backend
+    restart: unless-stopped
+
+volumes:
+  convex_data:
