@@ -177,6 +177,182 @@ The app will be available at **http://localhost:3000**
 3. Update data in Browser B
 4. Watch Browser A update **instantly**—no refresh needed!
 
+---
+
+## AI-Assisted Troubleshooting Guide
+
+This section provides step-by-step instructions for working with an AI coding assistant (like Claude Code, GitHub Copilot, or ChatGPT) to troubleshoot and fix issues with this self-hosted Convex application.
+
+### When to Use AI Troubleshooting
+
+Use this guide when you encounter:
+- Build or deployment failures
+- Runtime errors in the browser console
+- Functions not working or data not syncing
+- Accessibility or styling issues
+
+### Step-by-Step AI Instructions
+
+#### Step 1: Start with the Deploy Command
+
+**Prompt to AI:**
+```
+run python deploy.py up
+```
+
+**What to expect:** The AI will attempt to start all Docker services. If this fails, continue to Step 2.
+
+---
+
+#### Step 2: Investigate Build Failures
+
+If the build fails, use this prompt:
+
+**Prompt to AI:**
+```
+The Docker build failed. Please:
+1. Check what error occurred
+2. Read the Dockerfile to understand the build process
+3. Fix any missing dependencies or files
+4. Rebuild the frontend
+```
+
+**What to expect:** The AI will:
+- Read the error messages
+- Check if `package-lock.json` exists (run `npm install` if missing)
+- Fix any TypeScript or build errors
+- Rebuild with `docker compose up -d --build frontend`
+
+---
+
+#### Step 3: Test with Playwright
+
+After services are running, verify the application works:
+
+**Prompt to AI:**
+```
+Please test the application using Playwright:
+1. Install Playwright: npm install -D playwright @playwright/test
+2. Install Chromium: npx playwright install chromium
+3. Create a test script that:
+   - Opens http://localhost:3000/view
+   - Captures console errors
+   - Takes a screenshot
+4. Run the test and report any errors
+```
+
+**What to expect:** The AI will create a test script, run it, and report any JavaScript errors or issues found.
+
+---
+
+#### Step 4: Fix Function Reference Errors
+
+If you see `"[object Object] is not a functionReference"` error:
+
+**Prompt to AI:**
+```
+I'm seeing a functionReference error in the browser console. Please:
+1. Check the convex/_generated/api.ts file
+2. Ensure function references use Symbol.for("functionName") as the key
+3. Update the file and rebuild
+```
+
+**What to expect:** The AI will fix the function reference format and rebuild.
+
+---
+
+#### Step 5: Deploy Convex Functions
+
+If functions are not found:
+
+**Prompt to AI:**
+```
+The backend can't find the Convex functions. Please:
+1. Check if .env file exists with CONVEX_SELF_HOSTED_ADMIN_KEY
+2. Generate admin key if needed: docker compose exec backend ./generate_admin_key.sh
+3. Copy functions from src/convex/ to convex/ folder
+4. Deploy functions: npx convex deploy
+```
+
+**What to expect:** The AI will set up the environment and deploy the functions.
+
+---
+
+#### Step 6: Test Real-Time Sync
+
+To verify everything works:
+
+**Prompt to AI:**
+```
+Please create a Playwright test that demonstrates real-time sync:
+1. Open Browser A at http://localhost:3000/view
+2. Open Browser B at http://localhost:3000/update
+3. In Browser B, create a new message
+4. Verify Browser A receives the update automatically (no refresh)
+5. Take screenshots and report results
+```
+
+**What to expect:** The AI will create a two-browser test and confirm real-time sync is working.
+
+---
+
+#### Step 7: Check Accessibility
+
+If text is hard to see or invisible:
+
+**Prompt to AI:**
+```
+The page has poor visibility. Please check:
+1. Read src/index.css
+2. Ensure text color contrasts well with background
+3. Fix any white-on-white issues
+4. Rebuild and verify with screenshot
+```
+
+**What to expect:** The AI will fix the CSS for proper contrast and accessibility.
+
+---
+
+### Common AI Prompts Reference
+
+| Issue | Prompt to AI |
+|-------|--------------|
+| Build won't start | `run python deploy.py up and fix any errors` |
+| Missing lock file | `run npm install to generate package-lock.json` |
+| TypeScript errors | `check src/convex/_generated/ files and fix any issues` |
+| Function not found | `deploy functions with npx convex deploy` |
+| Console errors | `test with Playwright and capture browser console errors` |
+| Can't see text | `fix CSS contrast in src/index.css for accessibility` |
+| Real-time not working | `create two-browser Playwright test to verify sync` |
+
+### Tips for Working with AI
+
+1. **Be specific** - Tell the AI exactly what command to run first
+2. **Let it read files** - AI needs to read files to understand the codebase
+3. **Ask for verification** - Request screenshots or tests to confirm fixes
+4. **Iterate if needed** - If first fix doesn't work, ask AI to try another approach
+5. **Request explanation** - Ask AI to explain what it fixed and why
+
+### Full Troubleshooting Session Example
+
+**Starting Prompt:**
+```
+run python deploy.py up
+```
+
+**If AI reports errors, continue with:**
+```
+Please investigate and fix all issues. Then test with Playwright
+to verify the application works correctly.
+```
+
+**Final verification:**
+```
+Test real-time sync with two browsers and confirm it's working.
+```
+
+---
+
 ## Environment Variables
 
 Create a `.env` file in the project root with the following variables:
@@ -266,6 +442,133 @@ The magic of real-time synchronization comes from how Convex combines three tech
 - Type-safe (TypeScript ensures data matches your schema)
 
 ## Troubleshooting
+
+### Quick Fix Guide
+
+If something isn't working, try these quick fixes in order:
+
+| What's Wrong? | Quick Fix |
+|---------------|-----------|
+| Build fails with package-lock.json error | Run `npm install` |
+| Browser shows functionReference error | Run `npx convex deploy` |
+| Can't see text (white on white) | Run `docker compose up -d --build frontend` |
+| Functions not found | Copy files: `cp src/convex/*.ts convex/` then `npx convex deploy` |
+| Index name error | Rename `by_creation_time` to `by_created_at` in schema |
+| Nothing works at all | Run `docker compose down && docker compose up -d --build` |
+
+---
+
+### Docker Build Fails - "npm ci" Error
+
+**Problem:** The Docker build fails with an error about `package-lock.json` missing.
+
+```
+error The `npm ci` command can only install with an existing package-lock.json
+```
+
+**Solution:** You need to generate the lock file before building:
+
+```bash
+# Generate package-lock.json
+npm install
+
+# Then rebuild
+python deploy.py up
+```
+
+**Why this happens:** The Docker build uses `npm ci` which is faster and more reliable than `npm install`, but it requires a lock file to exist first.
+
+---
+
+### TypeScript Build Errors
+
+**Problem:** You see TypeScript errors about missing files or wrong types in `src/convex/_generated/`.
+
+**Solution:** Delete the generated folder and rebuild:
+
+```bash
+# Remove the generated files
+rm -rf src/convex/_generated convex/_generated
+
+# Rebuild the frontend
+docker compose up -d --build frontend
+```
+
+---
+
+### "is not a functionReference" Error in Browser
+
+**Problem:** You see this error in the browser console:
+
+```
+Error: [object Object] is not a functionReference
+```
+
+**Solution:** The functions need to be deployed to the Convex backend:
+
+```bash
+# 1. Make sure .env file exists with admin key
+cat .env
+
+# 2. Deploy functions
+npx convex deploy
+
+# 3. Refresh your browser
+```
+
+---
+
+### Functions Not Found - "Could not find public function"
+
+**Problem:** Browser error says functions don't exist after deploying.
+
+**Solution:** Make sure your functions are in the correct location:
+
+```bash
+# Functions should be in convex/ folder at root, NOT src/convex/
+ls convex/
+
+# If functions.ts is not there, copy it:
+cp src/convex/functions.ts convex/
+cp src/convex/schema.ts convex/
+
+# Then redeploy
+npx convex deploy
+```
+
+---
+
+### Schema Deployment Error - "IndexNameReserved"
+
+**Problem:** You see an error about a reserved index name like `by_creation_time`.
+
+**Solution:** Rename the index in your schema file (`convex/schema.ts`):
+
+```typescript
+// Change this:
+.index("by_creation_time", ["createdAt"])
+
+// To this:
+.index("by_created_at", ["createdAt"])
+```
+
+Then redeploy with `npx convex deploy`.
+
+---
+
+### Can't See Text - White Text on White Background
+
+**Problem:** The page loads but text is invisible (white text on white background).
+
+**Solution:** Rebuild the frontend with updated CSS:
+
+```bash
+docker compose up -d --build frontend
+```
+
+Then hard refresh your browser (Ctrl+Shift+R or Cmd+Shift+R).
+
+---
 
 ### Port 3000 Already in Use
 
