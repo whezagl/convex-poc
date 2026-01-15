@@ -16,7 +16,7 @@ None - Claude Agent SDK patterns are the focus, and this is a learning POC to es
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Setup** - TypeScript project with Convex (Docker Compose) and Claude SDK
+- [x] **Phase 1: Project Setup** - TypeScript project with Convex (Docker Compose) and Claude SDK
 - [ ] **Phase 2: Convex Schema** - Define data models for sessions, workflows, agents
 - [ ] **Phase 3: Agent Foundation** - Base agent class with Convex state storage
 - [ ] **Phase 4: Planner Agent** - Task decomposition with Convex integration
@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Nothing (first phase)
 **Research**: ✅ Complete (01-RESEARCH.md)
 **Research topics**: @anthropic-ai/claude-agent-sdk current API, TypeScript project structure, Convex Docker setup
-**Plans**: TBD
+**Plans**: 2/2 Complete ✅
 
 ### Phase 2: Convex Schema & State Model
 **Goal**: Define Convex schema for agent sessions, orchestration state, and workflow progress
@@ -93,8 +93,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Setup | 0/TBD | Not started | - |
-| 2. Convex Schema | 0/TBD | Not started | - |
+| 1. Project Setup | 2/2 | Complete | 2026-01-15 |
+| 2. Convex Schema | 0/2 | Not started | - |
 | 3. Agent Foundation | 0/TBD | Not started | - |
 | 4. Planner Agent | 0/TBD | Not started | - |
 | 5. Coder Agent | 0/TBD | Not started | - |
