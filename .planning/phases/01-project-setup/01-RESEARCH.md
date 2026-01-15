@@ -1,16 +1,17 @@
 # Phase 1: Project Setup - Research
 
 **Researched:** 2026-01-16
-**Domain:** Claude Agent SDK with TypeScript/Node
+**Updated:** 2026-01-16 (Added Convex Docker setup)
+**Domain:** Claude Agent SDK + Self-hosted Convex with TypeScript/Node
 **Confidence:** HIGH
 
 ## Summary
 
-Researched the Claude Agent SDK (`@anthropic-ai/claude-agent-sdk`) ecosystem and TypeScript project setup patterns for building autonomous agent systems. The SDK provides a complete agent harness with built-in tool support (Read, Write, Edit, Bash, etc.), session management, and subagent orchestration. It's designed as "giving Claude a computer" - the same tools programmers use daily.
+Researched the Claude Agent SDK (`@anthropic-ai/claude-agent-sdk`) ecosystem, TypeScript project setup patterns, and self-hosted Convex via Docker Compose for building autonomous agent systems with real-time state management. The SDK provides a complete agent harness with built-in tool support (Read, Write, Edit, Bash, etc.), session management, and subagent orchestration. Self-hosted Convex provides persistent state storage for agent sessions, orchestration state, and workflow progress via a local Docker Compose setup.
 
-Key finding: The Agent SDK is NOT just an API wrapper - it's a full agentic loop with context gathering (file system, web search), action execution (tools, bash), and verification (linting, testing). For multi-agent systems, use the SDK's built-in `agents` option for subagent definitions rather than building custom orchestration from scratch.
+Key finding: The Agent SDK is NOT just an API wrapper - it's a full agentic loop with context gathering (file system, web search), action execution (tools, bash), and verification (linting, testing). For multi-agent systems, use the SDK's built-in `agents` option for subagent definitions rather than building custom orchestration from scratch. Convex self-hosted via Docker Compose provides a local development backend for agent state without external service dependencies.
 
-**Primary recommendation:** Use `@anthropic-ai/claude-agent-sdk` (NOT `@anthropic-ai/sdk` - that's the low-level Messages API) with tsx for development and tsup for building. Structure as a single-package TypeScript project (not monorepo) for this learning POC.
+**Primary recommendation:** Use `@anthropic-ai/claude-agent-sdk` (NOT `@anthropic-ai/sdk` - that's the low-level Messages API) with tsx for development, tsup for building, and self-hosted Convex via Docker Compose for state storage. Structure as a single-package TypeScript project (not monorepo) for this learning POC.
 
 ## Standard Stack
 
@@ -28,6 +29,13 @@ Key finding: The Agent SDK is NOT just an API wrapper - it's a full agentic loop
 | tsx | Latest | TypeScript execution (dev/test) | Run TS files directly without build step |
 | tsup | Latest | Production bundler | Fast esbuild-based bundler for ESM/CJS output |
 
+### Backend (Self-Hosted Convex)
+| Library | Version | Purpose | Why Standard |
+|---------|---------|---------|--------------|
+| convex | Latest | Self-hosted reactive backend | Agent state storage, real-time sync |
+| docker | Latest | Container runtime | Self-hosted Convex via Docker Compose |
+| docker-compose | Latest | Multi-container orchestration | Local development environment |
+
 ### Tooling
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
@@ -40,12 +48,19 @@ Key finding: The Agent SDK is NOT just an API wrapper - it's a full agentic loop
 |------------|-----------|----------|
 | tsup | unbuild, rollup | tsup is zero-config, esbuild-based (faster) |
 | tsx | ts-node | tsx uses esbuild (much faster) |
+| Self-hosted Convex | Convex Cloud, Supabase | Self-hosted for local dev, no external dependencies |
 | Single package | Monorepo (Nx, Turborepo) | Monorepo overkill for learning POC |
 
 **Installation:**
 ```bash
-npm install @anthropic-ai/claude-agent-sdk zod
+# Core dependencies
+npm install @anthropic-ai/claude-agent-sdk zod convex
+
+# Development dependencies
 npm install -D tsx tsup typescript @types/node prettier eslint
+
+# Convex self-hosted setup (via Docker Compose)
+# See Docker Compose section below
 ```
 
 ## Architecture Patterns
@@ -59,6 +74,11 @@ src/
 │   └── workflow.ts  # Main orchestration logic
 ├── types/           # Shared TypeScript types
 └── index.ts         # Main entry point
+convex/              # Convex backend functions and schema
+├── schema.ts        # Data models (agent sessions, workflows, state)
+├── agents.ts        # Agent state mutations and queries
+└── orchestrator.ts  # Workflow orchestration functions
+docker-compose.yml   # Self-hosted Convex configuration
 package.json
 tsconfig.json
 tsup.config.ts       # Build configuration
@@ -137,6 +157,150 @@ const myTool = tool(
 - **Custom tool execution loops**: The SDK handles tool calling automatically. Don't build manual `while` loops for tool use.
 - **Ignoring permission modes**: For CLI tools, use `permissionMode: 'bypassPermissions'`. For production, implement proper `canUseTool` handlers.
 - **Not using subagents for specialization**: The SDK has built-in subagent support. Don't manually coordinate multiple client instances.
+- **Using Convex Cloud for development**: Self-hosted Convex via Docker Compose is sufficient for local development and avoids external service dependencies.
+
+### Pattern 4: Self-Hosted Convex via Docker Compose
+**What:** Run Convex backend locally using Docker Compose for development
+**When to use:** Local development, no external service dependencies needed
+**Example:**
+```yaml
+# docker-compose.yml - Self-hosted Convex setup
+# Source: Convex self-hosting documentation
+services:
+  convex-backend:
+    image: ghcr.io/get-convex/convex-backend:latest
+    ports:
+      - "3210:3210"  # CONVEX_CLOUD_ORIGIN (backend API)
+      - "3211:3211"  # CONVEX_SITE_ORIGIN (http action endpoints)
+    environment:
+      - CONVEX_CLOUD_ORIGIN=http://localhost:3210
+      - CONVEX_SITE_ORIGIN=http://localhost:3211
+    volumes:
+      - convex_data:/convex/data
+    restart: unless-stopped
+
+  convex-dashboard:
+    image: ghcr.io/get-convex/convex-dashboard:latest
+    ports:
+      - "6791:6791"
+    environment:
+      - CONVEX_SELF_HOSTED_URL=http://convex-backend:3210
+      - CONVEX_SELF_HOSTED_ADMIN_KEY=${CONVEX_ADMIN_KEY}
+    depends_on:
+      - convex-backend
+    restart: unless-stopped
+
+volumes:
+  convex_data:
+```
+
+```bash
+# Generate admin key for dashboard access
+openssl rand -hex 32
+
+# Set environment variable
+export CONVEX_ADMIN_KEY=<generated-key>
+
+# Start Convex backend and dashboard
+docker-compose up -d
+
+# Configure Convex CLI for self-hosted deployment
+export CONVEX_SELF_HOSTED_URL=http://localhost:3210
+export CONVEX_SELF_HOSTED_ADMIN_KEY=$CONVEX_ADMIN_KEY
+
+# Deploy to self-hosted Convex
+npx convex deploy
+```
+
+### Pattern 5: Convex Integration for Agent State
+**What:** Store agent sessions, orchestration state, and workflow progress in Convex
+**When to use:** Any multi-agent system needing persistent state and real-time sync
+**Example:**
+```typescript
+// convex/schema.ts - Agent state data models
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  // Agent sessions store conversation history and state
+  agentSessions: defineTable({
+    agentType: v.string(), // "planner" | "coder" | "reviewer"
+    status: v.string(),    // "idle" | "running" | "completed" | "failed"
+    sessionId: v.optional(v.string()), // Claude SDK session ID
+    input: v.string(),     // Task or input for the agent
+    output: v.optional(v.string()),    // Agent's output
+    error: v.optional(v.string()),     // Error if failed
+    metadata: v.optional(v.object({    // Additional metadata
+      workflowId: v.id("workflows"),
+      startedAt: v.number(),
+      completedAt: v.optional(v.number()),
+    })),
+  })
+    .index("by_workflow", ["workflowId"])
+    .index("by_status", ["status"]),
+
+  // Workflows orchestrate multi-agent execution
+  workflows: defineTable({
+    task: v.string(),              // Original user task
+    status: v.string(),            // "pending" | "in_progress" | "completed" | "failed"
+    currentStep: v.string(),       // Current agent in sequence
+    artifacts: v.array(v.string()), // File paths to artifacts (plan.md, code.ts, etc.)
+    metadata: v.object({
+      createdAt: v.number(),
+      updatedAt: v.number(),
+    }),
+  })
+    .index("by_status", ["status"]),
+});
+
+// convex/agents.ts - Agent state mutations
+import { mutation, query } from "./_generated/server";
+
+export const createAgentSession = mutation({
+  args: {
+    agentType: v.string(),
+    input: v.string(),
+    workflowId: v.id("workflows"),
+  },
+  handler: async (ctx, args) => {
+    const sessionId = await ctx.db.insert("agentSessions", {
+      agentType: args.agentType,
+      status: "running",
+      input: args.input,
+      metadata: {
+        workflowId: args.workflowId,
+        startedAt: Date.now(),
+      },
+    });
+    return sessionId;
+  },
+});
+
+export const updateAgentSession = mutation({
+  args: {
+    sessionId: v.id("agentSessions"),
+    output: v.optional(v.string()),
+    error: v.optional(v.string()),
+    status: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { sessionId, ...updates } = args;
+    await ctx.db.patch(sessionId, {
+      ...updates,
+      metadata: {
+        completedAt: Date.now(),
+      },
+    });
+  },
+});
+
+export const getAgentSession = query({
+  args: { sessionId: v.id("agentSessions") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.sessionId);
+  },
+});
+```
 
 ## Don't Hand-Roll
 
@@ -144,12 +308,15 @@ const myTool = tool(
 |---------|-------------|-------------|-----|
 | Tool calling loop | Custom `while` loop with manual tool execution | `query()` async generator | SDK handles tool use, streaming, and error recovery |
 | Session management | Custom session storage and resume logic | `resume` option in `query()` | SDK manages session persistence automatically |
+| Agent state storage | Custom JSON files or in-memory state | Convex (self-hosted via Docker) | Real-time sync, persistent, typed schema |
+| Workflow orchestration | Custom state machines | Convex mutations + queries | Real-time updates, consistent state |
 | Message parsing | Custom message type handling | SDK message types (`SDKMessage`, `SDKResultMessage`) | Standardized types with proper streaming support |
 | Tool definitions | Custom tool schemas and validation | SDK's `tool()` helper with Zod | Type-safe, integrates with MCP, standard format |
 | File operations | Custom fs-based file tools | Built-in tools (Read, Write, Edit) | Battle-tested, handle edge cases, permission-aware |
 | Agent handoff | Custom agent orchestration | `agents` option in `query()` | Built-in subagent support with proper isolation |
+| Backend deployment | Manual server setup | Docker Compose for Convex | Reproducible, isolated, easy teardown |
 
-**Key insight:** The Claude Agent SDK is a complete agent harness, not just an API client. Building custom tool loops, session management, or agent orchestration reinvents 6+ months of production hardening. The SDK's abstractions are designed specifically for multi-agent coordination.
+**Key insight:** The Claude Agent SDK + Convex combination provides a complete agent development stack. The SDK handles agent interactions, tool orchestration, and session management. Convex provides persistent state storage, real-time sync, and workflow orchestration. Together they eliminate the need to build custom state management, orchestration, or deployment infrastructure.
 
 ## Common Pitfalls
 
@@ -182,6 +349,18 @@ const myTool = tool(
 **Why it happens:** Not exploring SDK capabilities before building custom solutions
 **How to avoid:** Review available tools in docs first. Built-in tools handle permissions, streaming, and edge cases
 **Warning signs:** Writing custom fs.readFile/fn.writeFile wrappers
+
+### Pitfall 6: Convex Schema Mismatch
+**What goes wrong:** Runtime errors when documents don't match schema after deployment
+**Why it happens:** Adding schema after data exists, or schema validation disabled
+**How to avoid:** Start with schema validation enabled for development. Use `npx convex dashboard` to inspect data before schema changes
+**Warning signs:** "Document does not match schema" errors, failed deployments
+
+### Pitfall 7: Docker Compose Environment Issues
+**What goes wrong:** Convex backend can't connect, dashboard shows "connection refused"
+**Why it happens:** Missing `CONVEX_SELF_HOSTED_URL` or incorrect port configuration
+**How to avoid:** Set all required environment variables before running `docker-compose up`. Use `.env` file for consistent configuration
+**Warning signs:** Backend starts but dashboard can't connect, deployment failures
 
 ## Code Examples
 
@@ -300,6 +479,9 @@ const server = createSdkMcpServer({
 - [Agent SDK reference - TypeScript](https://platform.claude.com/docs/en/agent-sdk/typescript) - Complete API reference (all functions, types, interfaces)
 - [Building agents with the Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) - Official engineering blog (Sept 2025)
 - [anthropics/anthropic-sdk-typescript](https://github.com/anthropics/anthropic-sdk-typescript) - GitHub repository for base SDK
+- [Convex Documentation - Schemas](https://docs.convex.dev/database/schemas) - Schema definition, validation, and TypeScript types
+- [Convex Best Practices](https://docs.convex.dev/understanding/best-practices/) - Official Convex best practices and anti-patterns
+- [Self-Hosting with Convex: Everything You Need to Know](https://stack.convex.dev/self-hosted-develop-and-deploy) - Comprehensive self-hosting guide
 
 ### Secondary (MEDIUM confidence)
 - [egoist/tsup](https://github.com/egoist/tsup) - Official tsup repository (zero-config TypeScript bundler)
@@ -316,17 +498,21 @@ const server = createSdkMcpServer({
 **Research scope:**
 - Core technology: @anthropic-ai/claude-agent-sdk
 - Ecosystem: tsx, tsup, zod, TypeScript project structure
-- Patterns: Agent query, subagent definition, tool creation
-- Pitfalls: Wrong package, session errors, permissions, over-engineering
+- Backend: Self-hosted Convex via Docker Compose
+- Patterns: Agent query, subagent definition, tool creation, Convex state storage
+- Pitfalls: Wrong package, session errors, permissions, over-engineering, Convex schema issues, Docker configuration
 
 **Confidence breakdown:**
 - Standard stack: HIGH - verified with official docs and GitHub repositories
 - Architecture: HIGH - from official Agent SDK documentation and engineering blog
+- Convex integration: HIGH - from official Convex documentation and self-hosting guide
+- Docker setup: HIGH - from official Convex self-hosting documentation
 - Pitfalls: MEDIUM - GitHub issues indicate session problems, but may be version-specific
 - Code examples: HIGH - verified against official documentation sources
 
 **Research date:** 2026-01-16
-**Valid until:** 2026-02-15 (30 days - Agent SDK is actively developed)
+**Updated:** 2026-01-16 (Added Convex Docker setup)
+**Valid until:** 2026-02-15 (30 days - Agent SDK and Convex are actively developed)
 
 ---
 
