@@ -1,0 +1,77 @@
+services:
+  # Convex Backend - Self-hosted Convex database server
+  backend:
+    image: ghcr.io/get-convex/convex-backend:latest
+    container_name: convex-backend
+    stop_grace_period: 10s
+    stop_signal: SIGINT
+    ports:
+      - "3210:3210"
+      - "3211:3211"
+    volumes:
+      - convex_data:/convex/data
+    environment:
+      # Backend configuration
+      - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://127.0.0.1:3210}
+      - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://127.0.0.1:3211}
+      - CONVEX_SELF_HOSTED_ADMIN_KEY=${CONVEX_SELF_HOSTED_ADMIN_KEY}
+      - INSTANCE_NAME=${INSTANCE_NAME:-convex-poc}
+      # Logging configuration
+      - RUST_LOG=${RUST_LOG:-info}
+      # Document retention (lowered to 2 days for POC)
+      - DOCUMENT_RETENTION_DELAY=${DOCUMENT_RETENTION_DELAY:-172800}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3210/version"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - convex-network
+
+  # Convex Dashboard - Admin interface for Convex backend
+  dashboard:
+    image: ghcr.io/get-convex/convex-dashboard:latest
+    container_name: convex-dashboard
+    stop_grace_period: 10s
+    stop_signal: SIGINT
+    ports:
+      - "6791:6791"
+    environment:
+      # Dashboard URL pointing to backend
+      - NEXT_PUBLIC_DEPLOYMENT_URL=${NEXT_PUBLIC_DEPLOYMENT_URL:-http://127.0.0.1:3210}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - convex-network
+
+  # Frontend - React + Vite application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: convex-poc-frontend
+    ports:
+      - "3000:80"
+    environment:
+      # Frontend connects to backend using service name (not localhost)
+      - VITE_CONVEX_URL=${VITE_CONVEX_URL:-http://backend:3210}
+    depends_on:
+      backend:
+        condition: service_healthy
+      dashboard:
+        condition: service_started
+    networks:
+      - convex-network
+    restart: unless-stopped
+
+# Named volumes for data persistence
+volumes:
+  convex_data:
+    driver: local
+
+# Network for service communication
+networks:
+  convex-network:
+    driver: bridge

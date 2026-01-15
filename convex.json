@@ -1,0 +1,6 @@
+{
+  "deploymentName": "convex-poc",
+  "selfHosted": {
+    "url": "http://localhost:3210"
+  }
+}
