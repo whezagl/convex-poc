@@ -19,6 +19,7 @@ If everything else fails, the agent orchestration pattern must work and the code
 ### Active
 
 - [ ] Multi-agent orchestration system using Claude Agent SDK
+- [ ] Self-hosted Convex backend via Docker Compose for development
 - [ ] Convex backend for agent state storage (sessions, orchestration state, workflow progress)
 - [ ] Claude Agent SDK functions exposed as Convex actions
 - [ ] Three agent types with distinct responsibilities:
@@ -40,6 +41,8 @@ If everything else fails, the agent orchestration pattern must work and the code
 - **MCP integrations** — Focus on Claude SDK agent patterns; external integrations add scope
 - **Production-grade security** — Learning environment; security patterns can be added later
 - **Complex state machines** — Simple sequential workflow (Planner→Coder→Reviewer) for POC
+- **Cloud Convex deployment** — Self-hosted Docker Compose only; cloud deployment adds complexity
+- **Production Docker setup** — Development-focused Docker Compose; production orchestration (K8s, etc.) out of scope
 
 ## Context
 
@@ -53,16 +56,19 @@ Inspired by the Auto-Claude project (`/Users/wharsojo/dev/Auto-Claude2`), which 
 The Auto-Claude architecture shows a proven pattern: Planner → Coder → QA Reviewer → QA Fixer. This POC simplifies to Planner → Coder → Reviewer for learning purposes.
 
 **Convex Integration:**
+- Self-hosted Convex via Docker Compose for local development
 - Convex stores agent sessions, orchestration state, and workflow progress
 - Claude Agent SDK functions run as Convex actions
 - Real-time sync of agent state across CLI instances
 - Filesystem remains for code artifacts (separation of concerns)
+- Docker Compose for reproducible development environment
 
 ## Constraints
 
 - **Tech Stack**: TypeScript/Node + Convex — No Python backend; aligns with user's existing skills
 - **Claude SDK**: Must use @anthropic-ai/claude-agent-sdk — Core dependency for agent sessions
-- **Convex**: Required for agent state storage — Provides real-time sync and persistence
+- **Convex**: Self-hosted via Docker Compose — Development environment consistency
+- **Docker**: Docker Compose required for local Convex deployment
 - **Learning Focus**: Code clarity over optimization — Patterns must be understandable for future reference
 
 ## Key Decisions
@@ -70,12 +76,14 @@ The Auto-Claude architecture shows a proven pattern: Planner → Coder → QA Re
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | TypeScript/Node over Python | User's primary stack; simplifies local development; demonstrates cross-platform patterns | — Pending |
+| Self-hosted Convex via Docker | Development environment consistency; no external service dependencies | — Pending |
 | Convex for agent state storage | Real-time sync, persistent sessions, orchestration state without database complexity | — Pending |
 | Filesystem for code artifacts | Separation of concerns: Convex for state, files for code | — Pending |
 | Claude SDK as Convex actions | Leverage Convex's function execution for agent orchestration | — Pending |
 | Simplified agent pipeline (3 vs 4 agents) | Learning POC - focus on core coordination patterns; QA Fixer can be added later | — Pending |
 | CLI-first design | Remove UI complexity; agents are the focus, not the interface | — Pending |
 | No external memory system | Convex provides persistent state; no additional Graphiti/memory system needed | — Pending |
+| No cloud Convex deployment | Self-hosted only for POC; cloud deployment adds complexity | — Pending |
 
 ---
-*Last updated: 2026-01-16 after adding Convex integration*
+*Last updated: 2026-01-16 after adding Docker Compose for Convex*

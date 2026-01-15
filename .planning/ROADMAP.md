@@ -2,11 +2,11 @@
 
 ## Overview
 
-A journey from blank TypeScript project to a working multi-agent autonomous coding system with Convex as the real-time state backend. We'll build a clean implementation of the Planner → Coder → Reviewer pattern using Claude Agent SDK + Convex actions, demonstrating agent coordination with reusable patterns for future projects.
+A journey from blank TypeScript project to a working multi-agent autonomous coding system with self-hosted Convex as the real-time state backend via Docker Compose. We'll build a clean implementation of the Planner → Coder → Reviewer pattern using Claude Agent SDK + Convex actions, demonstrating agent coordination with reusable patterns for future projects.
 
 ## Domain Expertise
 
-None - Claude Agent SDK patterns are the focus, and this is a learning POC to establish those patterns. Convex provides the persistent state layer.
+None - Claude Agent SDK patterns are the focus, and this is a learning POC to establish those patterns. Convex provides the persistent state layer. Docker Compose enables reproducible local development.
 
 ## Phases
 
@@ -16,7 +16,7 @@ None - Claude Agent SDK patterns are the focus, and this is a learning POC to es
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Setup** - TypeScript project with Convex and Claude SDK
+- [ ] **Phase 1: Project Setup** - TypeScript project with Convex (Docker Compose) and Claude SDK
 - [ ] **Phase 2: Convex Schema** - Define data models for sessions, workflows, agents
 - [ ] **Phase 3: Agent Foundation** - Base agent class with Convex state storage
 - [ ] **Phase 4: Planner Agent** - Task decomposition with Convex integration
@@ -29,10 +29,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Project Setup
-**Goal**: TypeScript project with Convex deployment configured and Claude SDK integrated
+**Goal**: TypeScript project with self-hosted Convex (Docker Compose) configured and Claude SDK integrated
 **Depends on**: Nothing (first phase)
 **Research**: ✅ Complete (01-RESEARCH.md)
-**Research topics**: @anthropic-ai/claude-agent-sdk current API, TypeScript project structure, Convex setup
+**Research topics**: @anthropic-ai/claude-agent-sdk current API, TypeScript project structure, Convex Docker setup
 **Plans**: TBD
 
 ### Phase 2: Convex Schema & State Model
