@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-16)
+See: .planning/PROJECT.md (updated 2026-01-16 after adding Convex integration)
 
 **Core value:** Demonstrate working multi-agent coordination with clean, reusable patterns.
-**Current focus:** Phase 1 — Project Setup
+**Current focus:** Phase 1 — Project Setup (with Convex)
 
 ## Current Position
 
-Phase: 1 of 8 (Project Setup)
+Phase: 1 of 9 (Project Setup with Convex)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-01-16 — Roadmap created
+Last activity: 2026-01-16 — Roadmap restructured for Convex integration
 
 Progress: ░░░░░░░░░░ 0%
 
@@ -40,7 +40,10 @@ Progress: ░░░░░░░░░░ 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-(None yet)
+- Convex for agent state storage (sessions, orchestration state, workflow progress)
+- Filesystem for code artifacts (separation of concerns)
+- Claude Agent SDK functions exposed as Convex actions
+- Restructured roadmap to include dedicated Convex Schema phase
 
 ### Deferred Issues
 
@@ -53,5 +56,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Roadmap initialization complete
+Stopped at: PROJECT.md and ROADMAP.md updated with Convex integration
 Resume file: None

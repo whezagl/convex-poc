@@ -2,11 +2,11 @@
 
 ## Overview
 
-A journey from blank TypeScript project to a working multi-agent autonomous coding system. We'll build a clean implementation of the Planner → Coder → Reviewer pattern using Claude Agent SDK, demonstrating agent coordination with reusable patterns for future projects.
+A journey from blank TypeScript project to a working multi-agent autonomous coding system with Convex as the real-time state backend. We'll build a clean implementation of the Planner → Coder → Reviewer pattern using Claude Agent SDK + Convex actions, demonstrating agent coordination with reusable patterns for future projects.
 
 ## Domain Expertise
 
-None - Claude Agent SDK patterns are the focus, and this is a learning POC to establish those patterns.
+None - Claude Agent SDK patterns are the focus, and this is a learning POC to establish those patterns. Convex provides the persistent state layer.
 
 ## Phases
 
@@ -16,80 +16,89 @@ None - Claude Agent SDK patterns are the focus, and this is a learning POC to es
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Setup** - TypeScript project structure with Claude SDK integration
-- [ ] **Phase 2: Agent Foundation** - Base agent abstraction and session management
-- [ ] **Phase 3: Planner Agent** - Task decomposition and planning logic
-- [ ] **Phase 4: Coder Agent** - Code implementation with file operations
-- [ ] **Phase 5: Reviewer Agent** - Validation and quality checks
-- [ ] **Phase 6: Orchestration** - Agent handoff patterns and workflow coordination
-- [ ] **Phase 7: Example Task** - End-to-end demonstration with a simple coding task
-- [ ] **Phase 8: Documentation** - Pattern documentation and cleanup
+- [ ] **Phase 1: Project Setup** - TypeScript project with Convex and Claude SDK
+- [ ] **Phase 2: Convex Schema** - Define data models for sessions, workflows, agents
+- [ ] **Phase 3: Agent Foundation** - Base agent class with Convex state storage
+- [ ] **Phase 4: Planner Agent** - Task decomposition with Convex integration
+- [ ] **Phase 5: Coder Agent** - Code implementation with file operations
+- [ ] **Phase 6: Reviewer Agent** - Validation with Convex state tracking
+- [ ] **Phase 7: Orchestration** - Workflow coordination via Convex
+- [ ] **Phase 8: Example Task** - End-to-end demonstration
+- [ ] **Phase 9: Documentation** - Pattern documentation and cleanup
 
 ## Phase Details
 
 ### Phase 1: Project Setup
-**Goal**: TypeScript project with Claude SDK configured and build pipeline working
+**Goal**: TypeScript project with Convex deployment configured and Claude SDK integrated
 **Depends on**: Nothing (first phase)
-**Research**: Likely (Claude SDK current patterns, TypeScript project structure)
-**Research topics**: @anthropic-ai/sdk current API, project structure for agent systems
+**Research**: ✅ Complete (01-RESEARCH.md)
+**Research topics**: @anthropic-ai/claude-agent-sdk current API, TypeScript project structure, Convex setup
 **Plans**: TBD
 
-### Phase 2: Agent Foundation
-**Goal**: Base agent class with session management and client factory
+### Phase 2: Convex Schema & State Model
+**Goal**: Define Convex schema for agent sessions, orchestration state, and workflow progress
 **Depends on**: Phase 1
-**Research**: Likely (Claude Agent SDK session patterns, agent lifecycle)
-**Research topics**: SDK session creation, agent lifecycle management, client configuration
+**Research**: Likely (Convex data modeling patterns, real-time state design)
+**Research topics**: Convex schema best practices, state synchronization patterns, document modeling
 **Plans**: TBD
 
-### Phase 3: Planner Agent
-**Goal**: Agent that decomposes tasks into implementation steps
+### Phase 3: Agent Foundation with Convex
+**Goal**: Base agent class that integrates Claude SDK with Convex state storage
 **Depends on**: Phase 2
+**Research**: ✅ Complete (02-RESEARCH.md)
+**Research topics**: SDK session creation, agent lifecycle, Convex mutation patterns
+**Plans**: TBD
+
+### Phase 4: Planner Agent
+**Goal**: Agent that decomposes tasks and stores plans in Convex
+**Depends on**: Phase 3
 **Research**: Unlikely (internal prompt engineering, established planning patterns)
 **Plans**: TBD
 
-### Phase 4: Coder Agent
-**Goal**: Agent that implements code based on plans with file operations
-**Depends on**: Phase 2
+### Phase 5: Coder Agent
+**Goal**: Agent that implements code based on plans; tracks state in Convex; uses filesystem for artifacts
+**Depends on**: Phase 3
 **Research**: Unlikely (file I/O patterns, established in foundation)
 **Plans**: TBD
 
-### Phase 5: Reviewer Agent
-**Goal**: Agent that validates implementations against requirements
-**Depends on**: Phase 2
+### Phase 6: Reviewer Agent
+**Goal**: Agent that validates implementations; stores reviews in Convex
+**Depends on**: Phase 3
 **Research**: Unlikely (validation logic, established patterns)
 **Plans**: TBD
 
-### Phase 6: Orchestration
-**Goal**: Handoff patterns and agent workflow coordination
-**Depends on**: Phases 3, 4, 5
-**Research**: Likely (agent coordination patterns, workflow design)
-**Research topics**: Multi-agent patterns, handoff protocols, error handling in workflows
+### Phase 7: Orchestration
+**Goal**: Workflow coordination using Convex for state management and real-time sync
+**Depends on**: Phases 4, 5, 6
+**Research**: ⚠️ Needs update (06-RESEARCH.md exists, add Convex workflows)
+**Research topics**: Multi-agent patterns with Convex, handoff protocols, error handling, real-time orchestration
 **Plans**: TBD
 
-### Phase 7: Example Task
+### Phase 8: Example Task
 **Goal**: End-to-end demonstration with a simple coding task
-**Depends on**: Phase 6
+**Depends on**: Phase 7
 **Research**: Unlikely (applying established patterns)
 **Plans**: TBD
 
-### Phase 8: Documentation
+### Phase 9: Documentation
 **Goal**: Pattern documentation and code cleanup
-**Depends on**: Phase 7
+**Depends on**: Phase 8
 **Research**: Unlikely (documentation and cleanup)
 **Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Setup | 0/TBD | Not started | - |
-| 2. Agent Foundation | 0/TBD | Not started | - |
-| 3. Planner Agent | 0/TBD | Not started | - |
-| 4. Coder Agent | 0/TBD | Not started | - |
-| 5. Reviewer Agent | 0/TBD | Not started | - |
-| 6. Orchestration | 0/TBD | Not started | - |
-| 7. Example Task | 0/TBD | Not started | - |
-| 8. Documentation | 0/TBD | Not started | - |
+| 2. Convex Schema | 0/TBD | Not started | - |
+| 3. Agent Foundation | 0/TBD | Not started | - |
+| 4. Planner Agent | 0/TBD | Not started | - |
+| 5. Coder Agent | 0/TBD | Not started | - |
+| 6. Reviewer Agent | 0/TBD | Not started | - |
+| 7. Orchestration | 0/TBD | Not started | - |
+| 8. Example Task | 0/TBD | Not started | - |
+| 9. Documentation | 0/TBD | Not started | - |
