@@ -1,0 +1,36 @@
+{
+  "name": "convex-poc",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AI Agents POC with Claude Agent SDK and Convex state backend",
+  "scripts": {
+    "dev": "tsx",
+    "build": "tsup",
+    "test": "echo \"no tests yet\""
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "claude",
+    "convex"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.7",
+    "convex": "^1.31.4",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "@typescript-eslint/eslint-plugin": "^8.53.0",
+    "@typescript-eslint/parser": "^8.53.0",
+    "eslint": "^9.39.2",
+    "prettier": "^3.8.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
