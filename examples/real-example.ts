@@ -133,7 +133,7 @@ Export the function so it can be imported by other modules.`;
   console.log("\n─────────────────────────────────────────────────────────────\n");
 
   // UNCOMMENT BELOW TO EXECUTE FOR REAL:
-  /*
+  
   try {
     console.log("Starting workflow execution...\n");
 
@@ -215,7 +215,7 @@ Export the function so it can be imported by other modules.`;
     console.error("  3. Check network connectivity");
     console.error("  4. Ensure workspace directory is writable");
   }
-  */
+  
 
   console.log("⚠️  To execute for real:");
   console.log("    1. Set ANTHROPIC_API_KEY environment variable");
