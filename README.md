@@ -16,32 +16,32 @@ A proof-of-concept React application demonstrating real-time data synchronizatio
 
 ```mermaid
 graph TB
-    subgraph "User's Browser"
-        A[React App<br/>Port 3000]
-        B[View Data Page<br/>Real-time display]
-        C[Update Data Page<br/>Data editing form]
+    subgraph Browser["User's Browser"]
+        A[React App :3000]
+        B[View Page]
+        C[Update Page]
     end
 
-    subgraph "Docker Containers"
-        D[Convex Backend<br/>Ports 3210/3211<br/>SQLite Database]
-        E[Convex Dashboard<br/>Port 6791<br/>Admin UI]
+    subgraph Backend["Convex Backend :3210"]
+        D[BE + SQLite]
     end
 
-    subgraph "Host Machine"
-        F[Python Deploy Script<br/>deploy.py]
-        G[NPM Scripts<br/>gen-admin-key, seed-data]
+    subgraph Dashboard["Convex Dashboard :6791"]
+        E[Admin UI]
     end
 
-    A -->|WebSocket| D
+    subgraph Host["Host Machine"]
+        F[deploy.py]
+        G[NPM Scripts]
+    end
+
     B --> A
-    C -->|HTTP Mutation| A
-    A --> B
-    A --> C
-
+    C --> A
+    A -->|WebSocket| D
     F -.->|Orchestrates| D
     F -.->|Orchestrates| E
-    E -.->|Admin Access| D
-    G -.->|Executes in container| D
+    E -.->|Admin| D
+    G -.->|Exec| D
 
     style D fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
     style E fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff

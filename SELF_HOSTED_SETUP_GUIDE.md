@@ -22,7 +22,7 @@ flowchart TB
         ReactApp[React + Vite App<br/>Port 3000]
     end
 
-    subgraph Convex["Convex Backend (Self-Hosted)"]
+    subgraph Convex["Convex BE (Self-Hosted)"]
         Backend[Convex Backend<br/>Port 3210<br/>Stores Data & Runs Functions]
         Dashboard[Convex Dashboard<br/>Port 6791<br/>Admin Interface]
     end

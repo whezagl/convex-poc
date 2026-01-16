@@ -332,29 +332,29 @@ The palette in this guide meets **WCAG AAA** standards.
 ## Summary Card
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    MERMAID ACCESSIBILITY                        │
-├─────────────────────────────────────────────────────────────────┤
+┌──────────────────────────────────────────────────────────────────┐
+│                    MERMAID ACCESSIBILITY                         │
+├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  Flowchart Style:                                                │
-│  style X fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff   │
-│              │      │         │              │          │       │
+│  style X fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff    │
+│              │      │         │              │          │        │
 │              │      │         │              │          └─ white │
 │              │      │         │              └─ 3px thick border │
-│              │      │         └─ black border                   │
-│              │      └─ dark orange (use palette)               │
-│              └─ node name                                         │
+│              │      │         └─ black border                    │
+│              │      └─ dark orange (use palette)                 │
+│              └─ node name                                        │
 │                                                                  │
 │  Sequence Diagram:                                               │
 │  rect rgb(232, 93, 4)                                            │
-│      (wrap steps in colored block)                              │
+│      (wrap steps in colored block)                               │
 │  end                                                             │
 │                                                                  │
 │  Key Colors:                                                     │
-│  Navy #2B2D42  │  Orange #E85D04  │  Blue #0077B6               │
-│  Teal #2A9D8F  │  Purple #6A4C93  │  Red #DC2F02                │
+│  Navy #2B2D42  │  Orange #E85D04  │  Blue #0077B6                │
+│  Teal #2A9D8F  │  Purple #6A4C93  │  Red #DC2F02                 │
 │                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
