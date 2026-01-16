@@ -373,6 +373,235 @@ The `overallStatus` is determined automatically based on the issues found:
 | **CoderAgent** | Implementation work | `CodeResult` with file changes | 5 |
 | **ReviewerAgent** | Validation and testing | `ReviewResult` with issues, approval | 6 |
 
+## Orchestration
+
+The `SequentialOrchestrator` coordinates multi-agent workflows by executing specialized agents in sequence: Planner → Coder → Reviewer. It manages state passing between agents via filesystem artifacts and integrates with Convex for workflow tracking.
+
+### Basic Usage
+
+```typescript
+import { SequentialOrchestrator } from "./orchestrator/index.js";
+
+// Configure the orchestrator
+const config = {
+  workspace: "./workspace",
+  continueOnError: false, // optional, defaults to false
+};
+
+// Create orchestrator instance
+const orchestrator = new SequentialOrchestrator(config);
+
+// Define the workflow context
+const context = {
+  task: "Create a User model with authentication",
+  workspace: "./workspace",
+  workflowId: workflowId, // optional, for Convex tracking
+};
+
+// Execute the workflow
+const result = await orchestrator.executeWorkflow(context);
+
+// Check result
+if (result.success) {
+  console.log("Workflow completed successfully!");
+  console.log(`Steps executed: ${result.steps.length}`);
+  console.log(`Artifacts created: ${result.artifacts.length}`);
+
+  // Access final review
+  if (result.finalReview) {
+    console.log(`Overall status: ${result.finalReview.overallStatus}`);
+  }
+} else {
+  console.log("Workflow failed");
+  // Check which steps failed
+  for (const step of result.steps) {
+    if (step.status === "failed") {
+      console.log(`${step.name} failed: ${step.error}`);
+    }
+  }
+}
+```
+
+### Workflow Flow
+
+The orchestrator executes agents in a sequential pipeline:
+
+1. **Planning** (`PlannerAgent`): Breaks down the task into actionable steps
+2. **Coding** (`CoderAgent`): Implements code based on the plan
+3. **Review** (`ReviewerAgent`): Validates the implementation
+
+Each agent's output is saved to the workspace as a JSON artifact:
+- `workspace/plan.json`: Planner output (PlanResult)
+- `workspace/code.json`: Coder output (CodeResult)
+- `workspace/review.json`: Reviewer output (ReviewResult)
+
+### Configuration Options
+
+The `ExecuteWorkflowConfig` interface accepts:
+
+- **workspace** (required): Filesystem path for artifact storage
+- **continueOnError** (optional): Whether to continue workflow after non-fatal errors (defaults to false)
+
+### WorkflowContext
+
+The `WorkflowContext` interface accepts:
+
+- **task** (required): The task description to execute
+- **workspace** (required): The filesystem path for artifact storage
+- **workflowId** (optional): Convex workflow ID for state tracking
+
+### WorkflowResult Structure
+
+```typescript
+interface WorkflowResult {
+  success: boolean;              // Whether the workflow completed successfully
+  steps: WorkflowStep[];         // All workflow steps with their results
+  artifacts: Artifact[];         // Artifacts produced during execution
+  finalReview?: ReviewResult;    // Final review result if available
+}
+
+interface WorkflowStep {
+  name: string;                  // Human-readable name of the step
+  agent: string;                 // Type of agent that executed this step
+  status: "pending" | "in_progress" | "completed" | "failed";
+  startTime: number;             // Timestamp when the step started
+  endTime?: number;              // Timestamp when the step completed
+  output?: string;               // Output from the agent execution
+  error?: string;                // Error message if the step failed
+}
+```
+
+### continueOnError Behavior
+
+When `continueOnError` is `false` (default):
+- Planner fails → Workflow stops (no plan to execute)
+- Coder fails → Workflow stops (no code to review)
+- Reviewer fails → Workflow completes with error status
+
+When `continueOnError` is `true`:
+- Planner fails → Workflow stops (no plan to execute)
+- Coder fails → Reviewer still runs (reviews partial implementation)
+- Reviewer fails → Workflow completes with error status
+
+Workflow success is determined by:
+- `continueOnError=false`: All steps must complete successfully
+- `continueOnError=true`: Reviewer must complete (even if Coder failed)
+
+### Convex Integration
+
+When a `workflowId` is provided, the orchestrator integrates with Convex:
+
+```typescript
+const context = {
+  task: "Create a User model",
+  workspace: "./workspace",
+  workflowId: workflowId, // Associates execution with Convex workflow
+};
+
+const result = await orchestrator.executeWorkflow(context);
+
+// Convex operations performed:
+// 1. Creates workflow session on start
+// 2. Updates workflow status on each step
+// 3. Saves final result on completion
+```
+
+Convex integration provides:
+- **Session Tracking**: Each agent execution is tracked as a session
+- **Persistent State**: Workflow state survives process restarts
+- **Queryable History**: Query workflow status and results via Convex
+
+### Error Handling
+
+The orchestrator handles errors at multiple levels:
+
+```typescript
+try {
+  const result = await orchestrator.executeWorkflow(context);
+
+  if (!result.success) {
+    // Find the first failed step
+    const failedStep = result.steps.find(s => s.status === "failed");
+
+    if (failedStep) {
+      console.log(`Workflow failed at: ${failedStep.name}`);
+      console.log(`Error: ${failedStep.error}`);
+
+      // Handle specific agent failures
+      switch (failedStep.agent) {
+        case "planner":
+          console.log("Task may be too vague or complex");
+          break;
+        case "coder":
+          console.log("Plan may be ambiguous or incomplete");
+          break;
+        case "reviewer":
+          console.log("Code output may be malformed");
+          break;
+      }
+    }
+  }
+} catch (error) {
+  // Handle unexpected errors
+  console.error("Workflow execution error:", error);
+}
+```
+
+### Inspecting Artifacts
+
+After workflow execution, inspect artifacts to understand the workflow:
+
+```typescript
+import { readFile } from "fs/promises";
+import { join } from "path";
+
+// Read plan artifact
+const planContent = await readFile(join("./workspace", "plan.json"), "utf-8");
+const plan = JSON.parse(planContent);
+console.log(`Plan has ${plan.steps.length} steps`);
+
+// Read code artifact
+const codeContent = await readFile(join("./workspace", "code.json"), "utf-8");
+const code = JSON.parse(codeContent);
+console.log(`Code has ${code.changes.length} file changes`);
+
+// Read review artifact
+const reviewContent = await readFile(join("./workspace", "review.json"), "utf-8");
+const review = JSON.parse(reviewContent);
+console.log(`Review status: ${review.overallStatus}`);
+```
+
+### Orchestration vs Individual Agents
+
+| Approach | When to Use | Benefits |
+|----------|------------|----------|
+| **SequentialOrchestrator** | Complete task execution (plan → code → review) | Automated pipeline, state management, error handling |
+| **Individual Agents** | Single-step operations or custom workflows | Fine-grained control, custom orchestration |
+
+### Orchestrator Comparison
+
+| Component | Purpose | Output |
+|-----------|---------|--------|
+| **SequentialOrchestrator** | Coordinates multi-agent workflow | `WorkflowResult` with all steps and artifacts |
+| **PlannerAgent** | Task decomposition | `PlanResult` with steps and dependencies |
+| **CoderAgent** | Code implementation | `CodeResult` with file changes |
+| **ReviewerAgent** | Code validation | `ReviewResult` with issues and approval |
+
+### Architecture Decisions
+
+1. **Sequential Execution**: Chosen over parallel for simpler state management and clearer dependencies
+2. **Filesystem State**: JSON artifacts enable inspection, debugging, and workflow persistence
+3. **Error Boundaries**: Each step wrapped in try-catch for graceful degradation
+4. **Convex Integration**: Optional workflow tracking without requiring Convex for basic operation
+
+### Future Enhancements
+
+- [ ] Parallel subagent execution for independent steps
+- [ ] Workflow resumption from checkpoints
+- [ ] Custom agent pipelines (not just Planner→Coder→Reviewer)
+- [ ] Artifact versioning and history
+- [ ] Workflow visualization and debugging UI
+
 ## Protected Methods
 
 Subclasses can access these protected methods:
