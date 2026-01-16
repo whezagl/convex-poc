@@ -170,9 +170,95 @@ const planWithWorkflow = await planner.executeWithWorkflow(
 
 ### PlannerAgent vs Other Agents
 
-- **PlannerAgent**: Task decomposition and planning only (does not execute)
-- **CoderAgent**: Implementation work (Phase 5)
-- **ReviewerAgent**: Validation and testing (Phase 6)
+| Agent | Purpose | Output | Phase |
+|-------|---------|--------|-------|
+| **PlannerAgent** | Task decomposition and planning | `PlanResult` with steps, dependencies | 4 |
+| **CoderAgent** | Implementation work | `CodeResult` with file changes | 5 |
+| **ReviewerAgent** | Validation and testing | Review results (Phase 6) | 6 |
+
+## Example: CoderAgent
+
+`CoderAgent` is a specialized agent for code implementation and file operations:
+
+```typescript
+import { CoderAgent } from "./agents/index.js";
+
+// Create coder with default settings
+const coder = new CoderAgent({
+  agentType: "coder",
+  // maxChanges: 10, // optional, limits number of file changes
+  // allowedPaths: ["src/", "lib/"], // optional, restricts where files can be written
+});
+
+// Generate code changes for a task
+const code = await coder.executeCode("Create a User model with email and password fields");
+
+console.log("Changes:", code.changes);
+// [
+//   {
+//     path: "src/models/User.ts",
+//     content: "export class User { ... }",
+//     operation: "create"
+//   }
+// ]
+
+console.log("Summary:", code.summary);
+// "Created User model with email and password fields"
+
+console.log("Files modified:", code.filesModified);
+// ["src/models/User.ts"]
+
+// Execute with Convex workflow tracking
+const codeWithWorkflow = await coder.executeWithWorkflow(
+  "Create a User model with email and password fields",
+  workflowId
+);
+```
+
+### CoderAgent Features
+
+- **Code Implementation**: Generates complete, working code based on plan descriptions
+- **File Operations**: Supports three operation types:
+  - `create`: Create new files
+  - `update`: Modify existing files
+  - `delete`: Remove files
+- **Path Restriction**: Optional `allowedPaths` for safety (limits where agent can write)
+- **Change Limits**: Optional `maxChanges` to control scope (default: 10)
+- **Structured Output**: Returns typed `CodeResult` interface for programmatic use
+
+### CoderConfig Options
+
+The `CoderConfig` interface extends `AgentConfig` with:
+
+- **agentType** (inherited): Type identifier for the agent (defaults to "coder")
+- **model** (inherited): Model name to use (defaults to "sonnet")
+- **workflowId** (inherited): Associated Convex workflow ID for session tracking
+- **maxChanges** (coder-specific): Maximum number of file changes (default: 10)
+- **allowedPaths** (coder-specific): Optional array of allowed file paths for safety
+
+### CodeResult Structure
+
+```typescript
+interface CodeResult {
+  changes: FileChange[];      // Array of file change operations (1-10 items)
+  summary: string;            // Human-readable description of changes
+  filesModified: string[];    // Array of file paths that were modified
+}
+
+interface FileChange {
+  path: string;               // File path relative to project root
+  content: string;            // File content (for create/update operations)
+  operation: "create" | "update" | "delete";  // Type of operation
+}
+```
+
+### CoderAgent vs Other Agents
+
+| Agent | Purpose | Output | Phase |
+|-------|---------|--------|-------|
+| **PlannerAgent** | Task decomposition and planning | `PlanResult` with steps, dependencies | 4 |
+| **CoderAgent** | Implementation work | `CodeResult` with file changes | 5 |
+| **ReviewerAgent** | Validation and testing | Review results (Phase 6) | 6 |
 
 ## Protected Methods
 
