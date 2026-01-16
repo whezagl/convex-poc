@@ -91,6 +91,12 @@ Recent decisions affecting current work:
 - Claude Agent SDK functions exposed as Convex actions
 - Restructured roadmap to include dedicated Convex Schema phase
 
+### Pending Todos
+
+**Updated: 2026-01-17**
+
+1 pending todo.
+
 ### Deferred Issues
 
 **Updated: 2026-01-17**
