@@ -96,26 +96,34 @@ sequenceDiagram
     participant Git as Git Repository
     participant Ign as .gitignore
 
-    Note over Conv,Ign: Phase 1: Existing Setup (Correct)
-    Ign->>Git: .env is ignored
-    Dev->>Git: .env exists with admin key
-    Git-->>Dev: Secrets safe (not committed)
+    rect rgb(42, 157, 143)
+        Note over Conv,Ign: Phase 1: Existing Setup (Correct)
+        Ign->>Git: .env is ignored
+        Dev->>Git: .env exists with admin key
+        Git-->>Dev: Secrets safe (not committed)
+    end
 
-    Note over Conv,Ign: Phase 2: Test Implementation (Mistake)
-    Conv->>Dev: "Need ZAI_API_KEY"
-    Dev->>Dev: Created .env.local
-    Dev->>Dev: Put secrets in .env.local
-    Dev->>Git: git add .env.local
-    Git-->>Dev: File added (not ignored!)
+    rect rgb(220, 47, 2)
+        Note over Conv,Ign: Phase 2: Test Implementation (Mistake)
+        Conv->>Dev: "Need ZAI_API_KEY"
+        Dev->>Dev: Created .env.local
+        Dev->>Dev: Put secrets in .env.local
+        Dev->>Git: git add .env.local
+        Git-->>Dev: File added (not ignored!)
+    end
 
-    Note over Conv,Ign: Phase 3: Commit (Security Issue)
-    Dev->>Git: git commit
-    Git-->>Dev: Secrets committed to history
+    rect rgb(220, 47, 2)
+        Note over Conv,Ign: Phase 3: Commit (Security Issue)
+        Dev->>Git: git commit
+        Git-->>Dev: Secrets committed to history
+    end
 
-    Note over Conv,Ign: Phase 4: Discovery
-    Conv->>Dev: "Why not use .env?"
-    Dev->>Ign: Check .gitignore
-    Ign-->>Dev: .env is ignored, .env.local is NOT
+    rect rgb(0, 119, 182)
+        Note over Conv,Ign: Phase 4: Discovery
+        Conv->>Dev: "Why not use .env?"
+        Dev->>Ign: Check .gitignore
+        Ign-->>Dev: .env is ignored, .env.local is NOT
+    end
 ```
 
 ---
