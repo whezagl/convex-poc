@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-16 after adding Convex integration)
 
 **Core value:** Demonstrate working multi-agent coordination with clean, reusable patterns.
-**Current focus:** Phase 9 — Documentation (complete)
+**Current focus:** Phase 10 — Convex Deployment (complete)
 
-**Project Status: ✅ COMPLETE**
+**Project Status: ✅ COMPLETE WITH POST-PROJECT DELIVERY**
 
 ## Current Position
 
-Phase: 9 of 9 (Documentation)
+Phase: 10 of 10 (Convex Deployment - Post-Project)
 Plan: 1 of 1 complete
-Status: **PROJECT COMPLETE** — All 9 phases delivered
-Last activity: 2026-01-16 — Completed 09-01-PLAN.md
+Status: **PROJECT COMPLETE + POST-PROJECT PHASE DELIVERED** — All 10 phases delivered
+Last activity: 2026-01-16 — Completed 10-01-PLAN.md
 
 Progress: ████████████ 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 10.0 min
-- Total execution time: 154 min (2h 34m)
+- Total plans completed: 12
+- Average duration: 10.8 min
+- Total execution time: 164 min (2h 44m)
 
 **By Phase:**
 
@@ -38,10 +38,11 @@ Progress: ████████████ 100%
 | 07-orchestration | 1 | 1 | 18 min |
 | 08-example-task | 1 | 1 | 8 min |
 | 09-documentation | 1 | 1 | 44 min |
+| 10-convex-deployment | 1 | 1 | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (9 min), 06-01 (7 min), 07-01 (18 min), 08-01 (8 min), 09-01 (44 min)
-- Trend: Final documentation phase took longer due to comprehensive pattern guide and completion summary
+- Last 5 plans: 06-01 (7 min), 07-01 (18 min), 08-01 (8 min), 09-01 (44 min), 10-01 (10 min)
+- Trend: Post-project deployment completed quickly; automated testing with Playwright added
 
 ## Accumulated Context
 
@@ -50,6 +51,11 @@ Progress: ████████████ 100%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- **Phase 10-01:** Self-hosted Convex backend deployed with convex/server ConvexClient (not convex-dev package)
+- **Phase 10-01:** Admin key format requires `convex-self-hosted|` prefix for authentication
+- **Phase 10-01:** BaseAgent hooks use correct HookInput properties (SessionStart: session_id, source; SessionEnd: reason)
+- **Phase 10-01:** execute() stores currentInput/currentOutput for Convex tracking (hooks don't have prompt/result)
+- **Phase 10-01:** Added Playwright for automated testing of dashboard accessibility
 - **Phase 09-01:** Created src/index.ts to fix pre-existing build gap (missing entry point for tsup bundling)
 - **Phase 09-01:** Documented Convex placeholder as intentional POC scope decision (design complete, deployment optional)
 - **Phase 09-01:** Comprehensive pattern documentation (PATTERNS.md) as key deliverable for future project reuse
@@ -89,27 +95,35 @@ Recent decisions affecting current work:
 
 **Updated: 2026-01-17**
 
-Created `.planning/ISSUES.md` with proper issue tracking.
+All issues resolved.
 
-**Open Issues:**
-- **ISS-001:** Self-hosted Convex backend deployment (re-opened - was incorrectly marked as resolved in Phase 09; project was documented as complete with placeholder, not actually resolved)
-- **ISS-002:** SDK response output extraction (newly discovered from TODO audit)
+**Resolved Issues:**
+- **ISS-001:** Self-hosted Convex backend deployment — RESOLVED in Phase 10
+  - Backend deployed via Docker Compose
+  - Admin key configured with correct format
+  - 6 functions deployed (3 mutations, 3 queries)
+  - Real ConvexClient integration in BaseAgent
+- **ISS-002:** SDK response output extraction — RESOLVED in Phase 10
+  - execute() method now stores currentInput/currentOutput
+  - Hooks use instance variables for Convex tracking
+  - Proper message text extraction from SDK responses
 
 See ISSUES.md for full details.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Completed 09-01-PLAN.md (Documentation) — **PROJECT COMPLETE**
+Stopped at: Completed 10-01-PLAN.md (Convex Deployment) — **PROJECT COMPLETE + POST-PROJECT DELIVERY**
 Resume file: None
 
 **Project Delivered:**
-- 9 phases, 11 plans
-- 154 min total execution (2h 34m)
+- 10 phases, 12 plans
+- 164 min total execution (2h 44m)
 - 126+ passing tests
 - Comprehensive pattern documentation (PATTERNS.md)
 - Complete project summary (COMPLETION.md)
+- Self-hosted Convex backend deployed and integrated (Phase 10)
