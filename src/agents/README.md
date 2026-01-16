@@ -258,7 +258,120 @@ interface FileChange {
 |-------|---------|--------|-------|
 | **PlannerAgent** | Task decomposition and planning | `PlanResult` with steps, dependencies | 4 |
 | **CoderAgent** | Implementation work | `CodeResult` with file changes | 5 |
-| **ReviewerAgent** | Validation and testing | Review results (Phase 6) | 6 |
+| **ReviewerAgent** | Validation and testing | `ReviewResult` with issues, approval | 6 |
+
+## Example: ReviewerAgent
+
+`ReviewerAgent` is a specialized agent for code validation and review:
+
+```typescript
+import { ReviewerAgent } from "./agents/index.js";
+
+// Create reviewer with default settings
+const reviewer = new ReviewerAgent({
+  agentType: "reviewer",
+  // maxIssues: 20, // optional, limits number of issues reported
+  // severity: "warning", // optional, minimum severity level ("error" | "warning" | "info")
+});
+
+// Review code changes
+const review = await reviewer.executeReview("Review this User model for security issues");
+
+console.log("Issues:", review.issues);
+// [
+//   {
+//     severity: "error",
+//     file: "src/models/User.ts",
+//     line: 15,
+//     message: "Missing input validation on email field",
+//     suggestion: "Add email format validation using a regex or validator library"
+//   },
+//   {
+//     severity: "warning",
+//     file: "src/models/User.ts",
+//     line: 20,
+//     message: "Password stored in plain text",
+//     suggestion: "Use bcrypt or argon2 for password hashing"
+//   }
+// ]
+
+console.log("Summary:", review.summary);
+// "Found 1 error and 1 warning that should be addressed"
+
+console.log("Overall status:", review.overallStatus);
+// "rejected" (because there's an error)
+
+console.log("Files reviewed:", review.filesReviewed);
+// ["src/models/User.ts"]
+
+// Execute with Convex workflow tracking
+const reviewWithWorkflow = await reviewer.executeWithWorkflow(
+  "Review this User model for security issues",
+  workflowId
+);
+```
+
+### ReviewerAgent Features
+
+- **Code Validation**: Reviews code for correctness, security, and best practices
+- **Severity Levels**: Categorizes issues by impact:
+  - `error`: Blocking issues that must be fixed (security vulnerabilities, crashes, data loss)
+  - `warning`: Non-blocking issues that should be addressed (code quality, performance, maintainability)
+  - `info`: Observations and suggestions for improvement (style, minor optimizations)
+- **Approval Status**: Determines overall status based on issues found:
+  - `approved`: No issues, or only info-level issues
+  - `needs-changes`: Has warnings but no errors
+  - `rejected`: Has one or more errors
+- **Structured Output**: Returns typed `ReviewResult` interface for programmatic use
+- **Configurable Limits**: Optional `maxIssues` to control output size (default: 20)
+- **Severity Filtering**: Optional `severity` setting to focus on specific issue levels
+
+### ReviewerConfig Options
+
+The `ReviewerConfig` interface extends `AgentConfig` with:
+
+- **agentType** (inherited): Type identifier for the agent (defaults to "reviewer")
+- **model** (inherited): Model name to use (defaults to "sonnet")
+- **workflowId** (inherited): Associated Convex workflow ID for session tracking
+- **maxIssues** (reviewer-specific): Maximum number of issues to report (default: 20)
+- **severity** (reviewer-specific): Minimum severity level to report ("error" | "warning" | "info")
+
+### ReviewResult Structure
+
+```typescript
+interface ReviewResult {
+  issues: ReviewIssue[];      // Array of review issues (0-20 items)
+  summary: string;            // Human-readable summary of the review
+  overallStatus: "approved" | "needs-changes" | "rejected";  // Final decision
+  filesReviewed: string[];    // Array of file paths that were reviewed
+}
+
+interface ReviewIssue {
+  severity: "error" | "warning" | "info";  // Impact level
+  file: string;               // File path where the issue was found
+  line: number;               // Line number where the issue occurs
+  message: string;            // Clear description of the issue
+  suggestion: string;         // Recommended fix or improvement
+}
+```
+
+### Overall Status Determination
+
+The `overallStatus` is determined automatically based on the issues found:
+
+| Issues Found | Overall Status |
+|--------------|----------------|
+| No issues, or only `info` level | `approved` |
+| Has `warning` but no `error` | `needs-changes` |
+| Has one or more `error` | `rejected` |
+
+### ReviewerAgent vs Other Agents
+
+| Agent | Purpose | Output | Phase |
+|-------|---------|--------|-------|
+| **PlannerAgent** | Task decomposition and planning | `PlanResult` with steps, dependencies | 4 |
+| **CoderAgent** | Implementation work | `CodeResult` with file changes | 5 |
+| **ReviewerAgent** | Validation and testing | `ReviewResult` with issues, approval | 6 |
 
 ## Protected Methods
 
