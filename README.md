@@ -43,9 +43,11 @@ graph TB
     E -.->|Admin Access| D
     G -.->|Executes in container| D
 
-    style D fill:#e1f5ff
-    style E fill:#fff4e1
-    style A fill:#f0e1ff
+    style D fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style E fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style A fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style F fill:#6A4C93,stroke:#000,stroke-width:2px,color:#fff
+    style G fill:#6A4C93,stroke:#000,stroke-width:2px,color:#fff
 ```
 
 **What this diagram shows:**
@@ -58,35 +60,44 @@ graph TB
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant BrowserA as Browser A<br/>(View Page)
     participant BrowserB as Browser B<br/>(Update Page)
     participant React as React App<br/>(useQuery hook)
     participant Convex as Convex Backend<br/>(WebSocket)
     participant DB as SQLite Database
 
-    Note over BrowserA,DB: Initial Data Load
-    BrowserA->>React: Component mounts
-    React->>Convex: WebSocket connection
-    Convex->>DB: Query data
-    DB-->>Convex: Return data
-    Convex-->>React: Send initial data
-    React-->>BrowserA: Display data
+    rect rgb(42, 157, 143)
+        Note over BrowserA,DB: Initial Data Load
+        BrowserA->>React: Component mounts
+        React->>Convex: WebSocket connection
+        Convex->>DB: Query data
+        DB-->>Convex: Return data
+        Convex-->>React: Send initial data
+        React-->>BrowserA: Display data
+    end
 
-    Note over BrowserB,DB: Real-Time Update
-    BrowserB->>React: Submit form (update data)
-    React->>Convex: Mutation request
-    Convex->>DB: Update record
-    DB-->>Convex: Confirm update
-    Convex-->>BrowserB: Success response
+    rect rgb(232, 93, 4)
+        Note over BrowserB,DB: Real-Time Update
+        BrowserB->>React: Submit form (update data)
+        React->>Convex: Mutation request
+        Convex->>DB: Update record
+        DB-->>Convex: Confirm update
+        Convex-->>BrowserB: Success response
+    end
 
-    Note over Convex,BrowserA: Instant Propagation
-    Convex->>Convex: Detect data change
-    Convex-->>BrowserA: Push update via WebSocket
-    BrowserA->>React: Trigger re-render
-    React-->>BrowserA: Display updated data (no refresh!)
+    rect rgb(0, 119, 182)
+        Note over Convex,BrowserA: Instant Propagation
+        Convex->>Convex: Detect data change
+        Convex-->>BrowserA: Push update via WebSocket
+        BrowserA->>React: Trigger re-render
+        React-->>BrowserA: Display updated data (no refresh!)
+    end
 
-    Note over BrowserA,BrowserB: Key Point
-    Note over BrowserA,BrowserB: Browser A sees changes<br/>instantly WITHOUT refreshing!
+    rect rgb(106, 76, 147)
+        Note over BrowserA,BrowserB: Key Point
+        Note over BrowserA,BrowserB: Browser A sees changes<br/>instantly WITHOUT refreshing!
+    end
 ```
 
 **What this diagram shows:**
