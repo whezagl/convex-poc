@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Convex Schema | 2/2 | Complete | 2026-01-16 |
 | 3. Agent Foundation | 1/1 | Complete | 2026-01-16 |
 | 4. Planner Agent | 1/1 | Complete | 2026-01-16 |
-| 5. Coder Agent | 0/TBD | Not started | - |
+| 5. Coder Agent | 1/1 | Complete | 2026-01-16 |
 | 6. Reviewer Agent | 0/TBD | Not started | - |
 | 7. Orchestration | 0/TBD | Not started | - |
 | 8. Example Task | 0/TBD | Not started | - |
