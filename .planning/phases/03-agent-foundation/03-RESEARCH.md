@@ -1,425 +1,384 @@
-# Phase 2: Agent Foundation - Research
+# Phase 3: Agent Foundation with Convex - Research
 
 **Researched:** 2026-01-16
-**Domain:** Claude Agent SDK session patterns and agent lifecycle management
+**Domain:** Claude Agent SDK + Convex state management
 **Confidence:** HIGH
 
+<research_summary>
 ## Summary
 
-Researched the Claude Agent SDK's session management, agent lifecycle, and client factory patterns. The SDK provides automatic session creation, resumption with context preservation, and forking for branching conversations. Sessions are the foundation for building stateful agents that maintain conversation history across multiple interactions.
+Researched the Claude Agent SDK TypeScript API, architecture patterns for base class design, and Convex integration patterns for state persistence. The SDK provides a `query()` function that returns an async generator for streaming messages, with extensive hook support for session management.
 
-Key finding: The SDK handles session lifecycle automatically - creating sessions on first query, returning session IDs in system init messages, and supporting resumption via the `resume` option. Forking sessions enables parallel exploration without modifying the original. The `agents` option in `query()` is the standard pattern for defining subagents with specialized prompts, tools, and model preferences.
+Key findings:
+- **No built-in base class pattern exists** in the SDK — the SDK is functional, not object-oriented. We need to design our own BaseAgent class.
+- **Hooks are the extension point** — `SessionStart`, `SessionEnd`, `SubagentStart`, `SubagentStop` hooks provide lifecycle management.
+- **Manual state persistence matches user preference** — the SDK requires explicit session resumption via `resume` parameter.
+- **Convex integration is straightforward** — use existing Convex functions (created in Phase 2) within hook callbacks.
 
-**Primary recommendation:** Don't build custom session management or agent lifecycle code. Use the SDK's built-in session handling with `resume` and `forkSession` options. Define base agent classes that wrap `query()` with common configuration (model, tools, permissions), and create specialized agents by extending with custom prompts.
+**Primary recommendation:** Design an abstract BaseAgent class that wraps `query()` with hooks for Convex persistence, uses protected methods for state management, and requires subclasses to implement agent-specific behavior.
+</research_summary>
 
+<standard_stack>
 ## Standard Stack
 
 ### Core
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| @anthropic-ai/claude-agent-sdk | Latest (0.x in 2025) | Session management, query execution | Built-in session lifecycle, resumption, forking |
-| @anthropic-ai/sdk | Latest | Types for Message API | Required dependency, type definitions |
+| @anthropic-ai/claude-agent-sdk | Latest (0.x) | Claude Agent SDK | Official SDK, provides query() function and hooks |
+| @anthropic-ai/sdk | Peer dependency | Anthropic API client | Required by Agent SDK |
+| convex | ^1.17.0 | Convex backend | Already installed, schema deployed in Phase 2 |
 
-### Development
+### Supporting
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| zod | Latest | Input schema validation | For custom tool definitions (if needed) |
+| zod | Peer dependency | Schema validation | Used by SDK for tool definitions (not needed for base class) |
 
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| SDK sessions | Custom session storage | SDK handles persistence, context limits, compaction automatically |
-| agents option | Manual client spawning | SDK provides proper isolation, context management, coordination |
+| Class-based base | Functional composition | User prefers class inheritance; composition would require different pattern |
 
 **Installation:**
 ```bash
-npm install @anthropic-ai/claude-agent-sdk zod
+npm install @anthropic-ai/claude-agent-sdk
+# Note: Already installed from Phase 1 setup
 ```
+</standard_stack>
 
+<architecture_patterns>
 ## Architecture Patterns
 
 ### Recommended Project Structure
 ```
 src/
 ├── agents/
-│   ├── base/
-│   │   └── Agent.ts          # Base agent class with common config
-│   ├── planner/              # Planner agent implementation
-│   ├── coder/                # Coder agent implementation
-│   └── reviewer/             # Reviewer agent implementation
-├── types/
-│   └── agent.ts              # Agent-related TypeScript types
-└── index.ts
+│   ├── BaseAgent.ts      # Abstract base class with Convex integration
+│   ├── DummyAgent.ts     # Simple test agent (proves pattern)
+│   └── index.ts          # Export all agents
+├── model/
+│   ├── agents.ts         # Agent session helpers (from Phase 2)
+│   └── workflows.ts      # Workflow helpers (from Phase 2)
+└── types/
+    └── agent.ts          # Agent-specific TypeScript types
 ```
 
-### Pattern 1: Base Agent Class
-**What:** Wrapper around `query()` with shared configuration
-**When to use:** Foundation for all specialized agents
+### Pattern 1: Abstract Base Class with Protected Methods
+**What:** Abstract BaseAgent class with protected Convex integration methods
+**When to use:** When multiple agent types need shared state persistence logic
 **Example:**
 ```typescript
-// Source: SDK session management docs
-import { query } from '@anthropic-ai/claude-agent-sdk'
+// Source: Based on Claude Agent SDK patterns
+import { query, Options, SDKMessage } from '@anthropic-ai/claude-agent-sdk';
+import { v } from 'convex/values';
+import type { Id } from './_generated/dataModel';
 
-interface AgentConfig {
-  model?: string
-  tools?: string[]
-  permissionMode?: 'default' | 'bypassPermissions'
+export interface AgentConfig {
+  agentType: string;
+  model?: string;
+  workflowId?: Id<'workflows'>;
 }
 
-abstract class BaseAgent {
-  protected config: AgentConfig
+export abstract class BaseAgent {
+  protected sessionId: string | null = null;
+  protected readonly agentType: string;
+  protected readonly workflowId?: Id<'workflows'>;
 
   constructor(config: AgentConfig) {
-    this.config = {
-      model: 'claude-sonnet-4-5',
-      tools: ['Read', 'Write', 'Edit', 'Grep', 'Glob'],
-      permissionMode: 'bypassPermissions',
-      ...config
-    }
+    this.agentType = config.agentType;
+    this.workflowId = config.workflowId;
   }
 
-  protected async execute(prompt: string, options = {}) {
-    return query({
-      prompt,
-      options: { ...this.config, ...options }
-    })
+  // Abstract: subclasses implement their specific prompt
+  protected abstract getSystemPrompt(): string;
+
+  // Protected: Convex state management (manual, as user prefers)
+  protected async saveSession(data: {
+    status: string;
+    output?: string;
+    error?: string;
+  }): Promise<void> {
+    // Call Convex mutation from Phase 2
+    // Uses model/updateAgentSession
   }
 
-  abstract executeTask(input: string): Promise<string>
-}
-```
-
-### Pattern 2: Session Creation and Capture
-**What:** Extract session ID from system init message
-**When to use:** Any agent that needs session persistence
-**Example:**
-```typescript
-// Source: Session management docs
-import { query } from '@anthropic-ai/claude-agent-sdk'
-
-async function createSession() {
-  const response = query({
-    prompt: 'Help me build a web application',
-    options: { model: 'claude-sonnet-4-5' }
-  })
-
-  let sessionId: string | undefined
-
-  for await (const message of response) {
-    if (message.type === 'system' && message.subtype === 'init') {
-      sessionId = message.session_id
-      console.log(`Session started: ${sessionId}`)
-    }
+  // Protected: Load existing session for resumption
+  protected async loadSession(sessionId: string): Promise<void> {
+    // Call Convex query from Phase 2
+    // Uses model/getAgentSession
   }
 
-  return sessionId
-}
-```
+  // Public: Execute the agent
+  async execute(input: string): Promise<string> {
+    const options = this.buildOptions();
+    const result = await query({ prompt: input, options });
 
-### Pattern 3: Session Resumption
-**What:** Continue a previous session with full context
-**When to use:** Multi-turn conversations, stateful workflows
-**Example:**
-```typescript
-// Source: Session management docs
-async function resumeSession(sessionId: string) {
-  const response = query({
-    prompt: 'Continue where we left off',
-    options: {
-      resume: sessionId,
-      model: 'claude-sonnet-4-5'
+    // Process messages and save state via hooks
+    for await (const message of result) {
+      await this.handleMessage(message);
     }
-  })
 
-  for await (const message of response) {
-    console.log(message)
-  }
-}
-```
-
-### Pattern 4: Forking Sessions
-**What:** Create a new branch from an existing session
-**When to use:** Exploring alternatives, testing without modifying original
-**Example:**
-```typescript
-// Source: Session management docs
-async function forkSession(originalSessionId: string) {
-  const forkedResponse = query({
-    prompt: 'Try a different approach',
-    options: {
-      resume: originalSessionId,
-      forkSession: true,  // Creates new session ID
-      model: 'claude-sonnet-4-5'
-    }
-  })
-
-  // Original session remains unchanged
-  const originalContinued = query({
-    prompt: 'Continue original work',
-    options: {
-      resume: originalSessionId,
-      forkSession: false,  // Continues original
-      model: 'claude-sonnet-4-5'
-    }
-  })
-}
-```
-
-### Pattern 5: Specialized Agent Definition
-**What:** Extend base agent with custom prompt and configuration
-**When to use:** Planner, Coder, Reviewer agents
-**Example:**
-```typescript
-// Source: Agent SDK docs + engineering blog
-class PlannerAgent extends BaseAgent {
-  constructor() {
-    super({
-      model: 'claude-sonnet-4-5',
-      tools: ['Read', 'Grep', 'Glob'],  // Read-only for planning
-    })
+    return this.getFinalResult();
   }
 
-  async executeTask(task: string): Promise<string> {
-    const response = await this.execute(
-      `Break down this task into implementation steps: ${task}`,
-      {
-        agents: {
-          planner: {
-            description: 'Creates detailed implementation plans',
-            prompt: `You are a planning agent.
-            - Break tasks into clear, sequential steps
-            - Identify dependencies between steps
-            - Estimate complexity for each step
-            - Return a structured plan`,
-          }
+  // Protected: Build SDK options with hooks
+  protected buildOptions(): Options {
+    return {
+      hooks: {
+        SessionStart: async (input) => {
+          // Create agent session in Convex
+        },
+        SessionEnd: async (input) => {
+          // Update final state in Convex
         }
-      }
-    )
+      },
+      systemPrompt: this.getSystemPrompt(),
+      model: this.getModel()
+    };
+  }
 
-    let result = ''
-    for await (const message of response) {
-      if (message.type === 'result') {
-        result = message.result
+  protected getModel(): string {
+    return 'sonnet'; // Default
+  }
+}
+```
+
+### Pattern 2: Hook-Based Lifecycle Management
+**What:** Use SDK hooks for automatic state synchronization
+**When to use:** For session creation, updates, and completion tracking
+**Example:**
+```typescript
+// Source: https://platform.claude.com/docs/en/agent-sdk/typescript
+protected buildOptions(): Options {
+  return {
+    hooks: {
+      SessionStart: async (input: BaseHookInput) => {
+        // Create Convex session on start
+        const session = await ctx.runMutation(model.agents.createAgentSession, {
+          agentType: this.agentType,
+          input: await this.extractInput(input),
+          workflowId: this.workflowId!
+        });
+        this.sessionId = session;
+      },
+      SessionEnd: async (input: SessionEndHookInput) => {
+        // Update final state on completion
+        await ctx.runMutation(model.agents.updateAgentSession, {
+          sessionId: this.sessionId!,
+          status: 'completed',
+          output: this.extractOutput(input)
+        });
       }
     }
-    return result
-  }
+  };
 }
 ```
 
 ### Anti-Patterns to Avoid
-- **Custom session storage**: SDK handles persistence, resumption, and context limits
-- **Manual agent spawning**: Use `agents` option instead of multiple client instances
-- **Ignoring session IDs**: Can't resume without capturing session_id from init message
-- **Not using base classes**: Duplication across agent implementations
-- **Synchronous for loops**: Always use `for await` with the async generator
+- **Automatic state persistence without hooks:** Would require wrapping the generator; hooks are the designed extension point
+- **Storing full message history in Convex:** Blobs documents; store only essential state (status, output, error)
+- **Tight coupling to specific agent logic:** Base class should only handle SDK + Convex, not agent behavior
+- **Ignoring session resumption:** SDK supports resume via options; base class should handle it
+</architecture_patterns>
 
+<dont_hand_roll>
 ## Don't Hand-Roll
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Session persistence | Custom DB/filesystem storage | `resume` option with session_id | SDK handles context limits, compaction, state management |
-| Context window management | Manual truncation/summarization | Built-in compaction | SDK automatically compresses when approaching limits |
-| Agent isolation | Separate client instances | `agents` option in query() | Proper context separation, standardized handoff |
-| Session branching | Copy-paste session data | `forkSession: true` | Clean branching without modifying original |
-| Message streaming | Custom async handling | `for await` of query() generator | Handles all message types, errors, completion |
+| Agent session creation | Custom ID generation, manual timestamping | `model.agents.createAgentSession` from Phase 2 | Already implements Convex mutation with validators |
+| Session state updates | Custom update logic, status validation | `model.agents.updateAgentSession` from Phase 2 | Handles optional fields, status validation |
+| Session queries | Custom Convex queries, filtering | `model.agents.getAgentSession` from Phase 2 | Type-safe, already defined |
+| Workflow association | Manual workflow ID tracking | Pass `workflowId` to BaseAgent constructor | Phase 2 schema designed for this relationship |
+| Message streaming | Custom async iteration, error handling | SDK's `query()` async generator | Handles streaming, errors, interruptions |
 
-**Key insight:** The Claude Agent SDK's session management is production-hardened. Custom implementations struggle with context limits, state consistency, error recovery, and compaction. The SDK's sessions handle automatic context compression, resumption from any point, and proper state serialization.
+**Key insight:** The Claude Agent SDK is designed to be the "agent runtime" — it handles Claude communication, tool execution, and message streaming. Our BaseAgent should coordinate between the SDK and Convex, not reimplement SDK features.
 
+Phase 2 already provides the Convex integration layer. We're building the orchestration layer that connects SDK lifecycle events to Convex mutations.
+</dont_hand_roll>
+
+<common_pitfalls>
 ## Common Pitfalls
 
-### Pitfall 1: Not Capturing Session ID
-**What goes wrong:** Can't resume sessions because session_id wasn't saved
-**Why it happens:** Session ID is only in the first `system:init` message
-**How to avoid:** Always extract and save `message.session_id` from the init message
-**Warning signs:** No session persistence, can't continue conversations
+### Pitfall 1: Not Handling Session Resumption
+**What goes wrong:** Agent can't resume from interruptions, loses context
+**Why it happens:** SDK requires explicit `resume` parameter; doesn't auto-resume
+**How to avoid:** Store `session_id` from SessionStart hook, pass to `options.resume` on subsequent executions
+**Warning signs:** Agent restarts from beginning every time, doesn't remember previous state
 
-### Pitfall 2: Confusing Resume vs Fork
-**What goes wrong:** Original session gets modified when trying to experiment
-**Why it happens:** Default `forkSession: false` continues the original session
-**How to avoid:** Use `forkSession: true` when you want to preserve the original
-**Warning signs:** Can't get back to previous conversation state
+### Pitfall 2: Blocking on Convex Operations
+**What goes wrong:** Agent pauses during execution waiting for Convex mutations
+**Why it happens:** Convex mutations are async but fast; shouldn't block significantly
+**How to avoid:** Use fire-and-forget for non-critical updates, await for state transitions
+**Warning signs:** Agent seems slow, "thinking" for long periods without output
 
-### Pitfall 3: Ignoring Context Limits
-**What goes wrong:** Long conversations truncate, losing important context
-**Why it happens:** Context window fills up (200K tokens with compression)
-**How to avoid:** Rely on SDK's automatic compaction, store important data externally
-**Warning signs:** Agent "forgets" earlier parts of long conversations
+### Pitfall 3: Storing Large Blobs in Convex
+**What goes wrong:** Documents exceed size limits, slow queries
+**Why it happens:** Tempting to store full conversation history or large outputs
+**How to avoid:** Store only essential state (status, summary, error). Use filesystem for artifacts (per Phase 1 decisions)
+**Warning signs:** Convex dashboard shows large documents, slow queries
 
-### Pitfall 4: Synchronous Processing
-**What goes wrong:** Agent hangs, never completes
-**Why it happens:** Using `forEach` or other sync patterns instead of `for await`
-**How to avoid:** Always iterate with `for await (const message of response)`
-**Warning signs:** Code completes immediately without results
+### Pitfall 4: Missing Error Handling in Hooks
+**What goes wrong:** Unhandled rejections crash the agent
+**Why it happens:** Hook callbacks are async, errors can be silently swallowed
+**How to avoid:** Wrap hook logic in try-catch, log errors, update session status to 'error'
+**Warning signs:** Agent stops unexpectedly, no error messages
 
-### Pitfall 5: Not Handling Errors
-**What goes wrong:** Unhandled rejections crash the process
-**Why it happens:** `query()` generator can throw (network, API, session errors)
-**How to avoid:** Wrap in try-catch, handle `type: 'result'` with `is_error: true`
-**Warning signs:** Process exits with code 1 on session errors
+### Pitfall 5: Abstract Class Not Enforcing Implementation
+**What goes wrong:** Subclasses don't implement required methods, fail at runtime
+**Why it happens:** TypeScript allows abstract classes without compile-time checks
+**How to avoid:** Use `abstract` keyword on methods that must be implemented
+**Warning signs:** Runtime errors about undefined methods
+</common_pitfalls>
 
+<code_examples>
 ## Code Examples
 
-### Complete Agent Lifecycle
+### Basic Agent Execution
 ```typescript
-// Source: Session docs + SDK patterns
-import { query } from '@anthropic-ai/claude-agent-sdk'
+// Source: https://platform.claude.com/docs/en/agent-sdk/typescript
+import { query } from '@anthropic-ai/claude-agent-sdk';
 
-class Agent {
-  private sessionId?: string
-
-  async start(prompt: string) {
-    const response = query({
-      prompt,
-      options: { model: 'claude-sonnet-4-5' }
-    })
-
-    for await (const message of response) {
-      // Capture session ID
-      if (message.type === 'system' && message.subtype === 'init') {
-        this.sessionId = message.session_id
-      }
-
-      // Handle completion
-      if (message.type === 'result') {
-        if (message.is_error) {
-          throw new Error(`Agent failed: ${message.result}`)
-        }
-        return message.result
-      }
-    }
+const result = await query({
+  prompt: 'Analyze this codebase',
+  options: {
+    systemPrompt: 'You are a code analysis agent.',
+    permissionMode: 'bypassPermissions'
   }
+});
 
-  async continue(prompt: string) {
-    if (!this.sessionId) {
-      throw new Error('No active session. Call start() first.')
-    }
+for await (const message of result) {
+  console.log(message);
+}
+```
 
-    const response = query({
-      prompt,
-      options: {
-        resume: this.sessionId,
-        model: 'claude-sonnet-4-5'
-      }
-    })
-
-    for await (const message of response) {
-      if (message.type === 'result') {
-        return message.result
-      }
+### Hook for Session Creation
+```typescript
+// Source: SDK hook documentation
+options: {
+  hooks: {
+    SessionStart: async (input: BaseHookInput) => {
+      const { session_id, cwd } = input;
+      console.log(`Agent starting: ${session_id} in ${cwd}`);
+      return { continue: true };
     }
   }
 }
 ```
 
-### Client Factory Pattern
+### Session Resumption
 ```typescript
-// Source: Common factory pattern for SDK clients
-class AgentFactory {
-  private static defaultConfig = {
-    model: 'claude-sonnet-4-5',
-    permissionMode: 'bypassPermissions' as const,
-    tools: ['Read', 'Write', 'Edit', 'Grep', 'Glob']
-  }
+// Source: SDK options documentation
+options: {
+  resume: 'previous-session-id',  // Resumes from specific session
+  resumeSessionAt: 'message-uuid' // Optional: resume at specific point
+}
+```
 
-  static createPlanner() {
-    return query({
-      prompt: '',
-      options: {
-        ...this.defaultConfig,
-        tools: ['Read', 'Grep', 'Glob'],  // Read-only
-        agents: {
-          planner: {
-            description: 'Creates implementation plans',
-            prompt: 'Break tasks into clear steps...'
-          }
-        }
-      }
-    })
-  }
-
-  static createCoder() {
-    return query({
-      prompt: '',
-      options: {
-        ...this.defaultConfig,
-        agents: {
-          coder: {
-            description: 'Implements code based on plans',
-            prompt: 'Write clean, tested code...'
-          }
-        }
-      }
-    })
+### Subagent Definition
+```typescript
+// Source: SDK subagent pattern
+options: {
+  agents: {
+    'researcher': {
+      description: 'Deep research agent for documentation',
+      prompt: 'You research topics thoroughly...',
+      tools: ['WebSearch', 'WebFetch', 'Read']
+    }
   }
 }
 ```
 
+### Reading from Convex in Hooks
+```typescript
+// Pattern: Use existing model functions
+import { model } from './model';
+
+SessionStart: async (input) => {
+  // Create agent session using Phase 2 function
+  const session = await ctx.runMutation(model.agents.createAgentSession, {
+    agentType: this.agentType,
+    input: 'Starting task...',
+    workflowId: this.workflowId!
+  });
+  this.sessionId = session;
+}
+```
+</code_examples>
+
+<sota_updates>
 ## State of the Art (2024-2025)
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| Manual session storage | SDK `resume` option | 2025 | Don't build custom persistence |
-| Context window truncation | Automatic compaction | 2025 | Long conversations handled automatically |
-| Separate client instances | `agents` option | Sept 2025 | Subagents now first-class |
-| No session branching | `forkSession` option | 2025 | Experiment without modifying originals |
+| Claude Code SDK | Claude Agent SDK | Sept 2025 | Renamed to reflect broader use beyond coding |
+| No official hooks | Rich hook system | 2025 | Use hooks for lifecycle, don't wrap query() manually |
+| Manual session management | Built-in session persistence | 2025 | SDK handles session files, use hooks for custom persistence |
 
 **New tools/patterns to consider:**
-- **V2 SDK interface (preview):** `send()` and `receive()` patterns for simpler multi-turn
-- **File checkpointing:** Track and revert file changes across sessions
-- **Structured outputs:** Define JSON schemas for agent responses
+- **TypeScript V2 SDK (preview):** Simplified `send()`/`receive()` pattern — still in preview, use current stable API
+- **MCP (Model Context Protocol):** Pre-built integrations to external services — use for extending agent capabilities
 
 **Deprecated/outdated:**
-- **Manual context management:** SDK handles compression automatically
-- **Custom session serialization:** Use built-in session_id and resume
+- **Claude Code SDK name:** Now Claude Agent SDK (same package, broader vision)
+- **Direct API usage for agents:** SDK provides better abstractions than raw Messages API
+</sota_updates>
 
+<open_questions>
 ## Open Questions
 
-1. **Long-running agent state persistence**
-   - What we know: SDK handles sessions, compaction, resumption
-   - What's unclear: Best pattern for persisting agent-specific state (not just conversation) across process restarts
-   - Recommendation: Use filesystem as shared state for long-running workflows. Store artifacts (plans, code) in files, pass paths between agents.
+1. **How should BaseAgent handle workflow association?**
+   - What we know: Phase 2 schema has `workflowId` in agentSessions metadata
+   - What's unclear: Should BaseAgent auto-associate workflows, or require explicit passing?
+   - Recommendation: Require explicit `workflowId` in constructor for clarity (matches Phase 2 design)
 
-2. **Error recovery patterns**
-   - What we know: SDK throws on errors, session can become invalid
-   - What's unclear: How to gracefully recover from session errors without losing context
-   - Recommendation: Wrap all `query()` calls in try-catch, implement retry logic with exponential backoff, capture session state before errors.
+2. **Should test agent (DummyAgent) actually call Claude?**
+   - What we know: User wants a simple test to prove the pattern works
+   - What's unclear: Should DummyAgent make real API calls or mock the execution?
+   - Recommendation: Use real SDK calls with minimal prompt to prove full integration works
 
+3. **How to handle session initialization errors?**
+   - What we know: Hooks can throw, but SDK may not handle hook failures gracefully
+   - What's unclear: Should BaseAgent catch hook errors or let them propagate?
+   - Recommendation: Catch hook errors, update session status to 'error', rethrow for caller to handle
+</open_questions>
+
+<sources>
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Session Management - Claude Docs](https://platform.claude.com/docs/en/agent-sdk/sessions) - Official session management documentation
-- [Agent SDK reference - TypeScript](https://platform.claude.com/docs/en/agent-sdk/typescript) - Complete API reference
-- [Building agents with the Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) - Engineering best practices (Sept 2025)
+- https://platform.claude.com/docs/en/agent-sdk/typescript - Complete API reference, functions, types, hooks
+- https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk - Official SDK architecture, patterns, best practices
+- https://github.com/anthropics/claude-agent-sdk-typescript - Official repository, package info
 
 ### Secondary (MEDIUM confidence)
-- [The Complete Guide to Building Agents](https://nader.substack.com/p/the-complete-guide-to-building-agents) - Community guide (updated 2025)
-- [How to Use Claude Agent SDK: Step-by-Step](https://skywork.ai/blog/how-to-use-claude-agent-sdk-step-by-step-ai-agent-tutorial/) - Tutorial with examples
-- [Claude Agent Skills: First Principles Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/) - Lifecycle walkthrough (Oct 2025)
+- https://docs.convex.dev/typescript - Convex TypeScript best practices (verified against docs)
+- Various community articles on Agent SDK usage - Verified patterns against official docs
 
 ### Tertiary (LOW confidence - needs validation)
-- [Session lifecycle discussion #7750](https://github.com/anthropics/claude-code/issues/7750) - GitHub issue (Sept 2025, may be resolved)
-- Various community blog posts - Verified patterns against official docs where possible
+- None - all findings verified against official documentation
+</sources>
 
+<metadata>
 ## Metadata
 
 **Research scope:**
-- Core technology: @anthropic-ai/claude-agent-sdk session management
-- Ecosystem: Base agent patterns, client factory, lifecycle management
-- Patterns: Session creation, resumption, forking, specialized agents
-- Pitfalls: Session ID handling, context limits, error handling
+- Core technology: Claude Agent SDK (TypeScript)
+- Ecosystem: Convex integration patterns, TypeScript base class design
+- Patterns: Abstract base class, hook-based lifecycle, manual state persistence
+- Pitfalls: Session resumption, blocking operations, large blobs, error handling
 
 **Confidence breakdown:**
-- Standard stack: HIGH - verified with official documentation
-- Architecture: HIGH - from official SDK docs and engineering blog
-- Pitfalls: HIGH - documented in official docs and GitHub issues
-- Code examples: HIGH - verified against official documentation
+- Standard stack: HIGH - from official docs and verified installation
+- Architecture: HIGH - based on official SDK patterns and user requirements
+- Pitfalls: HIGH - documented in SDK docs and common async/await patterns
+- Code examples: HIGH - from official documentation
 
 **Research date:** 2026-01-16
-**Valid until:** 2026-02-15 (30 days - SDK is actively developed)
+**Valid until:** 2025-02-15 (30 days - SDK ecosystem stable, recent release)
+</metadata>
 
 ---
 
-*Phase: 02-agent-foundation*
+*Phase: 03-agent-foundation*
 *Research completed: 2026-01-16*
 *Ready for planning: yes*
