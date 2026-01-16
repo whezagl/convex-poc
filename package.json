@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx",
     "build": "tsup",
-    "test": "echo \"no tests yet\""
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "engines": {
     "node": ">=20"
@@ -31,6 +32,7 @@
     "prettier": "^3.8.0",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
   }
 }
