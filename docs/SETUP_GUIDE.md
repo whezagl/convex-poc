@@ -229,10 +229,10 @@ convex-self-hosted|018795c33a293daadc0bab0e761e58d575544303062946537f91426696883
 
 ### Step 5: Save Configuration
 
-Create a `.env.local` file to store your configuration:
+Create a `.env` file to store your configuration:
 
 ```bash
-# .env.local
+# .env
 CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210
 CONVEX_SELF_HOSTED_ADMIN_KEY=paste-your-key-here
 ```
@@ -264,13 +264,13 @@ You should see the Convex Dashboard login screen. This confirms your backend is 
 
 ### Step 2: Save API Key to Environment
 
-Add this line to your `.env.local` file:
+Add this line to your `.env` file:
 
 ```bash
 ZAI_API_KEY=your-api-key-here
 ```
 
-Your complete `.env.local` should look like:
+Your complete `.env` should look like:
 
 ```bash
 CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210
@@ -342,7 +342,7 @@ The test file we created earlier demonstrates the complete flow. Here's what it 
 
 ```mermaid
 flowchart LR
-    A[Start Test] --> B[Load Environment<br/>.env.local]
+    A[Start Test] --> B[Load Environment<br/>.env]
     B --> C[Check API Keys<br/>ZAI_API_KEY<br/>CONVEX_ADMIN_KEY]
     C --> D[Create Workflow<br/>in Convex]
     D --> E[Create Agent Session<br/>linked to workflow]
@@ -440,7 +440,7 @@ Configuration:
 docker compose exec backend ./generate_admin_key.sh
 ```
 
-Update `.env.local` with the new key.
+Update `.env` with the new key.
 
 ### Problem: Z.AI API returns 429 Insufficient Balance
 
@@ -476,7 +476,7 @@ Here's the complete picture of what you've built:
 flowchart TB
     subgraph "Developer Experience"
         DEV[You: Developer]
-        ENV[.env.local<br/>Store secrets]
+        ENV[.env<br/>Store secrets]
         CLI[Terminal<br/>Run commands]
     end
 
@@ -558,7 +558,7 @@ mindmap
       docker compose ps
       docker compose down
     Environment
-      .env.local file
+      .env file
       CONVEX_SELF_HOSTED_URL
       CONVEX_SELF_HOSTED_ADMIN_KEY
       ZAI_API_KEY
@@ -576,7 +576,7 @@ mindmap
     Troubleshooting
       Check docker compose ps
       Regenerate admin key
-      Verify .env.local values
+      Verify .env values
 ```
 
 ---

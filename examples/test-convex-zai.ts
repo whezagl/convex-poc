@@ -6,17 +6,13 @@
  * Prerequisites:
  * 1. ZAI_API_KEY environment variable set (get from https://platform.z.ai/)
  * 2. Convex backend running (docker compose up)
+ * 3. Copy .env.example to .env and fill in your values
  *
  * To run:
- *   export ZAI_API_KEY="your-key-here"
  *   npx tsx examples/test-convex-zai.ts
  */
 
 import "dotenv/config.js";
-import { config as dotenvConfig } from "dotenv";
-
-// Load .env.local explicitly
-dotenvConfig({ path: ".env.local" });
 
 import { convex } from "../src/convex/client.js";
 
