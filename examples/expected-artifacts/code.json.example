@@ -1,0 +1,19 @@
+{
+  "changes": [
+    {
+      "path": "src/utils/emailValidator.ts",
+      "content": "/**\n * Validates an email address using regex pattern.\n *\n * @param email - The email address to validate (can be null/undefined)\n * @returns true if email is valid, false otherwise\n *\n * @example\n * validateEmail(\"user@example.com\") // true\n * validateEmail(\"invalid-email\")    // false\n * validateEmail(null)               // false\n */\nexport function validateEmail(email: string | null | undefined): boolean {\n  // Handle edge cases\n  if (email === null || email === undefined) {\n    return false;\n  }\n\n  if (email.trim() === \"\") {\n    return false;\n  }\n\n  // Practical email regex (catches common errors without being overly strict)\n  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;\n\n  return emailRegex.test(email);\n}\n",
+      "operation": "create"
+    },
+    {
+      "path": "src/utils/emailValidator.test.ts",
+      "content": "import { validateEmail } from \"./emailValidator\";\n\ndescribe(\"validateEmail\", () => {\n  test(\"returns false for null\", () => {\n    expect(validateEmail(null)).toBe(false);\n  });\n\n  test(\"returns false for undefined\", () => {\n    expect(validateEmail(undefined)).toBe(false);\n  });\n\n  test(\"returns false for empty string\", () => {\n    expect(validateEmail(\"\")).toBe(false);\n  });\n\n  test(\"returns false for invalid email (no @)\", () => {\n    expect(validateEmail(\"invalidemail\")).toBe(false);\n  });\n\n  test(\"returns false for invalid email (no domain)\", () => {\n    expect(validateEmail(\"user@\")).toBe(false);\n  });\n\n  test(\"returns true for valid email\", () => {\n    expect(validateEmail(\"user@example.com\")).toBe(true);\n  });\n\n  test(\"returns true for email with subdomain\", () => {\n    expect(validateEmail(\"user@mail.example.com\")).toBe(true);\n  });\n\n  test(\"returns true for email with plus sign\", () => {\n    expect(validateEmail(\"user+tag@example.com\")).toBe(true);\n  });\n});\n",
+      "operation": "create"
+    }
+  ],
+  "summary": "Created validateEmail utility function with regex pattern and comprehensive edge case handling. Includes JSDoc documentation and unit tests covering null, undefined, empty string, and various invalid email formats. Function returns boolean indicating email validity.",
+  "filesModified": [
+    "src/utils/emailValidator.ts",
+    "src/utils/emailValidator.test.ts"
+  ]
+}
