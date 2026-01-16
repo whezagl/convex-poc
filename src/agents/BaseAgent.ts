@@ -32,6 +32,8 @@ export abstract class BaseAgent {
   protected readonly agentType: string;
   protected readonly workflowId?: Id<"workflows">;
   protected readonly config: AgentConfig;
+  protected currentInput: string | null = null;
+  protected currentOutput: string | null = null;
 
   /**
    * Creates a new BaseAgent instance.
@@ -64,14 +66,16 @@ export abstract class BaseAgent {
 
   /**
    * Builds the Convex context object for mutations and queries.
-   * This is a placeholder for future Convex client integration.
+   * Returns session metadata for Convex integration.
    *
-   * @returns Convex context object
+   * @returns Convex context object with session metadata
    */
-  protected buildConvexContext(): any {
-    // TODO: Integrate with actual Convex client when backend is deployed
-    // For now, this is a placeholder that will be updated in ISS-001
-    return {};
+  protected buildConvexContext(): Record<string, unknown> {
+    return {
+      sessionId: this.sessionId,
+      agentType: this.agentType,
+      workflowId: this.workflowId,
+    };
   }
 
   /**
@@ -90,16 +94,18 @@ export abstract class BaseAgent {
               async (input: HookInput) => {
                 try {
                   // Create agent session in Convex
-                  // Note: This will be fully functional once Convex backend is deployed (ISS-001)
                   if (this.workflowId) {
-                    // Placeholder for Convex integration
-                    // const session = await convex.mutations.agents.createAgentSession({
-                    //   agentType: this.agentType,
-                    //   input: input.prompt || "Starting session",
-                    //   workflowId: this.workflowId,
-                    // });
-                    // this.sessionId = session;
-                    console.log(`[BaseAgent] SessionStart: Would create session for ${this.agentType}`);
+                    // Extract available info from HookInput
+                    const sessionId = (input as any).session_id || "unknown";
+                    const source = (input as any).source || "startup";
+
+                    const session = await convex.mutations.agents.createAgentSession({
+                      agentType: this.agentType,
+                      input: `Session ${sessionId} started (${source})`,
+                      workflowId: this.workflowId,
+                    });
+                    this.sessionId = session as Id<"agentSessions">;
+                    console.log(`[BaseAgent] Created session ${this.sessionId} for ${this.agentType}`);
                   }
                 } catch (error) {
                   console.error("[BaseAgent] SessionStart error:", error);
@@ -117,13 +123,15 @@ export abstract class BaseAgent {
                 try {
                   // Update final state in Convex
                   if (this.sessionId) {
-                    // Placeholder for Convex integration
-                    // await convex.mutations.agents.updateAgentSession({
-                    //   sessionId: this.sessionId,
-                    //   status: "completed",
-                    //   output: this.extractOutput(input),
-                    // });
-                    console.log(`[BaseAgent] SessionEnd: Would update session ${this.sessionId}`);
+                    const reason = (input as any).reason || "completed";
+                    const output = this.currentOutput || `Session ended: ${reason}`;
+
+                    await convex.mutations.agents.updateAgentSession({
+                      sessionId: this.sessionId,
+                      status: "completed",
+                      output: output,
+                    });
+                    console.log(`[BaseAgent] Updated session ${this.sessionId} with completion status`);
                   }
                 } catch (error) {
                   console.error("[BaseAgent] SessionEnd error:", error);
@@ -140,14 +148,18 @@ export abstract class BaseAgent {
 
   /**
    * Extracts the output from a HookInput.
+   * The HookInput for SessionEnd contains the exit reason.
    *
-   * @param input - The hook input
+   * @param input - The hook input containing execution results
    * @returns The extracted output string
    */
   protected extractOutput(input: HookInput): string {
-    // Extract relevant output from the hook input
-    // This will be refined based on actual SDK hook input structure
-    return "Session completed";
+    // SessionEnd hook has reason property
+    const reason = (input as any).reason;
+    if (reason) {
+      return this.currentOutput || `Session ended: ${reason}`;
+    }
+    return this.currentOutput || "Session completed";
   }
 
   /**
@@ -158,20 +170,35 @@ export abstract class BaseAgent {
    * @returns The agent's response as a string
    */
   public async execute(input: string): Promise<string> {
+    // Store input for Convex tracking
+    this.currentInput = input;
+    this.currentOutput = null;
+
     const options = this.buildOptions();
     const result = await query({ prompt: input, options });
 
     // Collect all messages from the async generator
     const messages: string[] = [];
     for await (const message of result) {
-      // Process each message
-      // For now, convert to string; this can be refined based on message structure
-      messages.push(JSON.stringify(message));
+      // Process each message - extract text content from message
+      // Message structure may vary; extract text where possible
+      if (message && typeof message === "object") {
+        // Extract text from message if available
+        if ("text" in message && typeof message.text === "string") {
+          messages.push(message.text);
+        } else {
+          messages.push(JSON.stringify(message));
+        }
+      } else if (typeof message === "string") {
+        messages.push(message);
+      }
     }
 
+    // Store output for Convex tracking
+    this.currentOutput = messages.join("\n");
+
     // Return the final result
-    // TODO: Extract actual output from messages based on SDK response structure
-    return messages.join("\n");
+    return this.currentOutput;
   }
 
   /**
