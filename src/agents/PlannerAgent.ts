@@ -112,14 +112,14 @@ Remember: Output ONLY valid JSON, nothing else.`;
   /**
    * Executes the planner and returns a structured PlanResult.
    *
-   * This method overrides BaseAgent.execute() to parse and validate
+   * This method wraps BaseAgent.execute() to parse and validate
    * the JSON response from Claude, returning a typed PlanResult.
    *
    * @param input - The task description to plan
    * @returns Structured plan with steps, dependencies, and risk assessment
    * @throws Error if JSON parsing fails or result is invalid
    */
-  public async execute(input: string): Promise<PlanResult> {
+  public async executePlan(input: string): Promise<PlanResult> {
     // Call parent execute to get raw response
     const rawResponse = await super.execute(input);
 
@@ -156,7 +156,7 @@ Remember: Output ONLY valid JSON, nothing else.`;
     });
 
     // Execute with workflow tracking
-    return agentWithWorkflow.execute(input);
+    return agentWithWorkflow.executePlan(input);
   }
 
   /**

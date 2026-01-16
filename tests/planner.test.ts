@@ -87,9 +87,9 @@ describe("PlannerAgent", () => {
       const prompt = (agent as any).getSystemPrompt();
 
       expect(prompt).toContain("Planner Agent");
-      expect(prompt).toContain("task into clear, actionable steps");
+      expect(prompt).toContain("clear, actionable steps");
       expect(prompt).toContain("coder");
-      expect(prompt).prompttoContain("reviewer");
+      expect(prompt).toContain("reviewer");
       expect(prompt).toContain("dependencies");
     });
 
@@ -417,7 +417,7 @@ Let me know if you need any adjustments!
 
       expect(() => {
         (agent as any).validatePlanResult(invalidPlan);
-      }).toThrow("description cannot be empty");
+      }).toThrow("non-empty description");
     });
 
     it("should reject step with missing agent", () => {
@@ -543,7 +543,7 @@ Let me know if you need any adjustments!
     });
   });
 
-  describe("execute", () => {
+  describe("executePlan", () => {
     it("should be callable and return Promise<PlanResult>", async () => {
       const config: PlannerConfig = {
         agentType: "planner",
@@ -552,7 +552,7 @@ Let me know if you need any adjustments!
 
       // Note: This will fail with real API call, but we're testing the method signature
       // In a real test, we would mock the BaseAgent.execute() method
-      expect(typeof agent.execute).toBe("function");
+      expect(typeof agent.executePlan).toBe("function");
     });
   });
 

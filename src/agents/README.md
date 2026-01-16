@@ -123,7 +123,7 @@ const planner = new PlannerAgent({
 });
 
 // Generate a plan for a task
-const plan = await planner.execute("Create a REST API for user management");
+const plan = await planner.executePlan("Create a REST API for user management");
 
 console.log("Steps:", plan.steps);
 // [
