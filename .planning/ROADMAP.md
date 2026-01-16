@@ -20,8 +20,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Convex Schema** - Define data models for sessions, workflows, agents
 - [x] **Phase 3: Agent Foundation** - Base agent class with Convex state storage
 - [x] **Phase 4: Planner Agent** - Task decomposition with Convex integration
-- [ ] **Phase 5: Coder Agent** - Code implementation with file operations
-- [ ] **Phase 6: Reviewer Agent** - Validation with Convex state tracking
+- [x] **Phase 5: Coder Agent** - Code implementation with file operations
+- [x] **Phase 6: Reviewer Agent** - Validation with Convex state tracking
 - [ ] **Phase 7: Orchestration** - Workflow coordination via Convex
 - [ ] **Phase 8: Example Task** - End-to-end demonstration
 - [ ] **Phase 9: Documentation** - Pattern documentation and cleanup
@@ -65,7 +65,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Goal**: Agent that validates implementations; stores reviews in Convex
 **Depends on**: Phase 3
 **Research**: Unlikely (validation logic, established patterns)
-**Plans**: TBD
+**Plans**: 1/1 Complete ✅
 
 ### Phase 7: Orchestration
 **Goal**: Workflow coordination using Convex for state management and real-time sync
@@ -98,7 +98,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Agent Foundation | 1/1 | Complete | 2026-01-16 |
 | 4. Planner Agent | 1/1 | Complete | 2026-01-16 |
 | 5. Coder Agent | 1/1 | Complete | 2026-01-16 |
-| 6. Reviewer Agent | 0/TBD | Not started | - |
+| 6. Reviewer Agent | 1/1 | Complete | 2026-01-16 |
 | 7. Orchestration | 0/TBD | Not started | - |
 | 8. Example Task | 0/TBD | Not started | - |
 | 9. Documentation | 0/TBD | Not started | - |
