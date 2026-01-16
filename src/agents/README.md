@@ -109,6 +109,71 @@ const result = await agent.execute("Hello, world!");
 // Result: "Dummy agent received: Hello, world!"
 ```
 
+## Example: PlannerAgent
+
+`PlannerAgent` is a specialized agent for task decomposition and planning:
+
+```typescript
+import { PlannerAgent } from "./agents/index.js";
+
+// Create planner with basic detail level
+const planner = new PlannerAgent({
+  agentType: "planner",
+  detailLevel: "basic", // or "detailed" for more comprehensive plans
+});
+
+// Generate a plan for a task
+const plan = await planner.execute("Create a REST API for user management");
+
+console.log("Steps:", plan.steps);
+// [
+//   {
+//     description: "Design database schema for users",
+//     agent: "coder",
+//     dependencies: []
+//   },
+//   {
+//     description: "Implement user CRUD endpoints",
+//     agent: "coder",
+//     dependencies: ["Design database schema for users"]
+//   },
+//   {
+//     description: "Review API implementation for security",
+//     agent: "reviewer",
+//     dependencies: ["Implement user CRUD endpoints"]
+//   }
+// ]
+
+console.log("Estimated duration:", plan.estimatedDuration);
+// "2-3 hours"
+
+console.log("Risks:", plan.risks);
+// ["Authentication complexity may require additional research"]
+
+// Execute with Convex workflow tracking
+const planWithWorkflow = await planner.executeWithWorkflow(
+  "Create a REST API for user management",
+  workflowId
+);
+```
+
+### PlannerAgent Features
+
+- **Task Decomposition**: Breaks complex tasks into 3-7 actionable steps
+- **Agent Assignment**: Assigns each step to appropriate agent types:
+  - `coder`: Implementation work (writing code, creating files)
+  - `reviewer`: Validation and testing (code review, test execution)
+  - `planner`: Further decomposition if needed
+- **Dependency Tracking**: Identifies sequential vs parallel work
+- **Risk Assessment**: Estimates duration and identifies potential blockers
+- **Structured Output**: Returns typed `PlanResult` interface for programmatic use
+
+### PlannerAgent vs Other Agents
+
+- **PlannerAgent**: Task decomposition and planning only (does not execute)
+- **CoderAgent**: Implementation work (Phase 5)
+- **ReviewerAgent**: Validation and testing (Phase 6)
+
 ## Protected Methods
 
 Subclasses can access these protected methods:
