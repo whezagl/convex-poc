@@ -26,7 +26,7 @@
  * - getAgentSession: Retrieves agent session by ID
  */
 
-import { ConvexClient } from "convex/server";
+import { ConvexClient } from "convex/browser";
 
 // Get configuration from environment
 const CONVEX_URL = process.env.CONVEX_SELF_HOSTED_URL || "http://127.0.0.1:3210";
@@ -79,6 +79,32 @@ export const convex = {
         return await client.mutation("agents.js:updateAgentSession", args);
       },
     },
+    workflows: {
+      /**
+       * Create a new workflow in Convex.
+       * @param args - Workflow creation parameters
+       * @returns The created workflow ID
+       */
+      createWorkflow: async (args: {
+        task: string;
+      }) => {
+        console.log("[Convex] Creating workflow", args);
+        return await client.mutation("workflows.js:createWorkflow", args);
+      },
+
+      /**
+       * Update workflow status.
+       * @param args - Workflow update parameters
+       */
+      updateWorkflowStatus: async (args: {
+        workflowId: string;
+        status: string;
+        currentStep?: string;
+      }) => {
+        console.log("[Convex] Updating workflow status", args);
+        return await client.mutation("workflows.js:updateWorkflowStatus", args);
+      },
+    },
   },
 
   queries: {
@@ -91,6 +117,17 @@ export const convex = {
       getAgentSession: async (args: { sessionId: string }) => {
         console.log("[Convex] Getting agent session", args);
         return await client.query("agents.js:getAgentSession", args);
+      },
+    },
+    workflows: {
+      /**
+       * Get a workflow by ID.
+       * @param args - Query parameters
+       * @returns The workflow or null
+       */
+      getWorkflow: async (args: { workflowId: string }) => {
+        console.log("[Convex] Getting workflow", args);
+        return await client.query("workflows.js:getWorkflow", args);
       },
     },
   },
