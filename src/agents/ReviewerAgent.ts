@@ -263,7 +263,7 @@ Best practices:
       const minLevel = severityLevels.indexOf(this.severity);
       for (const issue of review.issues) {
         const issueLevel = severityLevels.indexOf(issue.severity);
-        if (issueLevel < minLevel) {
+        if (issueLevel > minLevel) {
           throw new Error(
             `Issue with severity "${issue.severity}" found but only "${this.severity}" and higher requested`
           );
