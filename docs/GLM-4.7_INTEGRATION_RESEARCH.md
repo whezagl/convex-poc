@@ -15,13 +15,13 @@ The current `BaseAgent.ts` uses **Anthropic's Claude Agent SDK** (`@anthropic-ai
 
 ```mermaid
 flowchart TB
-    subgraph Current["Current BaseAgent (Claude SDK)"]
+    subgraph Current
         BASE[BaseAgent.ts]
-        SDK[@anthropic-ai/claude-agent-sdk]
-        ANTH[Anthropic API<br/>claude-sonnet<br/>claude-opus]
+        SDK[claude-agent-sdk]
+        ANTH[Anthropic API]
     end
 
-    subgraph Convex["Convex Integration"]
+    subgraph Convex
         MUT[convex.mutations.agents]
         SESSION[Agent Sessions]
     end
@@ -92,13 +92,13 @@ for await (const chunk of completion) {
 
 ```mermaid
 flowchart LR
-    subgraph Problem["The Problem"]
+    subgraph Problem
         CLAUDE_SDK[Claude Agent SDK]
-        CUSTOM_BASE[Custom Base URL?]
+        CUSTOM_BASE[Custom Base URL]
         ANTH_API[Anthropic API Only]
     end
 
-    CLAUDE_SDK -->|No| CUSTOM_BASE
+    CLAUDE_SDK -->|No support| CUSTOM_BASE
     CLAUDE_SDK -->|Hardcoded| ANTH_API
 
     style CLAUDE_SDK fill:#DC2F02,stroke:#000,stroke-width:3px,color:#fff
@@ -121,18 +121,18 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph Agents["Agent Classes"]
-        ABSTRACT[AgentInterface<br/>execute(input: string)]
-        CLAUDE[BaseAgent.ts<br/>Claude SDK]
-        GLM[GLMBaseAgent.ts<br/>OpenAI SDK + GLM-4.7]
+    subgraph Agents
+        ABSTRACT[AgentInterface]
+        CLAUDE[BaseAgent Claude SDK]
+        GLM[GLMBaseAgent OpenAI SDK]
     end
 
-    subgraph Providers["LLM Providers"]
+    subgraph Providers
         ANTH_API[Anthropic API]
-        ZAI_API[Z.AI API<br/>GLM-4.7]
+        ZAI_API[Z.AI API GLM-4.7]
     end
 
-    subgraph Shared["Shared Convex Integration"]
+    subgraph Shared
         CONVEX[convex.mutations.agents]
         SESSION[Agent Sessions]
     end
@@ -281,17 +281,17 @@ const code = await agent.execute("Write a function to validate emails");
 
 ```mermaid
 flowchart LR
-    subgraph Phase1["Phase 1: Parallel"]
-        CURRENT[Existing BaseAgent<br/>Claude SDK]
-        NEW[New GLMBaseAgent<br/>OpenAI SDK]
+    subgraph Phase1
+        CURRENT[Existing BaseAgent Claude SDK]
+        NEW[New GLMBaseAgent OpenAI SDK]
     end
 
-    subgraph Phase2["Phase 2: Migration"]
+    subgraph Phase2
         TEST[Test both agents]
         COMPARE[Compare results]
     end
 
-    subgraph Phase3["Phase 3: Switch"]
+    subgraph Phase3
         SELECT[Choose provider]
         DEP[Deprecate unused]
     end
