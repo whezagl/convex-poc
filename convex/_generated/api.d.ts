@@ -8,8 +8,48 @@
  * @module
  */
 
-import type { AnyApi, AnyComponents } from "convex/server";
+import type * as agents from "../agents.js";
+import type * as model_agents from "../model/agents.js";
+import type * as model_workflows from "../model/workflows.js";
+import type * as workflows from "../workflows.js";
 
-export declare const api: AnyApi;
-export declare const internal: AnyApi;
-export declare const components: AnyComponents;
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+
+declare const fullApi: ApiFromModules<{
+  agents: typeof agents;
+  "model/agents": typeof model_agents;
+  "model/workflows": typeof model_workflows;
+  workflows: typeof workflows;
+}>;
+
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
+export declare const api: FilterApi<
+  typeof fullApi,
+  FunctionReference<any, "public">
+>;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
+export declare const internal: FilterApi<
+  typeof fullApi,
+  FunctionReference<any, "internal">
+>;
+
+export declare const components: {};

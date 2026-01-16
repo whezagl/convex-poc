@@ -105,7 +105,7 @@ export class SequentialOrchestrator {
 
           if (reviewerStep.output) {
             try {
-              result.finalReview = reviewFromJson(reviewerStep.output);
+              result.finalReview = JSON.parse(reviewerStep.output) as ReviewResult;
             } catch (error) {
               console.error(`[Orchestrator] Failed to parse review result: ${error}`);
             }
@@ -317,7 +317,7 @@ export class SequentialOrchestrator {
     // If continueOnError is enabled, success depends on reviewer completing
     if (this.config.continueOnError) {
       const reviewerStep = steps.find((s) => s.agent === "reviewer");
-      return reviewerStep?.status === "completed" ?? false;
+      return reviewerStep?.status === "completed" || false;
     }
 
     // Otherwise, all steps must complete successfully
