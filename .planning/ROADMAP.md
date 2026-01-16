@@ -38,9 +38,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 2: Convex Schema & State Model
 **Goal**: Define Convex schema for agent sessions, orchestration state, and workflow progress
 **Depends on**: Phase 1
-**Research**: Likely (Convex data modeling patterns, real-time state design)
+**Research**: ✅ Complete (02-RESEARCH.md)
 **Research topics**: Convex schema best practices, state synchronization patterns, document modeling
-**Plans**: TBD
+**Plans**: 1/2 In progress
 
 ### Phase 3: Agent Foundation with Convex
 **Goal**: Base agent class that integrates Claude SDK with Convex state storage
@@ -94,7 +94,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Setup | 2/2 | Complete | 2026-01-15 |
-| 2. Convex Schema | 0/2 | Not started | - |
+| 2. Convex Schema | 1/2 | In progress | - |
 | 3. Agent Foundation | 0/TBD | Not started | - |
 | 4. Planner Agent | 0/TBD | Not started | - |
 | 5. Coder Agent | 0/TBD | Not started | - |
