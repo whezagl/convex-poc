@@ -87,7 +87,15 @@ Recent decisions affecting current work:
 
 ### Deferred Issues
 
-None. ISS-001 resolved on 2026-01-16.
+**Updated: 2026-01-17**
+
+Created `.planning/ISSUES.md` with proper issue tracking.
+
+**Open Issues:**
+- **ISS-001:** Self-hosted Convex backend deployment (re-opened - was incorrectly marked as resolved in Phase 09; project was documented as complete with placeholder, not actually resolved)
+- **ISS-002:** SDK response output extraction (newly discovered from TODO audit)
+
+See ISSUES.md for full details.
 
 ### Blockers/Concerns
 

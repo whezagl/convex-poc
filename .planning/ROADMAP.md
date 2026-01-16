@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Orchestration** - Workflow coordination via Convex
 - [x] **Phase 8: Example Task** - End-to-end demonstration
 - [x] **Phase 9: Documentation** - Pattern documentation and cleanup
-
+- [ ] **Phase 10: Convex Deployment** - Self-hosted Convex backend deployment (post-project: ISS-001)
 ## Phase Details
 
 ### Phase 1: Project Setup
@@ -86,6 +86,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Research**: Unlikely (documentation and cleanup)
 **Plans**: 1/1 Complete ✅
 
+### Phase 10: Convex Deployment (Post-Project)
+**Goal**: Deploy self-hosted Convex backend and resolve ISS-001
+**Depends on**: Phase 9
+**Research**: Unlikely (follow SELF_HOSTED_SETUP_GUIDE.md)
+**Plans**: 1 plan pending
+
 ## Progress
 
 **Execution Order:**
@@ -102,7 +108,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Orchestration | 1/1 | Complete | 2026-01-16 |
 | 8. Example Task | 1/1 | Complete | 2026-01-16 |
 | 9. Documentation | 1/1 | Complete | 2026-01-16 |
+| 10. Convex Deployment | 0/1 | In Progress | 2026-01-17 |
 
-**Overall Progress: 9/9 phases complete (100%)**
-**Total Plans: 11/11 complete**
+**Overall Progress: 9/10 phases complete (90%)**
+**Total Plans: 11/12 complete (1 in progress)**
 **Total Execution Time: 154 min (2h 34m)**
