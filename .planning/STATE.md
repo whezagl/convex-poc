@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-16 after adding Convex integration)
 
 **Core value:** Demonstrate working multi-agent coordination with clean, reusable patterns.
-**Current focus:** Phase 2 — Convex Schema & State Model
+**Current focus:** Phase 3 — Agent Foundation with Convex
 
 ## Current Position
 
 Phase: 2 of 9 (Convex Schema & State Model)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-16 — Completed 02-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-16 — Completed 02-02-PLAN.md
 
-Progress: █████░░░░░░ 22%
+Progress: ██████░░░░░ 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 18.3 min
-- Total execution time: 55 min
+- Total plans completed: 4
+- Average duration: 14.5 min
+- Total execution time: 58 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-project-setup | 2 | 2 | 25.5 min |
-| 02-convex-schema | 1 | 2 | 4 min |
+| 02-convex-schema | 2 | 2 | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (48 min), 01-02 (3 min), 02-01 (4 min)
-- Trend: Accelerating (infrastructure complete, schema definition fast)
+- Last 5 plans: 01-01 (48 min), 01-02 (3 min), 02-01 (4 min), 02-02 (3 min)
+- Trend: Accelerating (infrastructure complete, schema/API development fast)
 
 ## Accumulated Context
 
@@ -41,6 +41,8 @@ Progress: █████░░░░░░ 22%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- **Phase 02-02:** Helper functions in model/ directory follow separation-of-concerns pattern
+- **Phase 02-02:** Public API functions are thin wrappers with v.* argument validators
 - **Phase 02-01:** Nested metadata object for agentSessions (workflowId reference avoids circularity)
 - **Phase 02-01:** Indexes on status fields for efficient querying
 - **Phase 01-02:** Self-hosted Convex over Convex Cloud for local development control
@@ -62,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Completed 02-01-PLAN.md (Convex schema definition)
+Stopped at: Completed Phase 2 (02-02-PLAN.md)
 Resume file: None
