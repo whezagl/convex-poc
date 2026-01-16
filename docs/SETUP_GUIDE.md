@@ -83,43 +83,55 @@ flowchart TB
 
     DOCKER --> CONVEX_API
 
-    style ZAI fill:#f9f,stroke:#333
-    style GLM fill:#bbf,stroke:#333
-    style CONVEX_DB fill:#bfb,stroke:#333
-    style CONVEX_API fill:#fbf,stroke:#333
-    style DASHBOARD fill:#bbf,stroke:#333
+    style ZAI fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style GLM fill:#DC2F02,stroke:#000,stroke-width:3px,color:#fff
+    style CONVEX_DB fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style CONVEX_API fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style DASHBOARD fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style DOCKER fill:#2B2D42,stroke:#000,stroke-width:3px,color:#fff
 ```
 
 ### How Data Flows
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant App as Your App
     participant Convex as Convex Backend
     participant ZAI as Z.AI API
     participant DB as Database
 
-    App->>Convex: 1. Create workflow(task)
-    Convex->>DB: Store workflow
-    DB-->>Convex: workflow ID: j978q...
-    Convex-->>App: ✓ Workflow created
+    rect rgb(42, 157, 143)
+        App->>Convex: Create workflow(task)
+        Convex->>DB: Store workflow
+        DB-->>Convex: workflow ID: j978q...
+        Convex-->>App: ✓ Workflow created
+    end
 
-    App->>Convex: 2. Create agent session
-    Convex->>DB: Store session (linked to workflow)
-    DB-->>Convex: session ID: j5795...
-    Convex-->>App: ✓ Session created
+    rect rgb(42, 157, 143)
+        App->>Convex: Create agent session
+        Convex->>DB: Store session (linked to workflow)
+        DB-->>Convex: session ID: j5795...
+        Convex-->>App: ✓ Session created
+    end
 
-    App->>ZAI: 3. Call GLM-4.7 API
-    Note over App,ZAI: "Please write code for..."
-    ZAI-->>App: 4. AI response (code)
+    rect rgb(232, 93, 4)
+        App->>ZAI: Call GLM-4.7 API
+        Note over App,ZAI: "Please write code for..."
+        ZAI-->>App: AI response (code)
+    end
 
-    App->>Convex: 5. Update session with AI result
-    Convex->>DB: Save output to session
-    Convex-->>App: ✓ Session updated
+    rect rgb(0, 119, 182)
+        App->>Convex: Update session with AI result
+        Convex->>DB: Save output to session
+        Convex-->>App: ✓ Session updated
+    end
 
-    App->>Convex: 6. Update workflow: completed
-    Convex->>DB: Mark workflow as done
-    Convex-->>App: ✓ Workflow completed
+    rect rgb(0, 119, 182)
+        App->>Convex: Update workflow: completed
+        Convex->>DB: Mark workflow as done
+        Convex-->>App: ✓ Workflow completed
+    end
 ```
 
 ---
@@ -338,6 +350,16 @@ flowchart LR
     F --> G[Save AI Response<br/>to session]
     G --> H[Mark Workflow<br/>completed]
     H --> I[Verify in Dashboard<br/>http://localhost:6791]
+
+    style A fill:#2B2D42,stroke:#000,stroke-width:3px,color:#fff
+    style B fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style C fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style D fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style E fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style F fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style G fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style H fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style I fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
 ```
 
 ### Running the Test
@@ -486,10 +508,15 @@ flowchart TB
     CONVEX -->|Persist| DB
     CONVEX -->|Serve| DASH
 
-    style CONVEX fill:#e1f5ff
-    style ZAI_CLOUD fill:#fff4e6
-    style DB fill:#f3e5f5
-    style DASH fill:#e8f5e9
+    style DEV fill:#2B2D42,stroke:#000,stroke-width:3px,color:#fff
+    style ENV fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style CLI fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style APP fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style CLIENT fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style CONVEX fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style ZAI_CLOUD fill:#DC2F02,stroke:#000,stroke-width:3px,color:#fff
+    style DB fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style DASH fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
 ```
 
 ---
