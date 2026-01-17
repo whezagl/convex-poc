@@ -27,6 +27,8 @@
  * 3. Run: npx tsx examples/real-example.ts
  */
 
+import "dotenv/config.js";
+
 import { SequentialOrchestrator } from "../src/orchestrator/index.js";
 import type { ExecuteWorkflowConfig, WorkflowContext, WorkflowResult } from "../src/types/workflow.js";
 

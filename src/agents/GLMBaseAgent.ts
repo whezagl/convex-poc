@@ -36,6 +36,11 @@ export abstract class GLMBaseAgent {
   protected currentOutput: string | null = null;
 
   private readonly client: OpenAI;
+  private readonly verbose: boolean;
+  private readonly rateLimitConfig: Required<
+    NonNullable<AgentConfig["rateLimit"]>
+  >;
+  private lastRequestTime: number = 0;
 
   /**
    * Creates a new GLMBaseAgent instance.
@@ -53,12 +58,22 @@ export abstract class GLMBaseAgent {
       throw new Error("ZAI_API_KEY environment variable is required for GLMBaseAgent");
     }
 
+    this.verbose = config.verbose ?? false;
+    this.rateLimitConfig = {
+      minDelay: config.rateLimit?.minDelay ?? 1000,
+      maxRetries: config.rateLimit?.maxRetries ?? 3,
+      initialBackoff: config.rateLimit?.initialBackoff ?? 1000,
+    };
+
     this.client = new OpenAI({
       apiKey: apiKey,
       baseURL: "https://api.z.ai/api/paas/v4/",
     });
 
-    console.log(`[GLMBaseAgent] Initialized ${this.agentType} with Z.AI API`);
+    if (this.verbose) {
+      console.log(`[GLMBaseAgent] Initialized ${this.agentType} with Z.AI API`);
+      console.log(`[GLMBaseAgent] Rate limiting: minDelay=${this.rateLimitConfig.minDelay}ms, maxRetries=${this.rateLimitConfig.maxRetries}`);
+    }
   }
 
   /**
@@ -157,6 +172,46 @@ export abstract class GLMBaseAgent {
    * @returns The agent's response as a string
    */
   public async execute(input: string): Promise<string> {
+    // Apply rate limiting delay before making the request
+    await this.applyRateLimitDelay();
+
+    return this.executeWithRetry(input);
+  }
+
+  /**
+   * Applies rate limiting delay between requests.
+   * Ensures minimum time gap between consecutive API calls.
+   */
+  private async applyRateLimitDelay(): Promise<void> {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+
+    if (timeSinceLastRequest < this.rateLimitConfig.minDelay) {
+      const delay = this.rateLimitConfig.minDelay - timeSinceLastRequest;
+      if (this.verbose) {
+        console.log(`[GLMBaseAgent] Rate limiting: waiting ${delay}ms before request`);
+      }
+      await this.sleep(delay);
+    }
+
+    this.lastRequestTime = Date.now();
+  }
+
+  /**
+   * Sleep helper for delays.
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Executes the API call with retry logic for 429 errors.
+   * Implements exponential backoff for rate limit handling.
+   */
+  private async executeWithRetry(
+    input: string,
+    attempt: number = 1
+  ): Promise<string> {
     // Store input for Convex tracking
     this.currentInput = input;
     this.currentOutput = null;
@@ -165,66 +220,136 @@ export abstract class GLMBaseAgent {
     await this.createSession(input);
 
     try {
-      console.log(`[GLMBaseAgent] Calling GLM-4.7 with input: ${input.substring(0, 50)}...`);
+      return await this.callGLMAPI(input);
+    } catch (error) {
+      const is429Error = this.is429Error(error);
 
-      // Call GLM-4.7 with streaming enabled
-      const stream = await this.client.chat.completions.create({
-        model: this.getModel(),
-        messages: [
-          {
-            role: "system",
-            content: this.getSystemPrompt(),
-          },
-          {
-            role: "user",
-            content: input,
-          },
-        ],
-        thinking: {
-          type: "enabled", // Enable GLM-4.7's reasoning mode
-        },
-        stream: true,
-        temperature: this.getTemperature(),
-        max_tokens: this.getMaxTokens(),
-      });
-
-      // Collect streaming response
-      const chunks: string[] = [];
-      for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content || "";
-        const reasoning = chunk.choices[0]?.delta?.reasoning_content || "";
-
-        // GLM-4.7 returns both reasoning_content and content
-        if (reasoning) {
-          // Optional: You can capture reasoning if needed
-          // console.log(`[Reasoning]: ${reasoning}`);
-        }
-        if (content) {
-          chunks.push(content);
-        }
+      if (is429Error && attempt < this.rateLimitConfig.maxRetries) {
+        const backoffDelay = this.rateLimitConfig.initialBackoff * Math.pow(2, attempt - 1);
+        console.warn(
+          `[GLMBaseAgent] 429 error detected (attempt ${attempt}/${this.rateLimitConfig.maxRetries}), ` +
+            `retrying after ${backoffDelay}ms...`
+        );
+        await this.sleep(backoffDelay);
+        return this.executeWithRetry(input, attempt + 1);
       }
 
-      // Store output for Convex tracking
-      this.currentOutput = chunks.join("");
-
-      // Update session with successful result
-      await this.updateSession(this.currentOutput, "completed");
-
-      console.log(`[GLMBaseAgent] GLM-4.7 response received: ${this.currentOutput.length} chars`);
-
-      return this.currentOutput;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[GLMBaseAgent] GLM-4.7 call failed:`, error);
+      // Max retries exceeded or non-429 error
+      const errorMessage = this.getErrorMessage(error);
+      console.error(`[GLMBaseAgent] GLM call failed after ${attempt} attempts:`, error);
 
       // Update session with error status
-      await this.updateSession(
-        `Error: ${errorMessage}`,
-        "failed"
-      );
+      await this.updateSession(`Error: ${errorMessage}`, "failed");
 
-      throw new Error(`GLM-4.7 execution failed: ${errorMessage}`);
+      throw new Error(`GLM execution failed after ${attempt} attempts: ${errorMessage}`);
     }
+  }
+
+  /**
+   * Checks if an error is a 429 rate limit error.
+   */
+  private is429Error(error: unknown): boolean {
+    if (error instanceof Error) {
+      // Check for 429 status code in error message or custom status property
+      if ("status" in error && (error as { status: number }).status === 429) {
+        return true;
+      }
+      // Check for common 429 error messages
+      const message = error.message.toLowerCase();
+      return (
+        message.includes("429") ||
+        message.includes("rate limit") ||
+        message.includes("too many requests") ||
+        message.includes("insufficient balance")
+      );
+    }
+    return false;
+  }
+
+  /**
+   * Extracts error message from various error types.
+   */
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return String(error);
+  }
+
+  /**
+   * Calls the GLM-4.7 API with streaming enabled.
+   */
+  private async callGLMAPI(input: string): Promise<string> {
+    const startTime = Date.now();
+
+    if (this.verbose) {
+      console.log(`[GLMBaseAgent] API Request - Model: ${this.getModel()}`);
+      console.log(`[GLMBaseAgent] API Request - Input: ${input.substring(0, 100)}...`);
+      console.log(`[GLMBaseAgent] API Request - Temperature: ${this.getTemperature()}, MaxTokens: ${this.getMaxTokens()}`);
+    } else {
+      console.log(`[GLMBaseAgent] Calling GLM-4.7 with input: ${input.substring(0, 50)}...`);
+    }
+
+    // Call GLM-4.7 with streaming enabled
+    const stream = await this.client.chat.completions.create({
+      model: this.getModel(),
+      messages: [
+        {
+          role: "system",
+          content: this.getSystemPrompt(),
+        },
+        {
+          role: "user",
+          content: input,
+        },
+      ],
+      thinking: {
+        type: "enabled", // Enable GLM-4.7's reasoning mode
+      },
+      stream: true,
+      temperature: this.getTemperature(),
+      max_tokens: this.getMaxTokens(),
+    });
+
+    // Collect streaming response
+    const chunks: string[] = [];
+    let chunkCount = 0;
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      const reasoning = chunk.choices[0]?.delta?.reasoning_content || "";
+
+      // GLM-4.7 returns both reasoning_content and content
+      if (reasoning && this.verbose) {
+        // Capture reasoning in verbose mode
+        console.log(`[GLMBaseAgent] Reasoning chunk: ${reasoning.substring(0, 50)}...`);
+      }
+      if (content) {
+        chunks.push(content);
+        chunkCount++;
+        if (this.verbose && chunkCount % 10 === 0) {
+          console.log(`[GLMBaseAgent] Received ${chunkCount} chunks...`);
+        }
+      }
+    }
+
+    // Store output for Convex tracking
+    this.currentOutput = chunks.join("");
+
+    // Update session with successful result
+    await this.updateSession(this.currentOutput, "completed");
+
+    const duration = Date.now() - startTime;
+    if (this.verbose) {
+      console.log(`[GLMBaseAgent] API Response - Duration: ${duration}ms`);
+      console.log(`[GLMBaseAgent] API Response - Chunks received: ${chunkCount}`);
+      console.log(`[GLMBaseAgent] API Response - Output length: ${this.currentOutput.length} chars`);
+      console.log(`[GLMBaseAgent] API Response - Output preview: ${this.currentOutput.substring(0, 100)}...`);
+    } else {
+      console.log(`[GLMBaseAgent] GLM-4.7 response received: ${this.currentOutput.length} chars (${duration}ms)`);
+    }
+
+    return this.currentOutput;
   }
 
   /**

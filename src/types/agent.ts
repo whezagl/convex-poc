@@ -15,12 +15,23 @@ export type AgentProvider = "claude" | "glm";
  * @property model - Optional model name to use (defaults to "sonnet" for Claude, "glm-4.7" for GLM)
  * @property workflowId - Optional associated workflow ID for session tracking
  * @property provider - Optional provider override (defaults to BASE_AGENT env var or "claude")
+ * @property verbose - Enable verbose logging for API calls (default: false)
+ * @property rateLimit - Rate limiting configuration (primarily for GLM)
  */
 export interface AgentConfig {
   agentType: string;
   model?: string;
   workflowId?: Id<"workflows">;
   provider?: AgentProvider;
+  verbose?: boolean;
+  rateLimit?: {
+    /** Minimum delay between requests in milliseconds (default: 1000) */
+    minDelay?: number;
+    /** Maximum number of retry attempts for 429 errors (default: 3) */
+    maxRetries?: number;
+    /** Initial backoff delay in milliseconds for retries (default: 1000) */
+    initialBackoff?: number;
+  };
 }
 
 /**
