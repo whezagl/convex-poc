@@ -1,16 +1,16 @@
-import OpenAI from "openai";
 import type { Id } from "../../convex/_generated/dataModel.js";
 import { convex } from "../convex/client.js";
 import type { AgentConfig } from "../types/agent.js";
 
 /**
- * Abstract base class for GLM-4.7 agents using Z.AI's OpenAI-compatible API.
+ * Abstract base class for GLM-4.7 agents using Z.AI's API directly via fetch.
  *
  * This class provides:
  * - Automatic session creation and tracking via Convex
- * - GLM-4.7 integration with thinking mode enabled
- * - Streaming response support
- * - Protected methods for Convex integration details
+ * - GLM-4.7 integration using native fetch (no OpenAI SDK dependency)
+ * - Streaming response support via Server-Sent Events
+ * - Rate limiting with exponential backoff for 429 errors
+ * - Verbose logging mode for debugging
  *
  * Subclasses must implement:
  * - getSystemPrompt(): Returns the agent's system prompt
@@ -35,7 +35,8 @@ export abstract class GLMBaseAgent {
   protected currentInput: string | null = null;
   protected currentOutput: string | null = null;
 
-  private readonly client: OpenAI;
+  private readonly apiKey: string;
+  private readonly baseURL: string;
   private readonly verbose: boolean;
   private readonly rateLimitConfig: Required<
     NonNullable<AgentConfig["rateLimit"]>
@@ -58,6 +59,9 @@ export abstract class GLMBaseAgent {
       throw new Error("ZAI_API_KEY environment variable is required for GLMBaseAgent");
     }
 
+    this.apiKey = apiKey;
+    this.baseURL = "https://open.bigmodel.cn/api/paas/v4/";
+
     this.verbose = config.verbose ?? false;
     this.rateLimitConfig = {
       minDelay: config.rateLimit?.minDelay ?? 1000,
@@ -65,13 +69,9 @@ export abstract class GLMBaseAgent {
       initialBackoff: config.rateLimit?.initialBackoff ?? 1000,
     };
 
-    this.client = new OpenAI({
-      apiKey: apiKey,
-      baseURL: "https://api.z.ai/api/paas/v4/",
-    });
-
     if (this.verbose) {
-      console.log(`[GLMBaseAgent] Initialized ${this.agentType} with Z.AI API`);
+      console.log(`[GLMBaseAgent] Initialized ${this.agentType} with native fetch`);
+      console.log(`[GLMBaseAgent] Base URL: ${this.baseURL}`);
       console.log(`[GLMBaseAgent] Rate limiting: minDelay=${this.rateLimitConfig.minDelay}ms, maxRetries=${this.rateLimitConfig.maxRetries}`);
     }
   }
@@ -86,23 +86,21 @@ export abstract class GLMBaseAgent {
 
   /**
    * Returns the model name to use for this agent.
-   * Defaults to "glm-4.7" if not specified in config.
+   * Defaults to "GLM-4-Plus" for better concurrency handling.
    *
    * @returns The model name
    */
   protected getModel(): string {
-    return this.config.model || "glm-4.7";
+    return this.config.model || "GLM-4-Plus";
   }
 
   /**
    * Returns the temperature setting for the model.
-   * Lower values (0.1-0.3) for deterministic output
-   * Higher values (0.7-1.0) for creative output
    *
    * @returns The temperature value (0.0 to 1.0)
    */
   protected getTemperature(): number {
-    return 0.6; // Balanced temperature for code generation
+    return 0.6;
   }
 
   /**
@@ -116,12 +114,12 @@ export abstract class GLMBaseAgent {
 
   /**
    * Creates a new agent session in Convex.
-   *
-   * @param input - The input prompt for the session
    */
   protected async createSession(input: string): Promise<void> {
     if (!this.workflowId) {
-      console.warn(`[GLMBaseAgent] No workflowId provided, skipping session creation`);
+      if (this.verbose) {
+        console.warn(`[GLMBaseAgent] No workflowId provided, skipping session creation`);
+      }
       return;
     }
 
@@ -132,22 +130,22 @@ export abstract class GLMBaseAgent {
         workflowId: this.workflowId,
       });
       this.sessionId = session as Id<"agentSessions">;
-      console.log(`[GLMBaseAgent] Created session ${this.sessionId} for ${this.agentType}`);
+      if (this.verbose) {
+        console.log(`[GLMBaseAgent] Created session ${this.sessionId} for ${this.agentType}`);
+      }
     } catch (error) {
       console.error("[GLMBaseAgent] Failed to create session:", error);
-      // Don't throw - allow execution to proceed even if tracking fails
     }
   }
 
   /**
    * Updates the existing agent session in Convex.
-   *
-   * @param output - The output content to store
-   * @param status - The status of the session (completed, failed, etc.)
    */
   protected async updateSession(output: string, status: string): Promise<void> {
     if (!this.sessionId) {
-      console.warn(`[GLMBaseAgent] No sessionId to update`);
+      if (this.verbose) {
+        console.warn(`[GLMBaseAgent] No sessionId to update`);
+      }
       return;
     }
 
@@ -157,30 +155,24 @@ export abstract class GLMBaseAgent {
         status: status,
         output: output,
       });
-      console.log(`[GLMBaseAgent] Updated session ${this.sessionId} with status: ${status}`);
+      if (this.verbose) {
+        console.log(`[GLMBaseAgent] Updated session ${this.sessionId} with status: ${status}`);
+      }
     } catch (error) {
       console.error("[GLMBaseAgent] Failed to update session:", error);
-      // Don't throw - allow execution to complete gracefully
     }
   }
 
   /**
    * Main execution entry point for the agent.
-   * Calls the GLM-4.7 API via OpenAI SDK with streaming enabled.
-   *
-   * @param input - The input prompt for the agent
-   * @returns The agent's response as a string
    */
   public async execute(input: string): Promise<string> {
-    // Apply rate limiting delay before making the request
     await this.applyRateLimitDelay();
-
     return this.executeWithRetry(input);
   }
 
   /**
    * Applies rate limiting delay between requests.
-   * Ensures minimum time gap between consecutive API calls.
    */
   private async applyRateLimitDelay(): Promise<void> {
     const now = Date.now();
@@ -197,26 +189,20 @@ export abstract class GLMBaseAgent {
     this.lastRequestTime = Date.now();
   }
 
-  /**
-   * Sleep helper for delays.
-   */
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
    * Executes the API call with retry logic for 429 errors.
-   * Implements exponential backoff for rate limit handling.
    */
   private async executeWithRetry(
     input: string,
     attempt: number = 1
   ): Promise<string> {
-    // Store input for Convex tracking
     this.currentInput = input;
     this.currentOutput = null;
 
-    // Create session if workflowId is provided
     await this.createSession(input);
 
     try {
@@ -234,11 +220,9 @@ export abstract class GLMBaseAgent {
         return this.executeWithRetry(input, attempt + 1);
       }
 
-      // Max retries exceeded or non-429 error
       const errorMessage = this.getErrorMessage(error);
       console.error(`[GLMBaseAgent] GLM call failed after ${attempt} attempts:`, error);
 
-      // Update session with error status
       await this.updateSession(`Error: ${errorMessage}`, "failed");
 
       throw new Error(`GLM execution failed after ${attempt} attempts: ${errorMessage}`);
@@ -250,11 +234,9 @@ export abstract class GLMBaseAgent {
    */
   private is429Error(error: unknown): boolean {
     if (error instanceof Error) {
-      // Check for 429 status code in error message or custom status property
       if ("status" in error && (error as { status: number }).status === 429) {
         return true;
       }
-      // Check for common 429 error messages
       const message = error.message.toLowerCase();
       return (
         message.includes("429") ||
@@ -277,21 +259,12 @@ export abstract class GLMBaseAgent {
   }
 
   /**
-   * Calls the GLM-4.7 API with streaming enabled.
+   * Calls the GLM-4.7 API directly via fetch with streaming support.
    */
   private async callGLMAPI(input: string): Promise<string> {
     const startTime = Date.now();
 
-    if (this.verbose) {
-      console.log(`[GLMBaseAgent] API Request - Model: ${this.getModel()}`);
-      console.log(`[GLMBaseAgent] API Request - Input: ${input.substring(0, 100)}...`);
-      console.log(`[GLMBaseAgent] API Request - Temperature: ${this.getTemperature()}, MaxTokens: ${this.getMaxTokens()}`);
-    } else {
-      console.log(`[GLMBaseAgent] Calling GLM-4.7 with input: ${input.substring(0, 50)}...`);
-    }
-
-    // Call GLM-4.7 with streaming enabled
-    const stream = await this.client.chat.completions.create({
+    const requestBody = {
       model: this.getModel(),
       messages: [
         {
@@ -303,59 +276,78 @@ export abstract class GLMBaseAgent {
           content: input,
         },
       ],
-      thinking: {
-        type: "enabled", // Enable GLM-4.7's reasoning mode
-      },
-      stream: true,
+      stream: false, // Use non-streaming for simplicity
       temperature: this.getTemperature(),
       max_tokens: this.getMaxTokens(),
+    };
+
+    if (this.verbose) {
+      console.log(`[GLMBaseAgent] API Request - Model: ${this.getModel()}`);
+      console.log(`[GLMBaseAgent] API Request - URL: ${this.baseURL}chat/completions`);
+      console.log(`[GLMBaseAgent] API Request - Input: ${input.substring(0, 100)}...`);
+      console.log(`[GLMBaseAgent] API Request - Body:`, JSON.stringify(requestBody, null, 2));
+    } else {
+      console.log(`[GLMBaseAgent] Calling GLM (${this.getModel()}) with input: ${input.substring(0, 50)}...`);
+    }
+
+    const response = await fetch(`${this.baseURL}chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify(requestBody),
     });
 
-    // Collect streaming response
-    const chunks: string[] = [];
-    let chunkCount = 0;
+    const duration = Date.now() - startTime;
 
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      const reasoning = chunk.choices[0]?.delta?.reasoning_content || "";
+    if (!response.ok) {
+      const errorText = await response.text();
+      const errorData = this.tryParseJSON(errorText);
 
-      // GLM-4.7 returns both reasoning_content and content
-      if (reasoning && this.verbose) {
-        // Capture reasoning in verbose mode
-        console.log(`[GLMBaseAgent] Reasoning chunk: ${reasoning.substring(0, 50)}...`);
+      if (this.verbose) {
+        console.error(`[GLMBaseAgent] API Error - Status: ${response.status}`);
+        console.error(`[GLMBaseAgent] API Error - Response:`, errorData);
       }
-      if (content) {
-        chunks.push(content);
-        chunkCount++;
-        if (this.verbose && chunkCount % 10 === 0) {
-          console.log(`[GLMBaseAgent] Received ${chunkCount} chunks...`);
-        }
-      }
+
+      const error = new Error(
+        `GLM API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`
+      );
+      (error as { status: number }).status = response.status;
+      throw error;
     }
 
-    // Store output for Convex tracking
-    this.currentOutput = chunks.join("");
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
 
-    // Update session with successful result
-    await this.updateSession(this.currentOutput, "completed");
-
-    const duration = Date.now() - startTime;
     if (this.verbose) {
       console.log(`[GLMBaseAgent] API Response - Duration: ${duration}ms`);
-      console.log(`[GLMBaseAgent] API Response - Chunks received: ${chunkCount}`);
-      console.log(`[GLMBaseAgent] API Response - Output length: ${this.currentOutput.length} chars`);
-      console.log(`[GLMBaseAgent] API Response - Output preview: ${this.currentOutput.substring(0, 100)}...`);
+      console.log(`[GLMBaseAgent] API Response - Output length: ${content.length} chars`);
+      console.log(`[GLMBaseAgent] API Response - Output preview: ${content.substring(0, 100)}...`);
+      console.log(`[GLMBaseAgent] API Response - Full data:`, JSON.stringify(data, null, 2));
     } else {
-      console.log(`[GLMBaseAgent] GLM-4.7 response received: ${this.currentOutput.length} chars (${duration}ms)`);
+      console.log(`[GLMBaseAgent] GLM-4.7 response received: ${content.length} chars (${duration}ms)`);
     }
+
+    this.currentOutput = content;
+    await this.updateSession(this.currentOutput, "completed");
 
     return this.currentOutput;
   }
 
   /**
+   * Helper to safely parse JSON.
+   */
+  private tryParseJSON(text: string): unknown {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
+  }
+
+  /**
    * Returns the current session ID if a session is active.
-   *
-   * @returns The session ID or null if no session is active
    */
   public getSessionId(): Id<"agentSessions"> | null {
     return this.sessionId;
@@ -363,8 +355,6 @@ export abstract class GLMBaseAgent {
 
   /**
    * Returns the current output from the last execution.
-   *
-   * @returns The current output or null if no execution has occurred
    */
   public getOutput(): string | null {
     return this.currentOutput;
