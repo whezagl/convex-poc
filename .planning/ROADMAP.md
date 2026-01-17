@@ -26,6 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Example Task** - End-to-end demonstration
 - [x] **Phase 9: Documentation** - Pattern documentation and cleanup
 - [x] **Phase 10: Convex Deployment** - Self-hosted Convex backend deployment (post-project: ISS-001)
+- [ ] **Phase 11: GLM Integration** - Add GLM-4.7 model support via environment variables (post-project enhancement)
 ## Phase Details
 
 ### Phase 1: Project Setup
@@ -90,6 +91,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Goal**: Deploy self-hosted Convex backend and resolve ISS-001
 **Depends on**: Phase 9
 **Research**: Unlikely (follow SELF_HOSTED_SETUP_GUIDE.md)
+**Plans**: 1/1 Complete ✅
+
+### Phase 11: GLM Integration (Post-Project Enhancement)
+**Goal**: Add GLM-4.7 model support via environment variables using agent SDK's env option
+**Depends on**: Phase 3 (BaseAgent)
+**Research**: ✅ Complete (docs/GLM-4.7_INTEGRATION_RESEARCH2.md)
+**Research topics**: @anthropic-ai/claude-agent-sdk env option, GLM-4.7 compatible endpoint
 **Plans**: 1 plan pending
 
 ## Progress
@@ -109,7 +117,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Example Task | 1/1 | Complete | 2026-01-16 |
 | 9. Documentation | 1/1 | Complete | 2026-01-16 |
 | 10. Convex Deployment | 1/1 | Complete | 2026-01-16 |
+| 11. GLM Integration | 0/1 | Planned | - |
 
-**Overall Progress: 10/10 phases complete (100%)**
-**Total Plans: 12/12 complete**
+**Overall Progress: 10/11 phases complete (91%), Phase 11 is post-project enhancement**
+**Total Plans: 12/13 complete**
 **Total Execution Time: 164 min (2h 44m)**
