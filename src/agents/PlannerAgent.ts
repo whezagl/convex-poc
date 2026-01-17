@@ -2,6 +2,7 @@ import { BaseAgent } from "./BaseAgent.js";
 import type { AgentConfig } from "../types/agent.js";
 import type { PlanResult, PlanStep } from "../types/plan.js";
 import type { Id } from "../../convex/_generated/dataModel.js";
+import { parseJson } from "../utils/parseJson.js";
 
 /**
  * Configuration options specific to PlannerAgent.
@@ -81,7 +82,8 @@ Your responsibilities:
 ${detailGuidance}
 
 Output format requirements:
-- Return valid JSON only (no markdown formatting, no explanations outside JSON)
+- Return ONLY valid JSON wrapped in a markdown code block with the format \`\`\`json ... \`\`\`
+- Do NOT include any explanations outside the code block
 - Steps should be clear and independently verifiable
 - Each step description should be actionable (use verbs like "Create", "Implement", "Test")
 - Dependencies array contains step descriptions that must complete first
@@ -106,7 +108,16 @@ JSON structure:
   "risks": ["Authentication complexity may require additional research"]
 }
 
-Remember: Output ONLY valid JSON, nothing else.`;
+Example output format:
+\`\`\`json
+{
+  "steps": [...],
+  "estimatedDuration": "...",
+  "risks": [...]
+}
+\`\`\`
+
+Remember: Output ONLY the JSON code block, nothing else.`;
   }
 
   /**
@@ -160,51 +171,17 @@ Remember: Output ONLY valid JSON, nothing else.`;
   }
 
   /**
-   * Parses raw response string into PlanResult.
+   * Parses raw response string into PlanResult using robust JSON parsing.
    *
-   * Handles JSON extraction from response that may contain
-   * markdown code blocks or extra text.
+   * Uses the parseJson utility which handles multiple fallback strategies
+   * including fixing common escaping issues found in LLM responses.
    *
-   * @param rawResponse - Raw string response from Claude
+   * @param rawResponse - Raw string response from LLM
    * @returns Parsed PlanResult object
-   * @throws Error if JSON cannot be parsed
+   * @throws Error if JSON cannot be parsed after all strategies
    */
   private parsePlanResult(rawResponse: string): PlanResult {
-    try {
-      // Try to parse as-is first
-      return JSON.parse(rawResponse);
-    } catch (error) {
-      // If that fails, try to extract JSON from markdown code blocks
-      const jsonMatch = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[1]);
-        } catch (e) {
-          throw new Error(
-            `Failed to parse JSON from code block: ${
-              (e as Error).message
-            }`
-          );
-        }
-      }
-
-      // Try to find first valid JSON object in response
-      const objectMatch = rawResponse.match(/\{[\s\S]*\}/);
-      if (objectMatch) {
-        try {
-          return JSON.parse(objectMatch[0]);
-        } catch (e) {
-          // Fall through to error
-        }
-      }
-
-      throw new Error(
-        `Could not extract valid JSON from response: ${rawResponse.slice(
-          0,
-          100
-        )}...`
-      );
-    }
+    return parseJson(rawResponse);
   }
 
   /**

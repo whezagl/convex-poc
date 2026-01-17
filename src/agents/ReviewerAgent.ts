@@ -3,6 +3,7 @@ import type { AgentConfig } from "../types/agent.js";
 import type { ReviewResult, ReviewIssue } from "../types/review.js";
 import { validateReviewResult } from "../types/review.js";
 import type { Id } from "../../convex/_generated/dataModel.js";
+import { parseJson } from "../utils/parseJson.js";
 
 /**
  * Configuration options specific to ReviewerAgent.
@@ -86,7 +87,8 @@ Severity levels:
 - info: Observations and suggestions for improvement (style, minor optimizations)
 
 Output format requirements:
-- Return valid JSON only (no markdown formatting, no explanations outside JSON)
+- Return ONLY valid JSON wrapped in a markdown code block with the format \`\`\`json ... \`\`\`
+- Do NOT include any explanations outside the code block
 - Each issue should have a specific file location (file path and line number)
 - Suggestions should be actionable and specific
 - Keep issues between 0-${this.maxIssues} items
@@ -115,12 +117,22 @@ JSON structure:
   "filesReviewed": ["src/models/User.ts", "src/api/auth.ts"]
 }
 
+Example output format:
+\`\`\`json
+{
+  "issues": [...],
+  "summary": "...",
+  "overallStatus": "...",
+  "filesReviewed": [...]
+}
+\`\`\`
+
 Overall status determination:
 - approved: No issues, or only info-level issues
 - needs-changes: Has warnings but no errors
 - rejected: Has one or more errors
 
-Remember: Output ONLY valid JSON, nothing else.
+Remember: Output ONLY the JSON code block, nothing else.
 
 Best practices:
 - Check for common security vulnerabilities (SQL injection, XSS, CSRF, etc.)
@@ -184,51 +196,17 @@ Best practices:
   }
 
   /**
-   * Parses raw response string into ReviewResult.
+   * Parses raw response string into ReviewResult using robust JSON parsing.
    *
-   * Handles JSON extraction from response that may contain
-   * markdown code blocks or extra text.
+   * Uses the parseJson utility which handles multiple fallback strategies
+   * including fixing common escaping issues found in LLM responses.
    *
-   * @param rawResponse - Raw string response from Claude
+   * @param rawResponse - Raw string response from LLM
    * @returns Parsed ReviewResult object
-   * @throws Error if JSON cannot be parsed
+   * @throws Error if JSON cannot be parsed after all strategies
    */
   private parseReviewResult(rawResponse: string): ReviewResult {
-    try {
-      // Try to parse as-is first
-      return JSON.parse(rawResponse);
-    } catch (error) {
-      // If that fails, try to extract JSON from markdown code blocks
-      const jsonMatch = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[1]);
-        } catch (e) {
-          throw new Error(
-            `Failed to parse JSON from code block: ${
-              (e as Error).message
-            }`
-          );
-        }
-      }
-
-      // Try to find first valid JSON object in response
-      const objectMatch = rawResponse.match(/\{[\s\S]*\}/);
-      if (objectMatch) {
-        try {
-          return JSON.parse(objectMatch[0]);
-        } catch (e) {
-          // Fall through to error
-        }
-      }
-
-      throw new Error(
-        `Could not extract valid JSON from response: ${rawResponse.slice(
-          0,
-          100
-        )}...`
-      );
-    }
+    return parseJson(rawResponse);
   }
 
   /**

@@ -156,9 +156,31 @@ export abstract class BaseAgent {
 
     if (glmApiKey) {
       console.log(`[BaseAgent] GLM_API_KEY detected, configuring agent SDK to use GLM-4.7`);
+
+      // GLM provides an Anthropic-compatible endpoint at https://api.z.ai/api/anthropic
+      // The SDK appends /v1/messages, so the full URL becomes:
+      // https://api.z.ai/api/anthropic/v1/messages
+      // See: docs/GLM-4.7_INTEGRATION_RESEARCH2.md
+      const glmAnthropicUrl = 'https://api.z.ai/api/anthropic';
+
+      // Use the Anthropic-compatible endpoint, but allow override via GLM_BASE_URL
+      // Only use GLM_BASE_URL if it's not the OpenAI endpoint (which is incompatible with Claude SDK)
+      let baseUrl = glmAnthropicUrl;
+      if (glmBaseUrl && !glmBaseUrl.includes('/v4') && !glmBaseUrl.includes('/chat/completions')) {
+        baseUrl = glmBaseUrl;
+        console.log(`[BaseAgent] Using custom GLM endpoint from GLM_BASE_URL: ${baseUrl}`);
+      } else {
+        if (glmBaseUrl) {
+          console.log(`[BaseAgent] Ignoring GLM_BASE_URL (${glmBaseUrl}) - using Anthropic-compatible endpoint instead`);
+        }
+        console.log(`[BaseAgent] Using GLM Anthropic-compatible endpoint: ${baseUrl}`);
+      }
+
+      // CRITICAL: Must spread process.env first to preserve PATH for subprocess spawning
       options.env = {
+        ...process.env,
         ANTHROPIC_API_KEY: glmApiKey,
-        ...(glmBaseUrl && { ANTHROPIC_BASE_URL: glmBaseUrl }),
+        ANTHROPIC_BASE_URL: baseUrl,
       };
 
       // Default model to glm-4.7 when GLM is configured
@@ -199,30 +221,33 @@ export abstract class BaseAgent {
     this.currentOutput = null;
 
     const options = this.buildOptions();
-    const result = await query({ prompt: input, options });
 
-    // Collect all messages from the async generator
-    const messages: string[] = [];
-    for await (const message of result) {
-      // Process each message - extract text content from message
-      // Message structure may vary; extract text where possible
-      if (message && typeof message === "object") {
-        // Extract text from message if available
-        if ("text" in message && typeof message.text === "string") {
-          messages.push(message.text);
-        } else {
-          messages.push(JSON.stringify(message));
+    try {
+      const result = await query({ prompt: input, options });
+
+      // Collect all messages from the async generator
+      const messages: string[] = [];
+      for await (const message of result) {
+        // Process each message - extract result from SDK message format
+        if (message && typeof message === "object") {
+          // Only extract the actual result text from success/failure messages
+          // Skip system messages and other metadata
+          if (message.type === "result" && "result" in message && typeof message.result === "string") {
+            // This is the actual response from the LLM
+            messages.push(message.result);
+          }
+          // Ignore other message types (system init, tool use, etc.)
         }
-      } else if (typeof message === "string") {
-        messages.push(message);
       }
+
+      // Store output for Convex tracking
+      this.currentOutput = messages.join("\n");
+
+      return this.currentOutput;
+    } catch (error) {
+      console.error(`[BaseAgent] SDK error:`, error);
+      throw error;
     }
-
-    // Store output for Convex tracking
-    this.currentOutput = messages.join("\n");
-
-    // Return the final result
-    return this.currentOutput;
   }
 
   /**

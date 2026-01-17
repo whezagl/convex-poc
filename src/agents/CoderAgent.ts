@@ -3,6 +3,7 @@ import type { AgentConfig } from "../types/agent.js";
 import type { CodeResult, FileChange } from "../types/code.js";
 import { validateCodeResult } from "../types/code.js";
 import type { Id } from "../../convex/_generated/dataModel.js";
+import { parseJson } from "../utils/parseJson.js";
 
 /**
  * Configuration options specific to CoderAgent.
@@ -81,7 +82,8 @@ Your responsibilities:
 5. Provide a clear summary of what was changed${pathGuidance}
 
 Output format requirements:
-- Return valid JSON only (no markdown formatting, no explanations outside JSON)
+- Return ONLY valid JSON wrapped in a markdown code block with the format \`\`\`json ... \`\`\`
+- Do NOT include any explanations outside the code block
 - Each change should be complete and working code
 - Use "create" for new files, "update" for existing files, "delete" for removal
 - Include full file content in the content field
@@ -106,7 +108,16 @@ JSON structure:
   "filesModified": ["src/models/User.ts"]
 }
 
-Remember: Output ONLY valid JSON, nothing else.
+Example output format:
+\`\`\`json
+{
+  "changes": [...],
+  "summary": "...",
+  "filesModified": [...]
+}
+\`\`\`
+
+Remember: Output ONLY the JSON code block, nothing else.
 
 Best practices:
 - Write clean, readable code with proper formatting
@@ -169,51 +180,17 @@ Best practices:
   }
 
   /**
-   * Parses raw response string into CodeResult.
+   * Parses raw response string into CodeResult using robust JSON parsing.
    *
-   * Handles JSON extraction from response that may contain
-   * markdown code blocks or extra text.
+   * Uses the parseJson utility which handles multiple fallback strategies
+   * including fixing common escaping issues found in LLM responses.
    *
-   * @param rawResponse - Raw string response from Claude
+   * @param rawResponse - Raw string response from LLM
    * @returns Parsed CodeResult object
-   * @throws Error if JSON cannot be parsed
+   * @throws Error if JSON cannot be parsed after all strategies
    */
   private parseCodeResult(rawResponse: string): CodeResult {
-    try {
-      // Try to parse as-is first
-      return JSON.parse(rawResponse);
-    } catch (error) {
-      // If that fails, try to extract JSON from markdown code blocks
-      const jsonMatch = rawResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[1]);
-        } catch (e) {
-          throw new Error(
-            `Failed to parse JSON from code block: ${
-              (e as Error).message
-            }`
-          );
-        }
-      }
-
-      // Try to find first valid JSON object in response
-      const objectMatch = rawResponse.match(/\{[\s\S]*\}/);
-      if (objectMatch) {
-        try {
-          return JSON.parse(objectMatch[0]);
-        } catch (e) {
-          // Fall through to error
-        }
-      }
-
-      throw new Error(
-        `Could not extract valid JSON from response: ${rawResponse.slice(
-          0,
-          100
-        )}...`
-      );
-    }
+    return parseJson(rawResponse);
   }
 
   /**
