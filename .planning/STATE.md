@@ -95,7 +95,7 @@ Recent decisions affecting current work:
 
 **Updated: 2026-01-17**
 
-All todos completed.
+- **2026-01-17-glm-sdk-documentation.md** - Document GLM integration with @anthropic-ai/sdk (docs)
 
 ### Deferred Issues
 
