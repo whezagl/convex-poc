@@ -225,7 +225,8 @@ export class SequentialOrchestrator {
         workflowId: workflowId as any,
       });
 
-      const code: CodeResult = await coder.executeCode(planInput);
+      // Pass workspace path to enable file writing
+      const code: CodeResult = await coder.executeCode(planInput, this.config.workspace);
 
       // Save code artifact
       const codeJson = codeToJson(code);
@@ -272,18 +273,19 @@ export class SequentialOrchestrator {
     try {
       console.log(`[Orchestrator] Step 3: Review...`);
 
-      // Load plan and code artifacts for context
+      // Load plan artifact for context
       const planJson = await loadArtifact(this.config.workspace, "plan.json");
-      const codeJson = await loadArtifact(this.config.workspace, "code.json");
 
-      const reviewInput = `Task: ${task}\n\nPlan:\n${planJson}\n\nCode:\n${codeJson}`;
+      // Simplify reviewer input - pass task and plan only (reviewer reads actual files)
+      const reviewInput = `Task: ${task}\n\nPlan:\n${planJson}`;
 
       const reviewer = AgentFactory.createReviewer({
         agentType: "reviewer",
         workflowId: workflowId as any,
       });
 
-      const review: ReviewResult = await reviewer.executeReview(reviewInput);
+      // Pass workspace path to enable reading actual files
+      const review: ReviewResult = await reviewer.executeReview(reviewInput, this.config.workspace);
 
       // Save review artifact
       const reviewJson = reviewToJson(review);
