@@ -79,12 +79,17 @@ export abstract class BaseAgent {
   }
 
   /**
-   * Builds the SDK options with hooks for Convex integration.
+   * Builds the SDK options with hooks for Convex integration and GLM support.
    *
-   * @returns SDK options object with hooks configured
+   * When GLM_API_KEY is set, this method configures the agent SDK to route
+   * requests to GLM's compatible endpoint via the env option. The spawned
+   * Claude Code process receives ANTHROPIC_API_KEY and ANTHROPIC_BASE_URL
+   * pointing to GLM, enabling model-agnostic operation.
+   *
+   * @returns SDK options object with hooks and optional GLM env configuration
    */
   protected buildOptions(): Options {
-    return {
+    const options: Options = {
       systemPrompt: this.getSystemPrompt(),
       model: this.getModel(),
       hooks: {
@@ -144,6 +149,25 @@ export abstract class BaseAgent {
         ],
       },
     };
+
+    // Add GLM configuration via env option if GLM_API_KEY is set
+    const glmApiKey = process.env.GLM_API_KEY;
+    const glmBaseUrl = process.env.GLM_BASE_URL;
+
+    if (glmApiKey) {
+      console.log(`[BaseAgent] GLM_API_KEY detected, configuring agent SDK to use GLM-4.7`);
+      options.env = {
+        ANTHROPIC_API_KEY: glmApiKey,
+        ...(glmBaseUrl && { ANTHROPIC_BASE_URL: glmBaseUrl }),
+      };
+
+      // Default model to glm-4.7 when GLM is configured
+      if (!this.config.model) {
+        options.model = "glm-4.7";
+      }
+    }
+
+    return options;
   }
 
   /**
