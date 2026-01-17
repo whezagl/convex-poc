@@ -60,7 +60,7 @@ export abstract class GLMBaseAgent {
     }
 
     this.apiKey = apiKey;
-    this.baseURL = "https://open.bigmodel.cn/api/paas/v4/";
+    this.baseURL = "https://api.z.ai/api/coding/paas/v4/";
 
     this.verbose = config.verbose ?? false;
     this.rateLimitConfig = {
@@ -86,12 +86,12 @@ export abstract class GLMBaseAgent {
 
   /**
    * Returns the model name to use for this agent.
-   * Defaults to "GLM-4-Plus" for better concurrency handling.
+   * Defaults to "glm-4.7" for the coding endpoint.
    *
    * @returns The model name
    */
   protected getModel(): string {
-    return this.config.model || "GLM-4-Plus";
+    return this.config.model || "glm-4.7";
   }
 
   /**
