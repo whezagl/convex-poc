@@ -45,6 +45,14 @@ const client = new ConvexClient(CONVEX_URL, {
 });
 
 /**
+ * Closes the Convex client connection.
+ * Call this when shutting down the application to prevent hanging processes.
+ */
+export async function closeConvexClient(): Promise<void> {
+  await client.close();
+}
+
+/**
  * Convex client API with typed mutations and queries.
  * Provides type-safe access to deployed Convex functions.
  */

@@ -17,7 +17,7 @@ import type { WorkflowContext, WorkflowResult, WorkflowStep, Artifact, ExecuteWo
 import type { PlanResult } from "../types/plan.js";
 import type { CodeResult } from "../types/code.js";
 import type { ReviewResult } from "../types/review.js";
-import { convex } from "../convex/client.js";
+import { convex, closeConvexClient } from "../convex/client.js";
 import {
   createWorkspace,
   saveArtifact,
@@ -130,6 +130,14 @@ export class SequentialOrchestrator {
       } catch (error) {
         console.error(`[Orchestrator] Failed to update workflow status: ${error}`);
       }
+    }
+
+    // Close Convex client connection to prevent hanging
+    try {
+      await closeConvexClient();
+      console.log("[Orchestrator] Closed Convex client connection");
+    } catch (error) {
+      console.error(`[Orchestrator] Failed to close Convex client: ${error}`);
     }
 
     return result;
