@@ -4,6 +4,8 @@ import type { ReviewResult, ReviewIssue } from "../types/review.js";
 import { validateReviewResult } from "../types/review.js";
 import type { Id } from "../../convex/_generated/dataModel.js";
 import { parseJson } from "../utils/parseJson.js";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 /**
  * Configuration options specific to ReviewerAgent.
@@ -150,18 +152,99 @@ Best practices:
    * This method wraps BaseAgent.execute() to parse and validate
    * the JSON response from Claude, returning a typed ReviewResult.
    *
+   * Optionally reads actual file contents from workspace if workspacePath is provided.
+   *
    * @param input - The code or task to review
+   * @param workspacePath - Optional workspace path to read actual files from
    * @returns Structured review with issues, summary, and approval status
    * @throws Error if JSON parsing fails or result is invalid
    */
-  public async executeReview(input: string): Promise<ReviewResult> {
-    const rawResponse = await super.execute(input);
+  public async executeReview(input: string, workspacePath?: string): Promise<ReviewResult> {
+    let reviewInput = input;
+
+    // If workspace provided, extract file paths and read actual file contents
+    if (workspacePath) {
+      reviewInput = await this.buildReviewInputFromFiles(input, workspacePath);
+    }
+
+    const rawResponse = await super.execute(reviewInput);
 
     const review = this.parseReviewResult(rawResponse);
 
     this.validateReviewResult(review);
 
     return review;
+  }
+
+  /**
+   * Builds review input with actual file contents from workspace.
+   *
+   * Extracts file paths from the input (which contains task and plan),
+   * reads actual file contents, and formats them for the LLM.
+   *
+   * @param input - Original input containing task and plan JSON
+   * @param workspacePath - Path to workspace directory
+   * @returns Formatted input with actual file contents
+   */
+  private async buildReviewInputFromFiles(
+    input: string,
+    workspacePath: string
+  ): Promise<string> {
+    // Extract the task and plan from input
+    const taskMatch = input.match(/Task:\s*(.+?)(?:\n|$)/i);
+    const task = taskMatch ? taskMatch[1].trim() : input;
+
+    // Try to extract plan JSON to find file paths
+    const planMatch = input.match(/Plan:\s*(\{[\s\S]*\})/i);
+    let filePaths: string[] = [];
+
+    if (planMatch) {
+      try {
+        const plan = JSON.parse(planMatch[1]);
+        // Look for filesModified or filesWritten in the plan
+        if (plan.filesModified) {
+          filePaths = plan.filesModified;
+        } else if (plan.filesWritten) {
+          filePaths = plan.filesWritten;
+        }
+      } catch {
+        // If plan parsing fails, continue without it
+      }
+    }
+
+    // If no files found in plan, the input might already have the files listed
+    // In this case, return the input as-is
+    if (filePaths.length === 0) {
+      return input;
+    }
+
+    // Read actual file contents
+    const filesContent: string[] = [];
+    for (const filePath of filePaths) {
+      try {
+        const fullPath = join(workspacePath, filePath);
+        const content = await readFile(fullPath, "utf-8");
+        filesContent.push(`\n- ${filePath}\n${content}\n`);
+        console.log(`[ReviewerAgent] Read file: ${filePath}`);
+      } catch (error) {
+        console.error(`[ReviewerAgent] Failed to read file ${filePath}:`, error);
+        // Include file path with error note
+        filesContent.push(`\n- ${filePath}\n[Error: Could not read file]\n`);
+      }
+    }
+
+    // Build formatted input with actual file contents
+    let formattedInput = `Task: ${task}\n`;
+
+    if (planMatch) {
+      formattedInput += `\nPlan:\n${planMatch[1]}\n`;
+    }
+
+    if (filesContent.length > 0) {
+      formattedInput += `\nFiles to review:\n${filesContent.join("\n")}\n`;
+    }
+
+    return formattedInput;
   }
 
   /**
