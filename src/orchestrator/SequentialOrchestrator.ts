@@ -12,9 +12,7 @@
  * - Step timing and status tracking
  */
 
-import { PlannerAgent } from "../agents/PlannerAgent.js";
-import { CoderAgent } from "../agents/CoderAgent.js";
-import { ReviewerAgent } from "../agents/ReviewerAgent.js";
+import { AgentFactory } from "../agents/AgentFactory.js";
 import type { WorkflowContext, WorkflowResult, WorkflowStep, Artifact, ExecuteWorkflowConfig } from "../types/workflow.js";
 import type { PlanResult } from "../types/plan.js";
 import type { CodeResult } from "../types/code.js";
@@ -158,7 +156,7 @@ export class SequentialOrchestrator {
     try {
       console.log(`[Orchestrator] Step 1: Planning...`);
 
-      const planner = new PlannerAgent({
+      const planner = AgentFactory.createPlanner({
         agentType: "planner",
         workflowId: workflowId as any,
       });
@@ -214,7 +212,7 @@ export class SequentialOrchestrator {
       const planJson = await loadArtifact(this.config.workspace, "plan.json");
       const planInput = `Task: ${task}\n\nPlan:\n${planJson}`;
 
-      const coder = new CoderAgent({
+      const coder = AgentFactory.createCoder({
         agentType: "coder",
         workflowId: workflowId as any,
       });
@@ -272,7 +270,7 @@ export class SequentialOrchestrator {
 
       const reviewInput = `Task: ${task}\n\nPlan:\n${planJson}\n\nCode:\n${codeJson}`;
 
-      const reviewer = new ReviewerAgent({
+      const reviewer = AgentFactory.createReviewer({
         agentType: "reviewer",
         workflowId: workflowId as any,
       });

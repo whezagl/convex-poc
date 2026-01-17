@@ -337,22 +337,80 @@ src/agents/
 
 ```bash
 # .env
-# Claude API (existing)
-ANTHROPIC_API_KEY=your-claude-key
+# Agent provider selection (claude or glm)
+# Default: claude
+BASE_AGENT=glm
 
-# Z.AI API (new)
+# Z.AI API (required for GLM provider)
 ZAI_API_KEY=your-zai-api-key
+
+# Anthropic API (required for claude provider)
+ANTHROPIC_API_KEY=your-claude-key
 ```
 
 ---
 
-## Next Steps
+## Implementation Status
 
-1. **Review this research** - Confirm GLM-4.7 integration approach
-2. **Create implementation plan** - Break down into tasks
-3. **Implement GLMBaseAgent** - Core GLM-4.7 integration
-4. **Create test agents** - Verify functionality
-5. **Migrate existing agents** - Convert to use GLM-4.7
+**Status: ✅ COMPLETE** (Implemented 2026-01-17)
+
+### What Was Implemented
+
+1. **GLM Agent Classes** - Created GLM versions of all concrete agents:
+   - `GLMCoderAgent` - Code generation using GLM-4.7
+   - `GLMPlannerAgent` - Task planning using GLM-4.7
+   - `GLMReviewerAgent` - Code review using GLM-4.7
+
+2. **AgentFactory** - Factory pattern for provider selection:
+   - Reads `BASE_AGENT` environment variable
+   - Creates appropriate agent instances (Claude or GLM)
+   - Supports per-config provider override
+
+3. **SequentialOrchestrator Integration** - Updated to use AgentFactory:
+   - All agents now respect BASE_AGENT setting
+   - No code changes needed to switch providers
+
+4. **Type Definitions** - Added `AgentProvider` type:
+   - `"claude"` - Anthropic Claude SDK
+   - `"glm"` - Z.AI GLM-4.7 via OpenAI SDK
+
+5. **Documentation Updates**:
+   - `.env.example` - Added BASE_AGENT configuration
+   - `docs/SETUP_GUIDE.md` - Added provider selection guide
+
+### File Structure
+
+```
+src/agents/
+├── BaseAgent.ts              # Claude SDK implementation
+├── GLMBaseAgent.ts           # GLM-4.7 implementation ✅
+├── AgentFactory.ts           # Factory for provider selection ✅
+├── CoderAgent.ts             # Claude coder
+├── GLMCoderAgent.ts          # GLM coder ✅
+├── PlannerAgent.ts           # Claude planner
+├── GLMPlannerAgent.ts        # GLM planner ✅
+├── ReviewerAgent.ts          # Claude reviewer
+├── GLMReviewerAgent.ts       # GLM reviewer ✅
+└── index.ts                  # Updated exports ✅
+```
+
+### Usage Examples
+
+```typescript
+// Use BASE_AGENT env var (defaults to "claude")
+const planner = AgentFactory.createPlanner({ agentType: "planner" });
+const coder = AgentFactory.createCoder({ agentType: "coder" });
+const reviewer = AgentFactory.createReviewer({ agentType: "reviewer" });
+
+// Override provider for specific agent
+const glmCoder = AgentFactory.createCoder({
+  agentType: "coder",
+  provider: "glm"  // Always use GLM-4.7
+});
+
+// Direct instantiation still works
+const directGLM = new GLMCoderAgent({ agentType: "glm-coder" });
+```
 
 ---
 

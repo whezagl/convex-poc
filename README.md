@@ -2,7 +2,42 @@
 
 > **Project Status: ✅ Complete** — A fully functional multi-agent orchestration system demonstrating reusable patterns for autonomous coding agents.
 
-A proof-of-concept for building autonomous coding agents using the Claude Agent SDK integrated with Convex for persistent state management. This project demonstrates multi-agent coordination patterns where specialized agents (Planner, Coder, Reviewer) collaborate to complete coding tasks autonomously.
+A proof-of-concept for building autonomous coding agents using multiple AI provider integrations (Anthropic Claude SDK and Z.AI GLM-4.7 via OpenAI SDK) with Convex for persistent state management. This project demonstrates multi-agent coordination patterns where specialized agents (Planner, Coder, Reviewer) collaborate to complete coding tasks autonomously.
+
+## Provider Architecture
+
+```mermaid
+flowchart TB
+    subgraph Providers["AI Providers"]
+        CLAUDE["Claude SDK<br/>@anthropic-ai/claude-agent-sdk"]
+        GLM["GLM-4.7<br/>OpenAI SDK + Z.AI API"]
+    end
+
+    subgraph Factory["AgentFactory"]
+        FACTORY["AgentFactory.create()"]
+        ENV["BASE_AGENT env var"]
+    end
+
+    subgraph Agents["Concrete Agents"]
+        PLANNER["PlannerAgent"]
+        CODER["CoderAgent"]
+        REVIEWER["ReviewerAgent"]
+    end
+
+    ENV -->|reads| FACTORY
+    FACTORY -->|BASE_AGENT=claude| CLAUDE
+    FACTORY -->|BASE_AGENT=glm| GLM
+    CLAUDE --> Agents
+    GLM --> Agents
+
+    style CLAUDE fill:#DC2F02,stroke:#000,stroke-width:3px,color:#fff
+    style GLM fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style FACTORY fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style ENV fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style PLANNER fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style CODER fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style REVIEWER fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+```
 
 ## Quick Start
 
@@ -23,16 +58,98 @@ This POC showcases a working multi-agent orchestration system with:
 
 ### The Workflow
 
-```
-PlannerAgent → CoderAgent → ReviewerAgent
-     ↓              ↓              ↓
-  plan.json     code.json    review.json
+```mermaid
+flowchart LR
+    subgraph Input["Task Input"]
+        TASK["User Task"]
+    end
+
+    subgraph Orchestrator["SequentialOrchestrator"]
+        ORCH["Coordinate Workflow"]
+    end
+
+    subgraph Stage1["Stage 1: Planning"]
+        PLAN_AGENT["PlannerAgent"]
+        PLAN_ARTIFACT["plan.json<br/>PlanResult"]
+    end
+
+    subgraph Stage2["Stage 2: Coding"]
+        CODE_AGENT["CoderAgent"]
+        CODE_ARTIFACT["code.json<br/>CodeResult"]
+    end
+
+    subgraph Stage3["Stage 3: Review"]
+        REVIEW_AGENT["ReviewerAgent"]
+        REVIEW_ARTIFACT["review.json<br/>ReviewResult"]
+    end
+
+    subgraph Output["Final Output"]
+        RESULT["Workflow Result<br/>✓ Complete"]
+    end
+
+    TASK --> ORCH
+    ORCH --> PLAN_AGENT
+    PLAN_AGENT --> PLAN_ARTIFACT
+    PLAN_ARTIFACT --> CODE_AGENT
+    CODE_AGENT --> CODE_ARTIFACT
+    CODE_ARTIFACT --> REVIEW_AGENT
+    REVIEW_AGENT --> REVIEW_ARTIFACT
+    REVIEW_ARTIFACT --> RESULT
+
+    style TASK fill:#2B2D42,stroke:#000,stroke-width:3px,color:#fff
+    style ORCH fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
+    style PLAN_AGENT fill:#DC2F02,stroke:#000,stroke-width:3px,color:#fff
+    style PLAN_ARTIFACT fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style CODE_AGENT fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style CODE_ARTIFACT fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style REVIEW_AGENT fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style REVIEW_ARTIFACT fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style RESULT fill:#2A9D8F,stroke:#000,stroke-width:3px,color:#fff
 ```
 
 Each agent produces a JSON artifact that can be inspected for debugging and validation:
 - **plan.json** - Task decomposition with execution steps
 - **code.json** - File changes and implementation details
 - **review.json** - Validation feedback with issues and approval status
+
+### Provider-Specific Agent Implementations
+
+```mermaid
+flowchart TB
+    subgraph Base["Base Classes"]
+        BASE_AGENT["BaseAgent<br/>Claude SDK"]
+        GLM_BASE["GLMBaseAgent<br/>OpenAI SDK"]
+    end
+
+    subgraph ClaudeAgents["Claude SDK Agents"]
+        CLAUDE_PLANNER["PlannerAgent"]
+        CLAUDE_CODER["CoderAgent"]
+        CLAUDE_REVIEWER["ReviewerAgent"]
+    end
+
+    subgraph GLMAgents["GLM SDK Agents"]
+        GLM_PLANNER["GLMPlannerAgent"]
+        GLM_CODER["GLMCoderAgent"]
+        GLM_REVIEWER["GLMReviewerAgent"]
+    end
+
+    BASE_AGENT --> CLAUDE_PLANNER
+    BASE_AGENT --> CLAUDE_CODER
+    BASE_AGENT --> CLAUDE_REVIEWER
+
+    GLM_BASE --> GLM_PLANNER
+    GLM_BASE --> GLM_CODER
+    GLM_BASE --> GLM_REVIEWER
+
+    style BASE_AGENT fill:#DC2F02,stroke:#000,stroke-width:3px,color:#fff
+    style GLM_BASE fill:#E85D04,stroke:#000,stroke-width:3px,color:#fff
+    style CLAUDE_PLANNER fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style CLAUDE_CODER fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style CLAUDE_REVIEWER fill:#6A4C93,stroke:#000,stroke-width:3px,color:#fff
+    style GLM_PLANNER fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style GLM_CODER fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+    style GLM_REVIEWER fill:#0077B6,stroke:#000,stroke-width:3px,color:#fff
+```
 
 ## What Was Built
 
@@ -44,12 +161,20 @@ This POC delivered a complete multi-agent orchestration system:
 - Three specialized agents with typed interfaces (PlanResult, CodeResult, ReviewResult)
 - Filesystem-based state passing for inspection and debugging
 - Comprehensive examples with verification utilities
-- 126+ passing tests with full type safety
+- 159+ passing tests with full type safety
+
+**Provider Support:**
+- Dual provider architecture (Claude SDK + GLM-4.7 via OpenAI SDK)
+- AgentFactory for environment-based provider selection
+- Per-agent provider override capability
+- GLM-specific agent implementations (GLMPlannerAgent, GLMCoderAgent, GLMReviewerAgent)
 
 **Patterns Established:**
 - BaseAgent abstract class with SDK hooks for Convex integration
+- GLMBaseAgent abstract class for OpenAI SDK integration
 - Sequential orchestration with filesystem artifact passing
 - Agent specialization with typed result interfaces
+- Factory pattern for provider abstraction
 - Optional Convex workflow tracking for persistence
 
 **Learning Outcomes:**
@@ -100,13 +225,53 @@ convex-poc/
 ## Technical Stack
 
 - **TypeScript/Node** - Primary development environment
-- **Claude Agent SDK** - Agent session management
+- **Claude Agent SDK** - Anthropic Claude integration (default provider)
+- **OpenAI SDK** - Z.AI GLM-4.7 integration (alternative provider)
 - **Convex** - Optional persistent state management (self-hosted via Docker)
 - **SequentialOrchestrator** - Multi-agent coordination pattern
+- **AgentFactory** - Environment-based provider selection
+
+## Provider Selection
+
+The project supports two AI providers via the `BASE_AGENT` environment variable:
+
+| Provider | BASE_AGENT Value | Model | Description |
+|----------|------------------|-------|-------------|
+| **Claude SDK** | `claude` (default) | sonnet, opus, haiku | Anthropic's Claude Agent SDK with hooks |
+| **GLM-4.7** | `glm` | glm-4.7 | Z.AI's model via OpenAI SDK with thinking mode |
+
+### Configuration
+
+```bash
+# .env
+# Default: Uses Claude SDK
+BASE_AGENT=claude
+
+# Alternative: Uses GLM-4.7
+BASE_AGENT=glm
+ZAI_API_KEY=your-zai-api-key
+```
+
+### Factory Pattern
+
+```typescript
+import { AgentFactory } from './agents';
+
+// Uses BASE_AGENT env var (defaults to "claude")
+const coder = AgentFactory.createCoder({ agentType: "coder" });
+
+// Override provider per agent
+const glmPlanner = AgentFactory.createPlanner({
+  agentType: "planner",
+  provider: "glm"
+});
+```
 
 ## Documentation
 
 - **Pattern Guide**: [.planning/PATTERNS.md](./.planning/PATTERNS.md) — Reusable multi-agent coordination patterns
+- **Setup Guide**: [docs/SETUP_GUIDE.md](./docs/SETUP_GUIDE.md) — Convex + Z.AI integration setup
+- **GLM-4.7 Integration**: [docs/GLM-4.7_INTEGRATION_RESEARCH.md](./docs/GLM-4.7_INTEGRATION_RESEARCH.md) — GLM provider research
 - **Examples & Tutorials**: [examples/README.md](./examples/README.md)
 - **Project Context**: [.planning/PROJECT.md](./.planning/PROJECT.md)
 - **Completion Summary**: [.planning/COMPLETION.md](./.planning/COMPLETION.md)
@@ -115,8 +280,19 @@ convex-poc/
 ## Prerequisites
 
 - Node.js (v18 or higher)
-- Anthropic API key from [console.anthropic.com](https://console.anthropic.com/)
+- Anthropic API key from [console.anthropic.com](https://console.anthropic.com/) (for Claude provider)
+- Z.AI API key from [platform.z.ai](https://platform.z.ai/) (for GLM provider)
 - (Optional) Convex backend for state tracking
+
+### API Key Setup
+
+```bash
+# For Claude SDK (default)
+ANTHROPIC_API_KEY=your-anthropic-key
+
+# For GLM-4.7
+ZAI_API_KEY=your-zai-api-key
+```
 
 ## Installation
 

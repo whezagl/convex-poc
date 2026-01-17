@@ -276,6 +276,36 @@ Your complete `.env` should look like:
 CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210
 CONVEX_SELF_HOSTED_ADMIN_KEY=convex-self-hosted|your-full-key-here
 ZAI_API_KEY=4671e4a1cc714fe19ab2675d0a1279e4.6LBtjGBGTSN4hekM
+
+# Agent Provider Selection (optional)
+# Options: "claude" (default) or "glm"
+BASE_AGENT=claude
+```
+
+### Understanding BASE_AGENT Configuration
+
+The `BASE_AGENT` environment variable controls which AI provider your agents use:
+
+| Value | Provider | Model | Use When |
+|-------|----------|-------|----------|
+| `claude` (or unset) | Anthropic | sonnet/opus/haiku | You want Claude SDK features |
+| `glm` | Z.AI | GLM-4.7 | You want GLM-4.7 with thinking mode |
+
+**How it works:**
+- All agents (Planner, Coder, Reviewer) respect this setting
+- The `AgentFactory` reads `BASE_AGENT` and creates appropriate agent instances
+- Individual agents can override via `provider` property in their config
+
+**Example:**
+```typescript
+// Uses BASE_AGENT env var (defaults to "claude")
+const planner = AgentFactory.createPlanner({ agentType: "planner" });
+
+// Override to use GLM regardless of env var
+const coder = AgentFactory.createCoder({
+  agentType: "coder",
+  provider: "glm"
+});
 ```
 
 ### Step 3: Install Dependencies

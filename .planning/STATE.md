@@ -95,7 +95,7 @@ Recent decisions affecting current work:
 
 **Updated: 2026-01-17**
 
-1 pending todo.
+All todos completed.
 
 ### Deferred Issues
 
