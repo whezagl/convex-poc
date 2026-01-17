@@ -563,7 +563,7 @@ export async function saveValidatedArtifact(
 
 **Purpose:** Swap underlying model "brain" while keeping agent framework "body"
 
-The @anthropic-ai/sdk supports custom API endpoints via the `baseURL` parameter. This enables using alternative LLM providers (like GLM-4.7) that offer API-compatible endpoints while maintaining the same agent orchestration logic.
+The Claude Agent SDK's `env` option enables routing requests to alternative LLM providers (like GLM-4.7) that offer API-compatible endpoints. This allows BaseAgent to use different models without code changes by passing environment variables to the spawned Claude Code process.
 
 ### Concept: "Body" vs "Brain"
 
@@ -573,87 +573,98 @@ The @anthropic-ai/sdk supports custom API endpoints via the `baseURL` parameter.
 The body handles: tool use, memory management, task planning, state persistence.
 The brain handles: reasoning, understanding, generation.
 
-### Configuration
+### How It Works
 
-The TypeScript SDK uses camelCase `baseURL` (not `base_url` like Python):
+BaseAgent.buildOptions() detects GLM environment variables and passes them to the agent SDK:
 
 ```typescript
-import Anthropic from '@anthropic-ai/sdk';
+// From BaseAgent.buildOptions()
+const glmApiKey = process.env.GLM_API_KEY;
+const glmBaseUrl = process.env.GLM_BASE_URL;
 
-// Initialize with GLM-4.7 compatible endpoint
-const client = new Anthropic({
-  apiKey: process.env.GLM_API_KEY,
-  baseURL: 'https://api.z.ai/api/coding/paas/v4'
-});
+if (glmApiKey) {
+  options.env = {
+    ANTHROPIC_API_KEY: glmApiKey,
+    ...(glmBaseUrl && { ANTHROPIC_BASE_URL: glmBaseUrl }),
+  };
 
-// Use normally - the SDK routes requests to GLM instead of Anthropic
-const message = await client.messages.create({
-  model: 'glm-4.7',
-  max_tokens: 1024,
-  messages: [{ role: 'user', content: 'Hello GLM via Claude SDK' }]
-});
+  // Default model to glm-4.7 when GLM is configured
+  if (!this.config.model) {
+    options.model = "glm-4.7";
+  }
+}
 ```
+
+**The Flow:**
+1. BaseAgent detects `GLM_API_KEY` environment variable
+2. buildOptions() adds `env` object with `ANTHROPIC_API_KEY` and `ANTHROPIC_BASE_URL` to SDK options
+3. Agent SDK spawns Claude Code process with these environment variables
+4. Claude Code process routes requests to GLM's compatible endpoint instead of Anthropic
+5. Model automatically defaults to 'glm-4.7' when GLM is configured
 
 ### Environment Variables
 
 For development and production flexibility, use environment variables:
 
 ```bash
-# .env file
+# .env file (optional - when not set, uses Anthropic defaults)
 GLM_API_KEY=your-glm-api-key
 GLM_BASE_URL=https://api.z.ai/api/coding/paas/v4
 ```
 
-```typescript
-const client = new Anthropic({
-  apiKey: process.env.GLM_API_KEY || process.env.ANTHROPIC_API_KEY,
-  baseURL: process.env.GLM_BASE_URL || 'https://api.anthropic.com'
-});
-```
+**Important:** These variables are **optional**. When not set, BaseAgent uses default Anthropic models with no configuration needed.
 
 ### Using with BaseAgent
 
-To use GLM with BaseAgent, create a factory function:
+BaseAgent handles GLM configuration automatically. No code changes needed:
 
 ```typescript
-import Anthropic from '@anthropic-ai/sdk';
 import { BaseAgent } from "./agents/BaseAgent.js";
-
-function createLLMClient() {
-  // Support both Claude and GLM via environment
-  const apiKey = process.env.GLM_API_KEY || process.env.ANTHROPIC_API_KEY;
-  const baseURL = process.env.GLM_BASE_URL;
-
-  return new Anthropic({ apiKey, baseURL });
-}
 
 class MyAgent extends BaseAgent {
   protected getSystemPrompt(): string {
     return "You are a helpful assistant...";
   }
-
-  // Override to use custom client
-  protected async execute(input: string): Promise<string> {
-    const client = createLLMClient();
-    const response = await client.messages.create({
-      model: process.env.GLM_API_KEY ? 'glm-4.7' : 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: input }]
-    });
-    return response.content[0].text;
-  }
 }
+
+// With GLM_API_KEY set in environment:
+// - Automatically uses GLM-4.7 via compatible endpoint
+// - Model defaults to 'glm-4.7'
+const agent = new MyAgent({ agentType: "my-agent" });
+const result = await agent.execute("Help me write TypeScript code");
+
+// Without GLM_API_KEY:
+// - Uses default Anthropic models
+// - Model defaults to 'sonnet'
+const agent2 = new MyAgent({ agentType: "my-agent" });
+const result2 = await agent2.execute("Help me write TypeScript code");
 ```
+
+### Implementation Notes
+
+**Why Agent SDK's `env` Option?**
+
+The agent SDK's `env` option was chosen over direct @anthropic-ai/sdk instantiation because:
+
+1. **No New Dependencies**: Uses existing @anthropic-ai/claude-agent-sdk (v0.2.7) with `env` option
+2. **Clean Architecture**: BaseAgent continues to use agent SDK's `query()` function; model selection happens at SDK level
+3. **Separation of Concerns**: BaseAgent handles orchestration; SDK handles model routing
+4. **Backward Compatible**: Existing code works without GLM configuration
+
+**Not Using Low-Level SDK Directly**
+
+The plan intentionally does **NOT** add @anthropic-ai/sdk as a dependency. Instead, it leverages the agent SDK's ability to pass environment variables to the spawned Claude Code process. This maintains the existing architecture where BaseAgent uses the agent SDK's high-level `query()` function.
 
 ### Comparison: Claude vs GLM
 
 | Feature | Claude (Native) | GLM-4.7 (Compatible) |
 |---------|-----------------|----------------------|
-| Setup | Official SDK | Requires baseURL config |
-| Model | Claude 3.5 Sonnet | GLM-4.7 |
+| Setup | No configuration needed | Set GLM_API_KEY and GLM_BASE_URL |
+| Model | Claude 3.5 Sonnet (default: "sonnet") | GLM-4.7 (default: "glm-4.7") |
 | Cost | Higher per token | Often more cost-effective |
 | Data processed | Anthropic servers | 智谱AI servers |
 | Best for | Best-in-class reasoning | Cost-effective alternative |
+| Code changes | None | None (automatic via env) |
 
 ### Key Considerations
 
@@ -662,6 +673,8 @@ class MyAgent extends BaseAgent {
 2. **Feature Parity**: Compatible endpoints may not support all features. Test thoroughly.
 
 3. **Debugging**: Issues could be in the body (agent code), brain (model), or integration layer.
+
+4. **Environment Variables**: GLM configuration is entirely optional. BaseAgent works without any GLM vars set.
 
 ### Research Reference
 
