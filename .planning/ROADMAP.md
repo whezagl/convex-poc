@@ -8,6 +8,14 @@ A journey from blank TypeScript project to a working multi-agent autonomous codi
 
 None - Claude Agent SDK patterns are the focus, and this is a learning POC to establish those patterns. Convex provides the persistent state layer. Docker Compose enables reproducible local development.
 
+## Milestones
+
+- ✅ **v0.3 File Writing Fix** — Phase 12 (shipped 2026-01-17)
+- ✅ **v0.2 GLM Integration** — Phase 11 (shipped 2026-01-17)
+- ✅ **v0.1 Core System** — Phases 1-10 (shipped 2026-01-16)
+
+---
+
 ## Phases
 
 **Phase Numbering:**
@@ -140,3 +148,24 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 **Overall Progress: 12/12 phases complete (100%)**
 **Total Plans: 14/14 complete**
 **Total Execution Time: 172 min (2h 52m)**
+
+---
+
+## Project Status
+
+**Status:** ✅ COMPLETE — All phases delivered, multi-agent workflow verified end-to-end.
+
+**Milestones Shipped:**
+- v0.1 Core System (Phases 1-10) — Shipped 2026-01-16
+- v0.2 GLM Integration (Phase 11) — Shipped 2026-01-17
+- v0.3 File Writing Fix (Phase 12) — Shipped 2026-01-17
+
+**Key Deliverables:**
+- Multi-agent orchestration system (Planner → Coder → Reviewer)
+- Self-hosted Convex backend via Docker Compose
+- GLM-4.7 model support via environment variables
+- End-to-end file operations (write to workspace, read for review)
+- Pattern documentation (PATTERNS.md)
+- Working example (email validator utility)
+
+**See MILESTONES.md for full milestone details.**
