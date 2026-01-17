@@ -27,6 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 9: Documentation** - Pattern documentation and cleanup
 - [x] **Phase 10: Convex Deployment** - Self-hosted Convex backend deployment (post-project: ISS-001)
 - [ ] **Phase 11: GLM Integration** - Add GLM-4.7 model support via environment variables (post-project enhancement)
+- [ ] **Phase 12: File Writing Implementation** - Implement actual file operations in CoderAgent and ReviewerAgent
 ## Phase Details
 
 ### Phase 1: Project Setup
@@ -98,7 +99,23 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Phase 3 (BaseAgent)
 **Research**: ✅ Complete (docs/GLM-4.7_INTEGRATION_RESEARCH2.md)
 **Research topics**: @anthropic-ai/claude-agent-sdk env option, GLM-4.7 compatible endpoint
-**Plans**: 1 plan pending
+**Plans**: 1/1 Complete ✅
+
+---
+
+### 🚧 v0.3 File Writing Fix (In Progress)
+
+**Milestone Goal:** Close the loop on multi-agent workflow by implementing actual file operations — CoderAgent writes files to workspace, ReviewerAgent reads actual source code.
+
+#### Phase 12: File Writing Implementation
+
+**Goal**: Implement actual file operations in CoderAgent (write to workspace) and ReviewerAgent (read actual files)
+**Depends on**: Phase 11
+**Research**: Unlikely (internal filesystem operations, established patterns)
+**Plans**: TBD
+
+Plans:
+- [ ] 12-01: TBD (run /gsd:plan-phase 12 to break down)
 
 ## Progress
 
@@ -118,7 +135,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 9. Documentation | 1/1 | Complete | 2026-01-16 |
 | 10. Convex Deployment | 1/1 | Complete | 2026-01-16 |
 | 11. GLM Integration | 1/1 | Complete | 2026-01-17 |
+| 12. File Writing | v0.3 | 0/? | Not started | - |
 
-**Overall Progress: 11/11 phases complete (100%)**
+**Overall Progress: 11/12 phases complete (92%)**
 **Total Plans: 13/13 complete**
 **Total Execution Time: 169 min (2h 49m)**
