@@ -7,23 +7,23 @@ See: .planning/PROJECT.md (updated 2026-01-16 after adding Convex integration)
 **Core value:** Demonstrate working multi-agent coordination with clean, reusable patterns.
 **Current focus:** Phase 11 — GLM Integration (planned)
 
-**Project Status: ✅ COMPLETE WITH POST-PROJECT ENHANCEMENT**
+**Project Status: ✅ COMPLETE**
 
 ## Current Position
 
 Phase: 11 of 11 (GLM Integration - Post-Project Enhancement)
-Plan: 1 of 1 pending
-Status: **PROJECT COMPLETE + POST-PROJECT PHASE PLANNED** — Phase 11 plan created
-Last activity: 2026-01-17 — Created 11-01-PLAN.md
+Plan: 1 of 1 complete
+Status: **PROJECT COMPLETE** — All 11 phases delivered
+Last activity: 2026-01-17 — Completed 11-01-PLAN.md (GLM Integration)
 
-Progress: ████████████ 91% (10/11 phases)
+Progress: ████████████ 100% (11/11 phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 10.8 min
-- Total execution time: 164 min (2h 44m)
+- Total plans completed: 13
+- Average duration: 13.0 min
+- Total execution time: 169 min (2h 49m)
 
 **By Phase:**
 
@@ -39,11 +39,11 @@ Progress: ████████████ 91% (10/11 phases)
 | 08-example-task | 1 | 1 | 8 min |
 | 09-documentation | 1 | 1 | 44 min |
 | 10-convex-deployment | 1 | 1 | 10 min |
-| 11-glm-integration | 0 | 1 | - |
+| 11-glm-integration | 1 | 1 | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (7 min), 07-01 (18 min), 08-01 (8 min), 09-01 (44 min), 10-01 (10 min)
-- Trend: Post-project deployment completed quickly; automated testing with Playwright added
+- Last 5 plans: 07-01 (18 min), 08-01 (8 min), 09-01 (44 min), 10-01 (10 min), 11-01 (5 min)
+- Trend: All phases complete; GLM integration added quickly using agent SDK's env option
 
 ## Accumulated Context
 
@@ -52,6 +52,10 @@ Progress: ████████████ 91% (10/11 phases)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- **Phase 11-01:** GLM integration uses agent SDK's env option (not adding @anthropic-ai/sdk dependency)
+- **Phase 11-01:** BaseAgent.buildOptions() passes ANTHROPIC_API_KEY and ANTHROPIC_BASE_URL to spawned Claude Code process
+- **Phase 11-01:** GLM model defaults to 'glm-4.7' when GLM_API_KEY is set; backward compatible without GLM vars
+- **Phase 11-01:** PATTERNS.md Pattern 6 corrected to reflect actual implementation approach
 - **Phase 10-01:** Self-hosted Convex backend deployed with convex/server ConvexClient (not convex-dev package)
 - **Phase 10-01:** Admin key format requires `convex-self-hosted|` prefix for authentication
 - **Phase 10-01:** BaseAgent hooks use correct HookInput properties (SessionStart: session_id, source; SessionEnd: reason)
@@ -123,14 +127,15 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-16
-Stopped at: Completed 10-01-PLAN.md (Convex Deployment) — **PROJECT COMPLETE + POST-PROJECT DELIVERY**
+Last session: 2026-01-17
+Stopped at: Completed 11-01-PLAN.md (GLM Integration) — **PROJECT COMPLETE**
 Resume file: None
 
 **Project Delivered:**
-- 10 phases, 12 plans
-- 164 min total execution (2h 44m)
+- 11 phases, 13 plans
+- 169 min total execution (2h 49m)
 - 126+ passing tests
 - Comprehensive pattern documentation (PATTERNS.md)
 - Complete project summary (COMPLETION.md)
 - Self-hosted Convex backend deployed and integrated (Phase 10)
+- GLM-4.7 integration via environment variables (Phase 11)
