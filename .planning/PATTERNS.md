@@ -559,6 +559,116 @@ export async function saveValidatedArtifact(
 
 ---
 
+## Pattern 6: Model-Agnostic Body (Alternative LLMs)
+
+**Purpose:** Swap underlying model "brain" while keeping agent framework "body"
+
+The @anthropic-ai/sdk supports custom API endpoints via the `baseURL` parameter. This enables using alternative LLM providers (like GLM-4.7) that offer API-compatible endpoints while maintaining the same agent orchestration logic.
+
+### Concept: "Body" vs "Brain"
+
+- **Body** = Agent Framework (Claude Agent SDK, BaseAgent, orchestrators)
+- **Brain** = AI Model (Claude, GPT-4, GLM-4.7)
+
+The body handles: tool use, memory management, task planning, state persistence.
+The brain handles: reasoning, understanding, generation.
+
+### Configuration
+
+The TypeScript SDK uses camelCase `baseURL` (not `base_url` like Python):
+
+```typescript
+import Anthropic from '@anthropic-ai/sdk';
+
+// Initialize with GLM-4.7 compatible endpoint
+const client = new Anthropic({
+  apiKey: process.env.GLM_API_KEY,
+  baseURL: 'https://api.z.ai/api/coding/paas/v4'
+});
+
+// Use normally - the SDK routes requests to GLM instead of Anthropic
+const message = await client.messages.create({
+  model: 'glm-4.7',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: 'Hello GLM via Claude SDK' }]
+});
+```
+
+### Environment Variables
+
+For development and production flexibility, use environment variables:
+
+```bash
+# .env file
+GLM_API_KEY=your-glm-api-key
+GLM_BASE_URL=https://api.z.ai/api/coding/paas/v4
+```
+
+```typescript
+const client = new Anthropic({
+  apiKey: process.env.GLM_API_KEY || process.env.ANTHROPIC_API_KEY,
+  baseURL: process.env.GLM_BASE_URL || 'https://api.anthropic.com'
+});
+```
+
+### Using with BaseAgent
+
+To use GLM with BaseAgent, create a factory function:
+
+```typescript
+import Anthropic from '@anthropic-ai/sdk';
+import { BaseAgent } from "./agents/BaseAgent.js";
+
+function createLLMClient() {
+  // Support both Claude and GLM via environment
+  const apiKey = process.env.GLM_API_KEY || process.env.ANTHROPIC_API_KEY;
+  const baseURL = process.env.GLM_BASE_URL;
+
+  return new Anthropic({ apiKey, baseURL });
+}
+
+class MyAgent extends BaseAgent {
+  protected getSystemPrompt(): string {
+    return "You are a helpful assistant...";
+  }
+
+  // Override to use custom client
+  protected async execute(input: string): Promise<string> {
+    const client = createLLMClient();
+    const response = await client.messages.create({
+      model: process.env.GLM_API_KEY ? 'glm-4.7' : 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: input }]
+    });
+    return response.content[0].text;
+  }
+}
+```
+
+### Comparison: Claude vs GLM
+
+| Feature | Claude (Native) | GLM-4.7 (Compatible) |
+|---------|-----------------|----------------------|
+| Setup | Official SDK | Requires baseURL config |
+| Model | Claude 3.5 Sonnet | GLM-4.7 |
+| Cost | Higher per token | Often more cost-effective |
+| Data processed | Anthropic servers | 智谱AI servers |
+| Best for | Best-in-class reasoning | Cost-effective alternative |
+
+### Key Considerations
+
+1. **API Compatibility**: This only works because GLM-4.7 provides an Anthropic-compatible endpoint. Not all providers do this.
+
+2. **Feature Parity**: Compatible endpoints may not support all features. Test thoroughly.
+
+3. **Debugging**: Issues could be in the body (agent code), brain (model), or integration layer.
+
+### Research Reference
+
+See `docs/GLM-4.7_INTEGRATION_RESEARCH2.md` for complete research on GLM-4.7 integration with Claude Code CLI and Agent SDK.
+
+---
+
 ## Applying These Patterns
 
 ### Quick Start for New Projects
