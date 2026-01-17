@@ -112,9 +112,6 @@ export abstract class GLMBaseAgent {
     return 4096;
   }
 
-  /**
-   * Creates a new agent session in Convex.
-   */
   protected async createSession(input: string): Promise<void> {
     if (!this.workflowId) {
       if (this.verbose) {
@@ -138,9 +135,6 @@ export abstract class GLMBaseAgent {
     }
   }
 
-  /**
-   * Updates the existing agent session in Convex.
-   */
   protected async updateSession(output: string, status: string): Promise<void> {
     if (!this.sessionId) {
       if (this.verbose) {
@@ -163,17 +157,11 @@ export abstract class GLMBaseAgent {
     }
   }
 
-  /**
-   * Main execution entry point for the agent.
-   */
   public async execute(input: string): Promise<string> {
     await this.applyRateLimitDelay();
     return this.executeWithRetry(input);
   }
 
-  /**
-   * Applies rate limiting delay between requests.
-   */
   private async applyRateLimitDelay(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
@@ -193,9 +181,6 @@ export abstract class GLMBaseAgent {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  /**
-   * Executes the API call with retry logic for 429 errors.
-   */
   private async executeWithRetry(
     input: string,
     attempt: number = 1
@@ -229,9 +214,6 @@ export abstract class GLMBaseAgent {
     }
   }
 
-  /**
-   * Checks if an error is a 429 rate limit error.
-   */
   private is429Error(error: unknown): boolean {
     if (error instanceof Error) {
       if ("status" in error && (error as { status: number }).status === 429) {
@@ -248,9 +230,6 @@ export abstract class GLMBaseAgent {
     return false;
   }
 
-  /**
-   * Extracts error message from various error types.
-   */
   private getErrorMessage(error: unknown): string {
     if (error instanceof Error) {
       return error.message;
@@ -258,9 +237,6 @@ export abstract class GLMBaseAgent {
     return String(error);
   }
 
-  /**
-   * Calls the GLM-4.7 API directly via fetch with streaming support.
-   */
   private async callGLMAPI(input: string): Promise<string> {
     const startTime = Date.now();
 
@@ -276,7 +252,7 @@ export abstract class GLMBaseAgent {
           content: input,
         },
       ],
-      stream: false, // Use non-streaming for simplicity
+      stream: false,
       temperature: this.getTemperature(),
       max_tokens: this.getMaxTokens(),
     };
@@ -335,9 +311,6 @@ export abstract class GLMBaseAgent {
     return this.currentOutput;
   }
 
-  /**
-   * Helper to safely parse JSON.
-   */
   private tryParseJSON(text: string): unknown {
     try {
       return JSON.parse(text);
@@ -346,16 +319,10 @@ export abstract class GLMBaseAgent {
     }
   }
 
-  /**
-   * Returns the current session ID if a session is active.
-   */
   public getSessionId(): Id<"agentSessions"> | null {
     return this.sessionId;
   }
 
-  /**
-   * Returns the current output from the last execution.
-   */
   public getOutput(): string | null {
     return this.currentOutput;
   }

@@ -98,9 +98,7 @@ export abstract class BaseAgent {
             hooks: [
               async (input: HookInput) => {
                 try {
-                  // Create agent session in Convex
                   if (this.workflowId) {
-                    // Extract available info from HookInput
                     const sessionId = (input as any).session_id || "unknown";
                     const source = (input as any).source || "startup";
 
@@ -114,7 +112,6 @@ export abstract class BaseAgent {
                   }
                 } catch (error) {
                   console.error("[BaseAgent] SessionStart error:", error);
-                  // Don't throw - allow session to proceed even if tracking fails
                 }
                 return { continue: true };
               },
@@ -126,7 +123,6 @@ export abstract class BaseAgent {
             hooks: [
               async (input: HookInput) => {
                 try {
-                  // Update final state in Convex
                   if (this.sessionId) {
                     const reason = (input as any).reason || "completed";
                     const output = this.currentOutput || `Session ended: ${reason}`;
@@ -140,7 +136,6 @@ export abstract class BaseAgent {
                   }
                 } catch (error) {
                   console.error("[BaseAgent] SessionEnd error:", error);
-                  // Don't throw - allow session to complete gracefully
                 }
                 return { continue: true };
               },
@@ -150,21 +145,14 @@ export abstract class BaseAgent {
       },
     };
 
-    // Add GLM configuration via env option if GLM_API_KEY is set
     const glmApiKey = process.env.GLM_API_KEY;
     const glmBaseUrl = process.env.GLM_BASE_URL;
 
     if (glmApiKey) {
       console.log(`[BaseAgent] GLM_API_KEY detected, configuring agent SDK to use GLM-4.7`);
 
-      // GLM provides an Anthropic-compatible endpoint at https://api.z.ai/api/anthropic
-      // The SDK appends /v1/messages, so the full URL becomes:
-      // https://api.z.ai/api/anthropic/v1/messages
-      // See: docs/GLM-4.7_INTEGRATION_RESEARCH2.md
       const glmAnthropicUrl = 'https://api.z.ai/api/anthropic';
 
-      // Use the Anthropic-compatible endpoint, but allow override via GLM_BASE_URL
-      // Only use GLM_BASE_URL if it's not the OpenAI endpoint (which is incompatible with Claude SDK)
       let baseUrl = glmAnthropicUrl;
       if (glmBaseUrl && !glmBaseUrl.includes('/v4') && !glmBaseUrl.includes('/chat/completions')) {
         baseUrl = glmBaseUrl;
@@ -176,14 +164,12 @@ export abstract class BaseAgent {
         console.log(`[BaseAgent] Using GLM Anthropic-compatible endpoint: ${baseUrl}`);
       }
 
-      // CRITICAL: Must spread process.env first to preserve PATH for subprocess spawning
       options.env = {
         ...process.env,
         ANTHROPIC_API_KEY: glmApiKey,
         ANTHROPIC_BASE_URL: baseUrl,
       };
 
-      // Default model to glm-4.7 when GLM is configured
       if (!this.config.model) {
         options.model = "glm-4.7";
       }
@@ -216,7 +202,6 @@ export abstract class BaseAgent {
    * @returns The agent's response as a string
    */
   public async execute(input: string): Promise<string> {
-    // Store input for Convex tracking
     this.currentInput = input;
     this.currentOutput = null;
 
@@ -225,22 +210,15 @@ export abstract class BaseAgent {
     try {
       const result = await query({ prompt: input, options });
 
-      // Collect all messages from the async generator
       const messages: string[] = [];
       for await (const message of result) {
-        // Process each message - extract result from SDK message format
         if (message && typeof message === "object") {
-          // Only extract the actual result text from success/failure messages
-          // Skip system messages and other metadata
           if (message.type === "result" && "result" in message && typeof message.result === "string") {
-            // This is the actual response from the LLM
             messages.push(message.result);
           }
-          // Ignore other message types (system init, tool use, etc.)
         }
       }
 
-      // Store output for Convex tracking
       this.currentOutput = messages.join("\n");
 
       return this.currentOutput;

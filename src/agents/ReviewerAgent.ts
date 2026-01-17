@@ -155,13 +155,10 @@ Best practices:
    * @throws Error if JSON parsing fails or result is invalid
    */
   public async executeReview(input: string): Promise<ReviewResult> {
-    // Call parent execute to get raw response
     const rawResponse = await super.execute(input);
 
-    // Parse JSON from the response
     const review = this.parseReviewResult(rawResponse);
 
-    // Validate the review structure
     this.validateReviewResult(review);
 
     return review;
@@ -181,8 +178,6 @@ Best practices:
     input: string,
     workflowId: Id<"workflows">
   ): Promise<ReviewResult> {
-    // Update workflowId for this execution
-    // Note: This creates a new instance with the workflowId
     const agentWithWorkflow = new ReviewerAgent({
       agentType: this.agentType,
       model: this.config.model,
@@ -191,7 +186,6 @@ Best practices:
       severity: this.severity,
     });
 
-    // Execute with workflow tracking
     return agentWithWorkflow.executeReview(input);
   }
 
@@ -225,17 +219,14 @@ Best practices:
    * @throws Error if validation fails
    */
   private validateReviewResult(review: ReviewResult): void {
-    // Use the imported validation function
     validateReviewResult(review);
 
-    // Additional ReviewerAgent-specific validation
     if (review.issues.length > this.maxIssues) {
       throw new Error(
         `Review issues exceed maxIssues limit of ${this.maxIssues}, got ${review.issues.length}`
       );
     }
 
-    // Filter by severity if configured
     if (this.severity) {
       const severityLevels = ["error", "warning", "info"];
       const minLevel = severityLevels.indexOf(this.severity);

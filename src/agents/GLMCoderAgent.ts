@@ -130,13 +130,10 @@ Best practices:
    * @throws Error if JSON parsing fails or result is invalid
    */
   public async executeCode(input: string): Promise<CodeResult> {
-    // Call parent execute to get raw response
     const rawResponse = await super.execute(input);
 
-    // Parse JSON from the response
     const code = this.parseCodeResult(rawResponse);
 
-    // Validate the code structure
     this.validateCodeResult(code);
 
     return code;
@@ -156,8 +153,6 @@ Best practices:
     input: string,
     workflowId: Id<"workflows">
   ): Promise<CodeResult> {
-    // Update workflowId for this execution
-    // Note: This creates a new instance with the workflowId
     const agentWithWorkflow = new GLMCoderAgent({
       agentType: this.agentType,
       model: this.config.model,
@@ -166,7 +161,6 @@ Best practices:
       allowedPaths: this.allowedPaths,
     });
 
-    // Execute with workflow tracking
     return agentWithWorkflow.executeCode(input);
   }
 
@@ -488,17 +482,14 @@ Best practices:
    * @throws Error if validation fails
    */
   private validateCodeResult(code: CodeResult): void {
-    // Use the imported validation function
     validateCodeResult(code);
 
-    // Additional GLMCoderAgent-specific validation
     if (code.changes.length > this.maxChanges) {
       throw new Error(
         `Code changes exceed maxChanges limit of ${this.maxChanges}, got ${code.changes.length}`
       );
     }
 
-    // Validate path restrictions if configured
     if (this.allowedPaths && this.allowedPaths.length > 0) {
       for (const change of code.changes) {
         const isAllowed = this.allowedPaths.some((allowedPath) =>

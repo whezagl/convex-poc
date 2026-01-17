@@ -131,13 +131,10 @@ Remember: Output ONLY the JSON code block, nothing else.`;
    * @throws Error if JSON parsing fails or result is invalid
    */
   public async executePlan(input: string): Promise<PlanResult> {
-    // Call parent execute to get raw response
     const rawResponse = await super.execute(input);
 
-    // Parse JSON from the response
     const plan = this.parsePlanResult(rawResponse);
 
-    // Validate the plan structure
     this.validatePlanResult(plan);
 
     return plan;
@@ -157,8 +154,6 @@ Remember: Output ONLY the JSON code block, nothing else.`;
     input: string,
     workflowId: Id<"workflows">
   ): Promise<PlanResult> {
-    // Update workflowId for this execution
-    // Note: This creates a new instance with the workflowId
     const agentWithWorkflow = new PlannerAgent({
       agentType: this.agentType,
       model: this.config.model,
@@ -166,7 +161,6 @@ Remember: Output ONLY the JSON code block, nothing else.`;
       detailLevel: this.detailLevel,
     });
 
-    // Execute with workflow tracking
     return agentWithWorkflow.executePlan(input);
   }
 
@@ -231,11 +225,9 @@ Remember: Output ONLY the JSON code block, nothing else.`;
         throw new Error(`Step ${i} must have a dependencies array`);
       }
 
-      // Track step descriptions for dependency validation
       stepDescriptions.add(step.description);
     }
 
-    // Validate that dependencies reference existing steps
     for (let i = 0; i < plan.steps.length; i++) {
       const step: PlanStep = plan.steps[i];
 
@@ -248,7 +240,6 @@ Remember: Output ONLY the JSON code block, nothing else.`;
       }
     }
 
-    // Validate optional fields
     if (plan.estimatedDuration && typeof plan.estimatedDuration !== "string") {
       throw new Error("estimatedDuration must be a string");
     }
