@@ -4,6 +4,8 @@ import type { CodeResult, FileChange } from "../types/code.js";
 import { validateCodeResult } from "../types/code.js";
 import type { Id } from "../../convex/_generated/dataModel.js";
 import { parseJson } from "../utils/parseJson.js";
+import { writeFile, mkdir, rm } from "node:fs/promises";
+import { join } from "node:path";
 
 /**
  * Configuration options specific to CoderAgent.
@@ -134,18 +136,78 @@ Best practices:
    * This method wraps BaseAgent.execute() to parse and validate
    * the JSON response from Claude, returning a typed CodeResult.
    *
+   * Optionally applies file changes to workspace if workspacePath is provided.
+   *
    * @param input - The task description to implement
+   * @param workspacePath - Optional workspace path to write files to
    * @returns Structured code changes with file operations and summary
    * @throws Error if JSON parsing fails or result is invalid
    */
-  public async executeCode(input: string): Promise<CodeResult> {
+  public async executeCode(input: string, workspacePath?: string): Promise<CodeResult> {
     const rawResponse = await super.execute(input);
 
     const code = this.parseCodeResult(rawResponse);
 
     this.validateCodeResult(code);
 
+    // Apply file changes if workspace path provided
+    if (workspacePath) {
+      const filesWritten = await this.applyFileChanges(workspacePath, code.changes);
+      // Update filesWritten field
+      code.filesWritten = filesWritten;
+      console.log(`[CoderAgent] Wrote ${filesWritten.length} files to workspace: ${workspacePath}`);
+    }
+
     return code;
+  }
+
+  /**
+   * Applies file changes to the workspace directory.
+   *
+   * Handles create, update, and delete operations:
+   * - create/update: Writes file content, creates parent directories if needed
+   * - delete: Removes the file from workspace
+   *
+   * @param workspacePath - Root workspace directory path
+   * @param changes - Array of file change operations to apply
+   * @returns List of file paths that were written
+   * @throws Error if file operations fail
+   */
+  public async applyFileChanges(
+    workspacePath: string,
+    changes: FileChange[]
+  ): Promise<string[]> {
+    const filesWritten: string[] = [];
+
+    for (const change of changes) {
+      const fullPath = join(workspacePath, change.path);
+
+      switch (change.operation) {
+        case "create":
+        case "update":
+          // Create parent directories if they don't exist
+          const dirPath = join(workspacePath, change.path, "..");
+          await mkdir(dirPath, { recursive: true });
+
+          // Write the file content
+          await writeFile(fullPath, change.content, "utf-8");
+          console.log(`[CoderAgent] ${change.operation}: ${change.path}`);
+          filesWritten.push(change.path);
+          break;
+
+        case "delete":
+          // Remove the file
+          await rm(fullPath, { force: true });
+          console.log(`[CoderAgent] delete: ${change.path}`);
+          filesWritten.push(change.path);
+          break;
+
+        default:
+          throw new Error(`Unknown operation: ${(change as any).operation}`);
+      }
+    }
+
+    return filesWritten;
   }
 
   /**

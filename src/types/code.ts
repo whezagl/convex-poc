@@ -24,11 +24,13 @@ export interface FileChange {
  * @property changes - Array of 1-10 file change operations
  * @property summary - Human-readable description of what was changed
  * @property filesModified - Array of file paths that were modified
+ * @property filesWritten - Optional array of file paths actually written to workspace
  */
 export interface CodeResult {
   changes: FileChange[];
   summary: string;
   filesModified: string[];
+  filesWritten?: string[];
 }
 
 /**
