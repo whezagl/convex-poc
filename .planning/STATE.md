@@ -95,7 +95,7 @@ Recent decisions affecting current work:
 
 **Updated: 2026-01-17**
 
-All todos completed.
+1. Add GLM API logging and handle 429 rate limiting (2026-01-17-glm-rate-limiting-and-logging.md)
 
 ### Deferred Issues
 
