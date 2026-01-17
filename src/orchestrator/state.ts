@@ -8,7 +8,7 @@
 import { mkdir, writeFile, readFile, rm } from "fs/promises";
 import { join } from "path";
 import type { PlanResult } from "../types/plan.js";
-import type { CodeResult } from "../types/code.js";
+import type { CodeResult, FileChange } from "../types/code.js";
 import type { ReviewResult } from "../types/review.js";
 import type { Artifact } from "../types/workflow.js";
 
@@ -154,4 +154,79 @@ export function reviewFromJson(json: string): ReviewResult {
   } catch (error) {
     throw new Error(`Failed to parse ReviewResult from JSON: ${error}`);
   }
+}
+
+/**
+ * Writes file changes to the workspace directory.
+ *
+ * Handles create, update, and delete operations:
+ * - create/update: Writes file content, creates parent directories if needed
+ * - delete: Removes the file from workspace
+ *
+ * @param workspace - Path to the workspace directory
+ * @param changes - Array of file change operations to apply
+ * @returns List of file paths that were written
+ * @throws Error if file operations fail
+ */
+export async function writeFilesToWorkspace(
+  workspace: string,
+  changes: FileChange[]
+): Promise<string[]> {
+  const filesWritten: string[] = [];
+
+  for (const change of changes) {
+    const fullPath = join(workspace, change.path);
+
+    switch (change.operation) {
+      case "create":
+      case "update":
+        // Create parent directories if they don't exist
+        const dirPath = join(workspace, change.path, "..");
+        await mkdir(dirPath, { recursive: true });
+
+        // Write the file content
+        await writeFile(fullPath, change.content, "utf-8");
+        filesWritten.push(change.path);
+        break;
+
+      case "delete":
+        // Remove the file
+        await rm(fullPath, { force: true });
+        filesWritten.push(change.path);
+        break;
+
+      default:
+        throw new Error(`Unknown operation: ${(change as any).operation}`);
+    }
+  }
+
+  return filesWritten;
+}
+
+/**
+ * Reads multiple files from the workspace directory.
+ *
+ * @param workspace - Path to the workspace directory
+ * @param filePaths - Array of file paths to read
+ * @returns Map of file path to content (null for missing files)
+ * @throws Error if workspace doesn't exist
+ */
+export async function readFilesFromWorkspace(
+  workspace: string,
+  filePaths: string[]
+): Promise<Map<string, string | null>> {
+  const fileContents = new Map<string, string | null>();
+
+  for (const filePath of filePaths) {
+    try {
+      const fullPath = join(workspace, filePath);
+      const content = await readFile(fullPath, "utf-8");
+      fileContents.set(filePath, content);
+    } catch (error) {
+      // Handle missing files gracefully - store null
+      fileContents.set(filePath, null);
+    }
+  }
+
+  return fileContents;
 }
