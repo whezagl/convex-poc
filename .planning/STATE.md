@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 10 of 11 in current phase (Template Auto-Loading Integration)
-Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-10 (Template Auto-Loading Integration)
+Plan: 11 of 11 in current phase (Hot-Reload Development Server)
+Status: Phase complete
+Last activity: 2026-01-18 — Completed Plan 14-11 (Hot-Reload Development Server)
 
-Progress: [███░░░░░░░░] 27% (12/45 plans in v1.0)
+Progress: [███░░░░░░░░] 29% (13/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26 (14 from v0.3 + 12 from v1.0)
-- Average duration: 8.5 min
-- Total execution time: 213 minutes (3h 33m)
+- Total plans completed: 27 (14 from v0.3 + 13 from v1.0)
+- Average duration: 8.4 min
+- Total execution time: 220 minutes (3h 40m)
 
 **By Phase:**
 
@@ -37,10 +37,11 @@ Progress: [███░░░░░░░░] 27% (12/45 plans in v1.0)
 | v1.0 Phase 14-08 | 1 | 2m | 2.0m |
 | v1.0 Phase 14-09 | 1 | 12m | 12.0m |
 | v1.0 Phase 14-10 | 1 | 1m | 1.0m |
+| v1.0 Phase 14-11 | 1 | 7m | 7.0m |
 
 **Recent Trend:**
-- Last 5 plans: [2m, 12m, 1m]
-- Latest (14-10): 1m
+- Last 5 plans: [12m, 1m, 7m]
+- Latest (14-11): 7m
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -117,6 +118,10 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-10: Synchronous file reading (readFileSync) for simpler template loading API
 - v1.0 Phase 14-10: Cache key uses absolute file path to avoid duplicates
 - v1.0 Phase 14-10: invalidateCache() method for hot-reload integration (supports single-path and full clearing)
+- v1.0 Phase 14-11: Hot-reload development server with chokidar directory watching (not glob patterns)
+- v1.0 Phase 14-11: Watch directory directly and filter by .hbs extension in event handlers for cross-platform compatibility
+- v1.0 Phase 14-11: Graceful shutdown with SIGINT handler and proper cleanup
+- v1.0 Phase 14-11: Chokidar moved to dependencies (runtime requirement for watcher module)
 
 ### Pending Todos
 
@@ -153,10 +158,15 @@ None yet.
 - ~~P5 project seed data must use valid themes and descriptive assessments~~ — Used all 8 official P5 themes with descriptive grading scale
 - ~~@faker-js/faker v10 API compatibility~~ — Fixed date.future() → date.soon(), userName → displayName for v10 compatibility
 
+**Resolved (Phase 14-11):**
+- ~~Chokidar glob pattern doesn't detect file changes on macOS~~ — Fixed by watching directory directly and filtering by extension
+- ~~Chokidar listed as devDependency but needed at runtime~~ — Moved to dependencies in package.json
+- ~~Workspace packages not symlinked for import resolution~~ — Used relative imports to dist/ directory
+
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-09 (Seed Data Generator), Phase 14 complete
+Stopped at: Completed Plan 14-11 (Hot-Reload Development Server), Phase 14 complete
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -176,3 +186,5 @@ Resume file: None
 **Completed Plan 14-09:** npm run seeds script with @faker-js/faker v10.2.0 for Indonesian locale data generation. Seed data generator with national ID validation (NISN=10, NIP=18, NUPTK=16, NPSN=8, NIK=16). SQL INSERT generation from JavaScript objects with proper array handling. Generates 200K+ INSERT statements across 24 tables with foreign key relationships. README with usage examples and Indonesian domain specifics.
 
 **Completed Plan 14-10:** TemplateEngine.load() method with file system integration, caching, and cache invalidation support. Synchronous file reading for simpler API. Cache key uses absolute file path. invalidateCache() method enables hot-reload integration. Templates can be loaded from .templates/ directory with automatic caching. Clear error messages when template files don't exist.
+
+**Completed Plan 14-11:** Hot-reload development server with working template watching and cache invalidation. Fixed chokidar glob pattern issue by watching directory directly and filtering by .hbs extension. Moved chokidar to dependencies for runtime availability. npm run dev:templates script for convenient development. Graceful shutdown with SIGINT handler. Automatic cache invalidation on template changes, additions, and deletions.
