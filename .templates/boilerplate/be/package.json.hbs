@@ -1,0 +1,38 @@
+{
+  "name": "{{pascalCase projectName}}",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "{{{description}}}",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc --watch & nodemon --watch dist --exec node dist/index.js",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check src/",
+    "lint:fix": "biome check --write src/",
+    "format": "biome format --write src/",
+    "db:migrate": "node dist/db/migrate.js",
+    "db:seed": "node dist/db/seed.js"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "zod": "^4.0.0",
+    "pg": "^8.13.0",
+    "@types/pg": "^8.11.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0",
+    "nodemon": "^3.1.0",
+    "@biomejs/biome": "^1.9.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
