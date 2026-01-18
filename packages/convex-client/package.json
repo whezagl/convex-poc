@@ -4,7 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./tasks": "./src/tasks.ts",
+    "./subtasks": "./src/subtasks.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -12,11 +14,11 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "convex": "^1.31.4"
+    "convex": "^1.31.4",
+    "@convex-poc/shared-types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "@types/node": "^25.0.9",
-    "vitest": "^4.0.17"
+    "@types/node": "^25.0.9"
   }
 }
