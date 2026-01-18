@@ -1,0 +1,89 @@
+/**
+ * {{pascalCase tableName}} Table Component
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+import type { {{pascalCase tableName}} } from './types.js';
+
+interface {{pascalCase tableName}}TableProps {
+  data: {{pascalCase tableName}}[];
+  onEdit: (item: {{pascalCase tableName}}) => void;
+  onDelete: (id: string) => void;
+  isLoading?: boolean;
+}
+
+export function {{pascalCase tableName}}Table({ data, onEdit, onDelete, isLoading }: {{pascalCase tableName}}TableProps) {
+  if (isLoading) {
+    return <div className="text-center py-4">Loading...</div>;
+  }
+
+  if (data.length === 0) {
+    return <div className="text-center py-4 text-gray-500">No {{camelCase tableName}} records found</div>;
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+{{#each (takeColumns columns 6)}
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              {{pascalCase name}}
+            </th>
+{{/each}}
+            <th scope="col" className="relative px-6 py-3">
+              <span className="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {data.map((item) => (
+            <tr key={item.{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}}>
+{{#each (takeColumns columns 6)}
+              <td className="px-6 py-4 whitespace-nowrap">
+                {format{{pascalCase name}}(item.{{name}})}
+              </td>
+{{/each}}
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button
+                  onClick={() => onEdit(item)}
+                  className="text-indigo-600 hover:text-indigo-900 mr-4"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => onDelete(item.{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}})}
+                  className="text-red-600 hover:text-red-900"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/**
+ * Format helpers for table columns
+ */
+{{#each (takeColumns columns 6)}}
+function format{{pascalCase name}}(value: any): string {
+  if (value === null || value === undefined) return '-';
+  {{#if (eq (typescriptType this) 'Date')}}
+    return new Date(value).toLocaleDateString();
+  {{else if (eq (typescriptType this) 'boolean')}}
+    return value ? 'Yes' : 'No';
+  {{else if (eq type 'text')}}
+    return String(value).substring(0, 50) + (String(value).length > 50 ? '...' : '');
+  {{else}}
+    return String(value);
+  {{/if}}
+}
+{{/each}}
