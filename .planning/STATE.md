@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 5 of 9 in current phase (Backend CRUD Templates)
+Plan: 6 of 9 in current phase (Frontend CRUD Templates)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-05 (Backend CRUD Templates)
+Last activity: 2026-01-18 — Completed Plan 14-06 (Frontend CRUD Templates)
 
-Progress: [██░░░░░░░░░] 18% (8/45 plans in v1.0)
+Progress: [██░░░░░░░░░] 20% (9/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22 (14 from v0.3 + 8 from v1.0)
-- Average duration: 9.0 min
-- Total execution time: 195 minutes (3h 15m)
+- Total plans completed: 23 (14 from v0.3 + 9 from v1.0)
+- Average duration: 8.7 min
+- Total execution time: 197 minutes (3h 17m)
 
 **By Phase:**
 
@@ -32,10 +32,11 @@ Progress: [██░░░░░░░░░] 18% (8/45 plans in v1.0)
 | v1.0 Phase 14-01 | 1 | 2m | 2.0m |
 | v1.0 Phase 14-02 | 1 | 3m | 3.0m |
 | v1.0 Phase 14-05 | 1 | 2m | 2.0m |
+| v1.0 Phase 14-06 | 1 | 2m | 2.0m |
 
 **Recent Trend:**
-- Last 5 plans: [3m, 2m, 4m, 2m, 2m]
-- Latest (14-05): 2m
+- Last 5 plans: [2m, 4m, 2m, 2m, 2m]
+- Latest (14-06): 2m
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -91,6 +92,11 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-05: Backend CRUD templates with repository pattern (findMany, findById, create, update, delete, count)
 - v1.0 Phase 14-05: Parameterized queries ($1, $2) for all SQL to prevent injection attacks
 - v1.0 Phase 14-05: Handlebars helpers (add, filterColumns, findColumn, takeColumns) for template column manipulation
+- v1.0 Phase 14-06: Frontend CRUD templates with TanStack Query integration (useQuery, useMutation)
+- v1.0 Phase 14-06: Query key factory pattern for hierarchical cache structure (all, lists, list, details, detail)
+- v1.0 Phase 14-06: Mutations invalidate both detail and list queries for data consistency
+- v1.0 Phase 14-06: Fetch API for HTTP requests with VITE_API_URL configuration
+- v1.0 Phase 14-06: Auto-generated README documentation with usage examples for all hooks
 
 ### Pending Todos
 
@@ -130,7 +136,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-05 (Backend CRUD Templates), ready for Plan 14-06 (Frontend CRUD Templates)
+Stopped at: Completed Plan 14-06 (Frontend CRUD Templates), ready for Plan 14-07 (CRUD Integration)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
