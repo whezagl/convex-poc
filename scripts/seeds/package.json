@@ -1,0 +1,17 @@
+{
+  "name": "@convex-poc/seeds",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "generate": "tsx generate-seeds.ts"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "@convex-poc/template-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "workspace:*"
+  }
+}
