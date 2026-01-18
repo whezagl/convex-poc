@@ -42,7 +42,7 @@ See MILESTONES.md for full milestone details.
 **Milestone Goal:** Add Electron UI with 4-column Kanban board for visual task management and specialized CRUD agents for template-based code generation.
 
 - ✅ **Phase 13: Foundation** - Mono-repo structure, Convex backend, shared types (completed 2026-01-18)
-- 🚧 **Phase 14: Template System** - Handlebars engine, DDL parser, code templates (gap closure)
+- ✅ **Phase 14: Template System** - Handlebars engine, DDL parser, code templates (completed 2026-01-18)
 - [ ] **Phase 15: Agent Orchestration** - CRUD agents, keyword routing, parallel execution
 - [ ] **Phase 16: Electron Main Process** - IPC handlers, security, agent coordination
 - [ ] **Phase 17: Kanban UI** - 4-column board, real-time sync, drag-and-drop
@@ -90,8 +90,8 @@ Plans:
 - [x] 14-07-PLAN.md — Create UI CRUD templates (Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
 - [x] 14-08-PLAN.md — Build School ERP DDL with 24 tables for Indonesian schools
 - [x] 14-09-PLAN.md — Implement npm run seeds with @faker-js/faker (Indonesian locale)
-- [ ] 14-10-PLAN.md — Implement template auto-loading with file system integration (Gap Closure)
-- [ ] 14-11-PLAN.md — Wire up hot-reload with development server (Gap Closure)
+- [x] 14-10-PLAN.md — Implement template auto-loading with file system integration (Gap Closure)
+- [x] 14-11-PLAN.md — Wire up hot-reload with development server (Gap Closure)
 
 ### Phase 15: Agent Orchestration
 **Goal**: Implement specialized CRUD agents with parallel execution and keyword routing
@@ -189,11 +189,11 @@ Phases execute in numeric order: 13 → 14 → 15 → 16 → 17 → 18
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 13. Foundation | v1.0 | 5/5 | ✓ Complete | 2026-01-18 |
-| 14. Template System | v1.0 | 9/11 | Gap Closure | In progress |
+| 14. Template System | v1.0 | 11/11 | ✓ Complete | 2026-01-18 |
 | 15. Agent Orchestration | v1.0 | 0/9 | Not started | - |
 | 16. Electron Main Process | v1.0 | 0/6 | Not started | - |
 | 17. Kanban UI | v1.0 | 0/12 | Not started | - |
 | 18. Polish | v1.0 | 0/4 | Not started | - |
 
-**v1.0 Progress: 14/47 plans (30%)**
-**Overall Progress: 28/61 plans (46%)**
+**v1.0 Progress: 16/47 plans (34%)**
+**Overall Progress: 30/61 plans (49%)**

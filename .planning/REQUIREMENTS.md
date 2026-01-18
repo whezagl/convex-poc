@@ -57,27 +57,27 @@ Requirements for v1.0 milestone — Electron Kanban UI with specialized CRUD age
 
 ### Template System
 
-- [ ] **TMPL-01**: Handlebars template engine integration
-- [ ] **TMPL-02**: `.templates/` directory at mono-repo root
-- [ ] **TMPL-03**: BE boilerplate templates (project structure files)
-- [ ] **TMPL-04**: FE boilerplate templates (project structure files)
-- [ ] **TMPL-05**: BE CRUD templates (index.ts, sql.ts, types.ts, README.md, index.http)
-- [ ] **TMPL-06**: FE CRUD templates (index.ts, types.ts, api.ts, hooks.ts, README.md)
-- [ ] **TMPL-07**: UI CRUD templates (Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
-- [ ] **TMPL-08**: DDL parser using pgsql-parser (NOT regex)
-- [ ] **TMPL-09**: Input validation and escaping for template variables
-- [ ] **TMPL-10**: Template live reload when files change
+- [x] **TMPL-01**: Handlebars template engine integration
+- [x] **TMPL-02**: `.templates/` directory at mono-repo root
+- [x] **TMPL-03**: BE boilerplate templates (project structure files)
+- [x] **TMPL-04**: FE boilerplate templates (project structure files)
+- [x] **TMPL-05**: BE CRUD templates (index.ts, sql.ts, types.ts, README.md, index.http)
+- [x] **TMPL-06**: FE CRUD templates (index.ts, types.ts, api.ts, hooks.ts, README.md)
+- [x] **TMPL-07**: UI CRUD templates (Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
+- [x] **TMPL-08**: DDL parser using pgsql-parser (NOT regex)
+- [x] **TMPL-09**: Input validation and escaping for template variables
+- [x] **TMPL-10**: Template live reload when files change
 
 ### School ERP Domain
 
-- [ ] **SCHL-01**: 24-table PostgreSQL DDL for Indonesian schools
-- [ ] **SCHL-02**: npm run seeds script with mock data generation
-- [ ] **SCHL-03**: @faker-js/faker with Indonesian locale
-- [ ] **SCHL-04**: Kurikulum Merdeka support (P5 projects, descriptive grading)
-- [ ] **SCHL-05**: National ID fields (NISN, NIP, NUPTK) with validation
-- [ ] **SCHL-06**: Tables: students, teachers, classes, subjects, enrollments, attendance, grades, fees, parents, admins, and more
-- [ ] **SCHL-07**: Proper indexes and foreign key constraints
-- [ ] **SCHL-08**: PostgreSQL 17 specific features (JSONB, arrays, enums)
+- [x] **SCHL-01**: 24-table PostgreSQL DDL for Indonesian schools
+- [x] **SCHL-02**: npm run seeds script with mock data generation
+- [x] **SCHL-03**: @faker-js/faker with Indonesian locale
+- [x] **SCHL-04**: Kurikulum Merdeka support (P5 projects, descriptive grading)
+- [x] **SCHL-05**: National ID fields (NISN, NIP, NUPTK) with validation
+- [x] **SCHL-06**: Tables: students, teachers, classes, subjects, enrollments, attendance, grades, fees, parents, admins, and more
+- [x] **SCHL-07**: Proper indexes and foreign key constraints
+- [x] **SCHL-08**: PostgreSQL 17 specific features (JSONB, arrays, enums)
 
 ### Debugging & Polish
 
@@ -166,24 +166,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AGENT-06 | Phase 15 | Pending |
 | AGENT-07 | Phase 15 | Pending |
 | AGENT-08 | Phase 15 | Pending |
-| TMPL-01 | Phase 14 | Pending |
-| TMPL-02 | Phase 14 | Pending |
-| TMPL-03 | Phase 14 | Pending |
-| TMPL-04 | Phase 14 | Pending |
-| TMPL-05 | Phase 14 | Pending |
-| TMPL-06 | Phase 14 | Pending |
-| TMPL-07 | Phase 14 | Pending |
-| TMPL-08 | Phase 14 | Pending |
-| TMPL-09 | Phase 14 | Pending |
-| TMPL-10 | Phase 14 | Pending |
-| SCHL-01 | Phase 14 | Pending |
-| SCHL-02 | Phase 14 | Pending |
-| SCHL-03 | Phase 14 | Pending |
-| SCHL-04 | Phase 14 | Pending |
-| SCHL-05 | Phase 14 | Pending |
-| SCHL-06 | Phase 14 | Pending |
-| SCHL-07 | Phase 14 | Pending |
-| SCHL-08 | Phase 14 | Pending |
+| TMPL-01 | Phase 14 | Complete |
+| TMPL-02 | Phase 14 | Complete |
+| TMPL-03 | Phase 14 | Complete |
+| TMPL-04 | Phase 14 | Complete |
+| TMPL-05 | Phase 14 | Complete |
+| TMPL-06 | Phase 14 | Complete |
+| TMPL-07 | Phase 14 | Complete |
+| TMPL-08 | Phase 14 | Complete |
+| TMPL-09 | Phase 14 | Complete |
+| TMPL-10 | Phase 14 | Complete |
+| SCHL-01 | Phase 14 | Complete |
+| SCHL-02 | Phase 14 | Complete |
+| SCHL-03 | Phase 14 | Complete |
+| SCHL-04 | Phase 14 | Complete |
+| SCHL-05 | Phase 14 | Complete |
+| SCHL-06 | Phase 14 | Complete |
+| SCHL-07 | Phase 14 | Complete |
+| SCHL-08 | Phase 14 | Complete |
 | POLI-01 | Phase 17 | Pending |
 | POLI-02 | Phase 17 | Pending |
 | POLI-03 | Phase 17 | Pending |
