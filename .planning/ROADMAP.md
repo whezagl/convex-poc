@@ -55,17 +55,18 @@ See MILESTONES.md for full milestone details.
 **Success Criteria** (what must be TRUE):
   1. Developer can run `pnpm install` and all workspace dependencies resolve correctly
   2. Developer can run `docker-compose up` and Convex + PostgreSQL containers start successfully
-  3. TypeScript types from @repo/shared-types are importable across workspace packages
+  3. TypeScript types from @convex-poc/shared-types are importable across workspace packages
   4. Convex backend accepts connections and stores task/subtask/log documents
-  5. @repo/convex-client provides type-safe queries and mutations to backend
-**Plans**: TBD
+  5. @convex-poc/convex-client provides type-safe queries and mutations to backend
+
+**Plans**: 5 plans in 4 waves
 
 Plans:
-- [ ] 13-01: Set up pnpm workspace with apps/desktop and packages/ structure
-- [ ] 13-02: Create @repo/shared-types package with TypeScript types
-- [ ] 13-03: Deploy Convex schema for tasks, subtasks, and logs
-- [ ] 13-04: Build @repo/convex-client with type-safe queries/mutations
-- [ ] 13-05: Configure Docker Compose with Convex and PostgreSQL 17
+- [ ] 13-01-PLAN.md — Set up pnpm workspace with apps/desktop and packages/ structure (Wave 1)
+- [ ] 13-02-PLAN.md — Create @convex-poc/shared-types package with TypeScript types and Zod schemas (Wave 2)
+- [ ] 13-03-PLAN.md — Deploy Convex schema for tasks, subtasks, and logs (Wave 3)
+- [ ] 13-04-PLAN.md — Build @convex-poc/convex-client with type-safe queries/mutations (Wave 4)
+- [ ] 13-05-PLAN.md — Configure Docker Compose with Convex and PostgreSQL 17 (Wave 1)
 
 ### Phase 14: Template System
 **Goal**: Build robust template engine with DDL parser for code generation
@@ -185,7 +186,7 @@ Phases execute in numeric order: 13 → 14 → 15 → 16 → 17 → 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 13. Foundation | v1.0 | 0/5 | Not started | - |
+| 13. Foundation | v1.0 | 0/5 | Ready to execute | - |
 | 14. Template System | v1.0 | 0/9 | Not started | - |
 | 15. Agent Orchestration | v1.0 | 0/9 | Not started | - |
 | 16. Electron Main Process | v1.0 | 0/6 | Not started | - |
