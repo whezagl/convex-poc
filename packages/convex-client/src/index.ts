@@ -29,12 +29,16 @@ export const convex = {
     },
     subtasks: {
       create: async (args: any) => {
-        const { create } = await import("./subtasks.js");
-        return create(args, getConvexClient());
+        const { create: createSubTask } = await import("./subtasks.js");
+        return createSubTask(args, getConvexClient());
       },
       updateProgress: async (args: any) => {
         const { updateProgress } = await import("./subtasks.js");
         return updateProgress(args, getConvexClient());
+      },
+      updateStatus: async (args: any) => {
+        const { updateSubTaskStatus } = await import("./subtasks.js");
+        return updateSubTaskStatus(args, getConvexClient());
       },
     },
   },
