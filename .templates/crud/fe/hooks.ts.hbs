@@ -1,0 +1,114 @@
+/**
+ * {{pascalCase tableName}} React Hooks
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type {
+  {{pascalCase tableName}},
+  Create{{pascalCase tableName}}Input,
+  Update{{pascalCase tableName}}Input,
+  {{pascalCase tableName}}Filters,
+} from './types.js';
+import { {{camelCase tableName}}Api } from './api.js';
+
+/**
+ * Query key factory for {{camelCase tableName}}
+ */
+const {{camelCase tableName}}Keys = {
+  all: ['{{tableName}}'] as const,
+  lists: () => [...{{camelCase tableName}}Keys.all, 'list'] as const,
+  list: (filters?: {{pascalCase tableName}}Filters) => [...{{camelCase tableName}}Keys.lists(), filters] as const,
+  details: () => [...{{camelCase tableName}}Keys.all, 'detail'] as const,
+  detail: (id: string) => [...{{camelCase tableName}}Keys.details(), id] as const,
+};
+
+/**
+ * Get all {{camelCase tableName}} records
+ */
+export function use{{pascalCase tableName}}All(
+  filters?: {{pascalCase tableName}}Filters,
+  options?: { enabled?: boolean; limit?: number; offset?: number }
+) {
+  return useQuery({
+    queryKey: {{camelCase tableName}}Keys.list(filters),
+    queryFn: () => {{camelCase tableName}}Api.findAll(filters, options?.limit, options?.offset),
+    enabled: options?.enabled ?? true,
+  });
+}
+
+/**
+ * Get {{camelCase tableName}} by ID
+ */
+export function use{{pascalCase tableName}}(id: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: {{camelCase tableName}}Keys.detail(id),
+    queryFn: () => {{camelCase tableName}}Api.findById(id),
+    enabled: (options?.enabled ?? true) && !!id,
+  });
+}
+
+/**
+ * Create {{camelCase tableName}}
+ */
+export function useCreate{{pascalCase tableName}}() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: Create{{pascalCase tableName}}Input) => {{camelCase tableName}}Api.create(input),
+    onSuccess: () => {
+      // Invalidate list queries to refetch
+      queryClient.invalidateQueries({ queryKey: {{camelCase tableName}}Keys.lists() });
+    },
+  });
+}
+
+/**
+ * Update {{camelCase tableName}}
+ */
+export function useUpdate{{pascalCase tableName}}() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: Update{{pascalCase tableName}}Input) => {{camelCase tableName}}Api.update(input),
+    onSuccess: (data) => {
+      // Invalidate specific item query
+      queryClient.invalidateQueries({ queryKey: {{camelCase tableName}}Keys.detail(data.{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}) });
+      // Invalidate list queries
+      queryClient.invalidateQueries({ queryKey: {{camelCase tableName}}Keys.lists() });
+    },
+  });
+}
+
+/**
+ * Delete {{camelCase tableName}}
+ */
+export function useDelete{{pascalCase tableName}}() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => {{camelCase tableName}}Api.delete(id),
+    onSuccess: () => {
+      // Invalidate list queries
+      queryClient.invalidateQueries({ queryKey: {{camelCase tableName}}Keys.lists() });
+    },
+  });
+}
+
+/**
+ * Count {{camelCase tableName}} records
+ */
+export function use{{pascalCase tableName}}Count(
+  filters?: {{pascalCase tableName}}Filters,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: [...{{camelCase tableName}}Keys.all, 'count', filters] as const,
+    queryFn: () => {{camelCase tableName}}Api.count(filters),
+    enabled: options?.enabled ?? true,
+  });
+}
