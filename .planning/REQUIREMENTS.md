@@ -133,13 +133,83 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| All requirements | TBD | Pending |
+| MONO-01 | Phase 13 | Pending |
+| MONO-02 | Phase 13 | Pending |
+| MONO-03 | Phase 13 | Pending |
+| MONO-04 | Phase 13 | Pending |
+| MONO-05 | Phase 13 | Pending |
+| MONO-06 | Phase 13 | Pending |
+| ELEC-01 | Phase 16 | Pending |
+| ELEC-02 | Phase 16 | Pending |
+| ELEC-03 | Phase 16 | Pending |
+| ELEC-04 | Phase 16 | Pending |
+| ELEC-05 | Phase 16 | Pending |
+| ELEC-06 | Phase 16 | Pending |
+| KANB-01 | Phase 17 | Pending |
+| KANB-02 | Phase 17 | Pending |
+| KANB-03 | Phase 17 | Pending |
+| KANB-04 | Phase 17 | Pending |
+| KANB-05 | Phase 17 | Pending |
+| KANB-06 | Phase 17 | Pending |
+| TASK-01 | Phase 16 | Pending |
+| TASK-02 | Phase 16 | Pending |
+| TASK-03 | Phase 16 | Pending |
+| TASK-04 | Phase 16 | Pending |
+| TASK-05 | Phase 15 | Pending |
+| TASK-06 | Phase 15 | Pending |
+| TASK-07 | Phase 15 | Pending |
+| AGENT-01 | Phase 15 | Pending |
+| AGENT-02 | Phase 15 | Pending |
+| AGENT-03 | Phase 15 | Pending |
+| AGENT-04 | Phase 15 | Pending |
+| AGENT-05 | Phase 15 | Pending |
+| AGENT-06 | Phase 15 | Pending |
+| AGENT-07 | Phase 15 | Pending |
+| AGENT-08 | Phase 15 | Pending |
+| TMPL-01 | Phase 14 | Pending |
+| TMPL-02 | Phase 14 | Pending |
+| TMPL-03 | Phase 14 | Pending |
+| TMPL-04 | Phase 14 | Pending |
+| TMPL-05 | Phase 14 | Pending |
+| TMPL-06 | Phase 14 | Pending |
+| TMPL-07 | Phase 14 | Pending |
+| TMPL-08 | Phase 14 | Pending |
+| TMPL-09 | Phase 14 | Pending |
+| TMPL-10 | Phase 14 | Pending |
+| SCHL-01 | Phase 14 | Pending |
+| SCHL-02 | Phase 14 | Pending |
+| SCHL-03 | Phase 14 | Pending |
+| SCHL-04 | Phase 14 | Pending |
+| SCHL-05 | Phase 14 | Pending |
+| SCHL-06 | Phase 14 | Pending |
+| SCHL-07 | Phase 14 | Pending |
+| SCHL-08 | Phase 14 | Pending |
+| POLI-01 | Phase 17 | Pending |
+| POLI-02 | Phase 17 | Pending |
+| POLI-03 | Phase 17 | Pending |
+| POLI-04 | Phase 17 | Pending |
+| POLI-05 | Phase 17 | Pending |
+| POLI-06 | Phase 17 | Pending |
+| POLI-07 | Phase 17 | Pending |
+| POLI-08 | Phase 17 | Pending |
+| POLI-09 | Phase 18 | Pending |
+| POLI-10 | Phase 18 | Pending |
+| POLI-11 | Phase 18 | Pending |
+| POLI-12 | Phase 18 | Pending |
 
 **Coverage:**
 - v1 requirements: 73 total
-- Mapped to phases: 0 (roadmap not created yet)
-- Unmapped: 73 ⚠️
+- Mapped to phases: 73 (100%) ✓
+- Unmapped: 0
+
+**Phase Summary:**
+- Phase 13 (Foundation): 6 requirements - Mono-repo setup, Convex backend
+- Phase 14 (Template System): 18 requirements - Templates, DDL parser, School ERP
+- Phase 15 (Agent Orchestration): 11 requirements - CRUD agents, keyword routing, parallel execution
+- Phase 16 (Electron Main Process): 10 requirements - Electron app, IPC, security
+- Phase 17 (Kanban UI): 14 requirements - Kanban board, real-time sync, modals, dark mode
+- Phase 18 (Polish): 4 requirements - Two-pause states, WIP limits, keyboard shortcuts
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after initial definition*
+*Last updated: 2026-01-18 after roadmap creation*

@@ -2,163 +2,29 @@
 
 ## Overview
 
-A journey from blank TypeScript project to a working multi-agent autonomous coding system with self-hosted Convex as the real-time state backend via Docker Compose. We'll build a clean implementation of the Planner → Coder → Reviewer pattern using Claude Agent SDK + Convex actions, demonstrating agent coordination with reusable patterns for future projects.
-
-## Domain Expertise
-
-None - Claude Agent SDK patterns are the focus, and this is a learning POC to establish those patterns. Convex provides the persistent state layer. Docker Compose enables reproducible local development.
+Building a desktop-based multi-agent task management system with Electron, React, Convex, and specialized CRUD agents. The journey from mono-repo foundation to polished Kanban UI enables autonomous code generation with real-time workflow visualization.
 
 ## Milestones
 
-- ✅ **v0.3 File Writing Fix** — Phase 12 (shipped 2026-01-17)
-- ✅ **v0.2 GLM Integration** — Phase 11 (shipped 2026-01-17)
-- ✅ **v0.1 Core System** — Phases 1-10 (shipped 2026-01-16)
+- ✅ **v0.3 Multi-Agent Workflow** — Phases 1-12 (shipped 2026-01-18)
+- 🚧 **v1.0 Electron Kanban Board** — Phases 13-18 (in progress)
 
 ---
 
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- Integer phases (13, 14, 15): Planned v1.0 milestone work
+- Decimal phases (13.1, 13.2): Urgent insertions (marked with INSERTED)
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Project Setup** - TypeScript project with Convex (Docker Compose) and Claude SDK
-- [x] **Phase 2: Convex Schema** - Define data models for sessions, workflows, agents
-- [x] **Phase 3: Agent Foundation** - Base agent class with Convex state storage
-- [x] **Phase 4: Planner Agent** - Task decomposition with Convex integration
-- [x] **Phase 5: Coder Agent** - Code implementation with file operations
-- [x] **Phase 6: Reviewer Agent** - Validation with Convex state tracking
-- [x] **Phase 7: Orchestration** - Workflow coordination via Convex
-- [x] **Phase 8: Example Task** - End-to-end demonstration
-- [x] **Phase 9: Documentation** - Pattern documentation and cleanup
-- [x] **Phase 10: Convex Deployment** - Self-hosted Convex backend deployment (post-project: ISS-001)
-- [x] **Phase 11: GLM Integration** - Add GLM-4.7 model support via environment variables (post-project enhancement)
-- [x] **Phase 12: File Writing Implementation** - Implement actual file operations in CoderAgent and ReviewerAgent
-## Phase Details
+<details>
+<summary>✅ v0.3 Multi-Agent Workflow (Phases 1-12) - SHIPPED 2026-01-18</summary>
 
-### Phase 1: Project Setup
-**Goal**: TypeScript project with self-hosted Convex (Docker Compose) configured and Claude SDK integrated
-**Depends on**: Nothing (first phase)
-**Research**: ✅ Complete (01-RESEARCH.md)
-**Research topics**: @anthropic-ai/claude-agent-sdk current API, TypeScript project structure, Convex Docker setup
-**Plans**: 2/2 Complete ✅
+**Milestone Goal:** Demonstrate working multi-agent coordination with clean, reusable patterns.
 
-### Phase 2: Convex Schema & State Model
-**Goal**: Define Convex schema for agent sessions, orchestration state, and workflow progress
-**Depends on**: Phase 1
-**Research**: ✅ Complete (02-RESEARCH.md)
-**Research topics**: Convex schema best practices, state synchronization patterns, document modeling
-**Plans**: 2/2 Complete ✅
-
-### Phase 3: Agent Foundation with Convex
-**Goal**: Base agent class that integrates Claude SDK with Convex state storage
-**Depends on**: Phase 2
-**Research**: ✅ Complete (03-RESEARCH.md)
-**Research topics**: SDK session creation, agent lifecycle, Convex mutation patterns
-**Plans**: 1/1 Complete ✅
-
-### Phase 4: Planner Agent
-**Goal**: Agent that decomposes tasks and stores plans in Convex
-**Depends on**: Phase 3
-**Research**: Unlikely (internal prompt engineering, established planning patterns)
-**Plans**: 1/1 Complete ✅
-
-### Phase 5: Coder Agent
-**Goal**: Agent that implements code based on plans; tracks state in Convex; uses filesystem for artifacts
-**Depends on**: Phase 3
-**Research**: Unlikely (file I/O patterns, established in foundation)
-**Plans**: TBD
-
-### Phase 6: Reviewer Agent
-**Goal**: Agent that validates implementations; stores reviews in Convex
-**Depends on**: Phase 3
-**Research**: Unlikely (validation logic, established patterns)
-**Plans**: 1/1 Complete ✅
-
-### Phase 7: Orchestration
-**Goal**: Workflow coordination using Convex for state management and real-time sync
-**Depends on**: Phases 4, 5, 6
-**Research**: ✅ Complete (07-RESEARCH.md)
-**Research topics**: Multi-agent patterns with Convex, handoff protocols, error handling, real-time orchestration
-**Plans**: 1/1 Complete ✅
-
-### Phase 8: Example Task
-**Goal**: End-to-end demonstration with a simple coding task
-**Depends on**: Phase 7
-**Research**: Unlikely (applying established patterns)
-**Plans**: 1/1 Complete ✅
-
-### Phase 9: Documentation
-**Goal**: Pattern documentation and code cleanup
-**Depends on**: Phase 8
-**Research**: Unlikely (documentation and cleanup)
-**Plans**: 1/1 Complete ✅
-
-### Phase 10: Convex Deployment (Post-Project)
-**Goal**: Deploy self-hosted Convex backend and resolve ISS-001
-**Depends on**: Phase 9
-**Research**: Unlikely (follow SELF_HOSTED_SETUP_GUIDE.md)
-**Plans**: 1/1 Complete ✅
-
-### Phase 11: GLM Integration (Post-Project Enhancement)
-**Goal**: Add GLM-4.7 model support via environment variables using agent SDK's env option
-**Depends on**: Phase 3 (BaseAgent)
-**Research**: ✅ Complete (docs/GLM-4.7_INTEGRATION_RESEARCH2.md)
-**Research topics**: @anthropic-ai/claude-agent-sdk env option, GLM-4.7 compatible endpoint
-**Plans**: 1/1 Complete ✅
-
----
-
-### ✅ v0.3 File Writing Fix (Complete)
-
-**Milestone Goal:** Close the loop on multi-agent workflow by implementing actual file operations — CoderAgent writes files to workspace, ReviewerAgent reads actual source code.
-
-#### Phase 12: File Writing Implementation
-
-**Goal**: Implement actual file operations in CoderAgent (write to workspace) and ReviewerAgent (read actual files)
-**Depends on**: Phase 11
-**Research**: Unlikely (internal filesystem operations, established patterns)
-**Plans**: 1/1 Complete ✅
-
-Plans:
-- [x] 12-01: File writing implementation - CoderAgent.applyFileChanges(), ReviewerAgent file reading, SequentialOrchestrator coordination
-
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Project Setup | 2/2 | Complete | 2026-01-15 |
-| 2. Convex Schema | 2/2 | Complete | 2026-01-16 |
-| 3. Agent Foundation | 1/1 | Complete | 2026-01-16 |
-| 4. Planner Agent | 1/1 | Complete | 2026-01-16 |
-| 5. Coder Agent | 1/1 | Complete | 2026-01-16 |
-| 6. Reviewer Agent | 1/1 | Complete | 2026-01-16 |
-| 7. Orchestration | 1/1 | Complete | 2026-01-16 |
-| 8. Example Task | 1/1 | Complete | 2026-01-16 |
-| 9. Documentation | 1/1 | Complete | 2026-01-16 |
-| 10. Convex Deployment | 1/1 | Complete | 2026-01-16 |
-| 11. GLM Integration | 1/1 | Complete | 2026-01-17 |
-| 12. File Writing | 1/1 | Complete | 2026-01-17 |
-
-**Overall Progress: 12/12 phases complete (100%)**
-**Total Plans: 14/14 complete**
-**Total Execution Time: 172 min (2h 52m)**
-
----
-
-## Project Status
-
-**Status:** ✅ COMPLETE — All phases delivered, multi-agent workflow verified end-to-end.
-
-**Milestones Shipped:**
-- v0.1 Core System (Phases 1-10) — Shipped 2026-01-16
-- v0.2 GLM Integration (Phase 11) — Shipped 2026-01-17
-- v0.3 File Writing Fix (Phase 12) — Shipped 2026-01-17
+v0.3 delivered complete multi-agent orchestration with Planner, Coder, and Reviewer agents, Convex state storage, and end-to-end workflow execution. All 12 phases complete with 14 plans delivered in 172 minutes.
 
 **Key Deliverables:**
 - Multi-agent orchestration system (Planner → Coder → Reviewer)
@@ -166,6 +32,165 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 - GLM-4.7 model support via environment variables
 - End-to-end file operations (write to workspace, read for review)
 - Pattern documentation (PATTERNS.md)
-- Working example (email validator utility)
 
-**See MILESTONES.md for full milestone details.**
+See MILESTONES.md for full milestone details.
+
+</details>
+
+### 🚧 v1.0 Electron Kanban Board (In Progress)
+
+**Milestone Goal:** Add Electron UI with 4-column Kanban board for visual task management and specialized CRUD agents for template-based code generation.
+
+- [ ] **Phase 13: Foundation** - Mono-repo structure, Convex backend, shared types
+- [ ] **Phase 14: Template System** - Handlebars engine, DDL parser, code templates
+- [ ] **Phase 15: Agent Orchestration** - CRUD agents, keyword routing, parallel execution
+- [ ] **Phase 16: Electron Main Process** - IPC handlers, security, agent coordination
+- [ ] **Phase 17: Kanban UI** - 4-column board, real-time sync, drag-and-drop
+- [ ] **Phase 18: Polish** - Two-pause states, WIP limits, keyboard shortcuts
+
+### Phase 13: Foundation
+**Goal**: Establish mono-repo structure with Convex backend and type-safe shared packages
+**Depends on**: v0.3 complete
+**Requirements**: MONO-01, MONO-02, MONO-03, MONO-04, MONO-05, MONO-06
+**Success Criteria** (what must be TRUE):
+  1. Developer can run `pnpm install` and all workspace dependencies resolve correctly
+  2. Developer can run `docker-compose up` and Convex + PostgreSQL containers start successfully
+  3. TypeScript types from @repo/shared-types are importable across workspace packages
+  4. Convex backend accepts connections and stores task/subtask/log documents
+  5. @repo/convex-client provides type-safe queries and mutations to backend
+**Plans**: TBD
+
+Plans:
+- [ ] 13-01: Set up pnpm workspace with apps/desktop and packages/ structure
+- [ ] 13-02: Create @repo/shared-types package with TypeScript types
+- [ ] 13-03: Deploy Convex schema for tasks, subtasks, and logs
+- [ ] 13-04: Build @repo/convex-client with type-safe queries/mutations
+- [ ] 13-05: Configure Docker Compose with Convex and PostgreSQL 17
+
+### Phase 14: Template System
+**Goal**: Build robust template engine with DDL parser for code generation
+**Depends on**: Phase 13
+**Requirements**: TMPL-01, TMPL-02, TMPL-03, TMPL-04, TMPL-05, TMPL-06, TMPL-07, TMPL-08, TMPL-09, TMPL-10, SCHL-01, SCHL-02, SCHL-03, SCHL-04, SCHL-05, SCHL-06, SCHL-07, SCHL-08
+**Success Criteria** (what must be TRUE):
+  1. Developer can place `.handlebars` files in `.templates/` directory and they load automatically
+  2. DDL parser extracts table definitions from PostgreSQL 17 syntax without using regex
+  3. Template engine renders templates with variables and proper HTML/SQL escaping
+  4. School ERP DDL (24 tables) parses completely and generates seed data via npm run seeds
+  5. Template changes hot-reload without restarting the application
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: Build @repo/template-engine with Handlebars integration
+- [ ] 14-02: Implement DDL parser using pgsql-parser for PostgreSQL 17
+- [ ] 14-03: Create BE boilerplate templates (project structure files)
+- [ ] 14-04: Create FE boilerplate templates (project structure files)
+- [ ] 14-05: Create BE CRUD templates (index.ts, sql.ts, types.ts, README.md, index.http)
+- [ ] 14-06: Create FE CRUD templates (index.ts, types.ts, api.ts, hooks.ts, README.md)
+- [ ] 14-07: Create UI CRUD templates (Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
+- [ ] 14-08: Build School ERP DDL with 24 tables for Indonesian schools
+- [ ] 14-09: Implement npm run seeds with @faker-js/faker (Indonesian locale)
+
+### Phase 15: Agent Orchestration
+**Goal**: Implement specialized CRUD agents with parallel execution and keyword routing
+**Depends on**: Phase 14
+**Requirements**: AGENT-01, AGENT-02, AGENT-03, AGENT-04, AGENT-05, AGENT-06, AGENT-07, AGENT-08, TASK-05, TASK-06, TASK-07
+**Success Criteria** (what must be TRUE):
+  1. User creates task with "BE setup" keyword and BE Boilerplate agent spawns 1 sub-task
+  2. User creates task with "BE CRUD APIs" keyword and agent spawns N sub-tasks (one per table)
+  3. Task queue executes by priority while respecting max 5 concurrent tasks limit
+  4. Sub-tasks execute in parallel up to 5 per task with proper file locking
+  5. Agent progress updates Convex with current agent type and step number
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: Refactor existing SequentialOrchestrator to @repo/agent-orchestrator package
+- [ ] 15-02: Implement BE Boilerplate agent (spawns 1 sub-task for project setup)
+- [ ] 15-03: Implement FE Boilerplate agent (spawns 1 sub-task for project setup)
+- [ ] 15-04: Implement BE CRUD APIs agent (spawns N sub-tasks, one per table)
+- [ ] 15-05: Implement FE CRUD Services agent (spawns N sub-tasks, one per table)
+- [ ] 15-06: Implement UI CRUD Pages agent (spawns N sub-tasks, one per table)
+- [ ] 15-07: Build AgentDispatcher with keyword-based routing
+- [ ] 15-08: Implement TaskQueue with priority scheduling and concurrency limits
+- [ ] 15-09: Add file locking with proper-lockfile for parallel operations
+
+### Phase 16: Electron Main Process
+**Goal**: Create secure Electron app with IPC handlers coordinating agents and templates
+**Depends on**: Phase 15
+**Requirements**: ELEC-01, ELEC-02, ELEC-03, ELEC-04, ELEC-05, ELEC-06, TASK-01, TASK-02, TASK-03, TASK-04
+**Success Criteria** (what must be TRUE):
+  1. Electron app launches with main process, preload script, and renderer process
+  2. Renderer process cannot access Node.js APIs directly (contextIsolation enabled)
+  3. Preload script exposes taskManager, agentDispatcher, and templateManager APIs via contextBridge
+  4. IPC handlers create tasks with description, file uploads, and workspace path
+  5. Electron Forge produces distributable packages for target platforms
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: Configure Electron 33 + Vite 6 + TypeScript in apps/desktop
+- [ ] 16-02: Implement main process with IPC handlers for task/agent/template operations
+- [ ] 16-03: Build preload script with contextBridge exposing secure APIs
+- [ ] 16-04: Set up renderer process with React 19 + TypeScript
+- [ ] 16-05: Configure Electron Forge packaging for distribution
+- [ ] 16-06: Implement security settings (contextIsolation, CSP, disable nodeIntegration)
+
+### Phase 17: Kanban UI
+**Goal**: Build 4-column Kanban board with real-time Convex sync and drag-and-drop
+**Depends on**: Phase 16
+**Requirements**: KANB-01, KANB-02, KANB-03, KANB-04, KANB-05, KANB-06, POLI-01, POLI-02, POLI-03, POLI-04, POLI-05, POLI-06, POLI-07, POLI-08
+**Success Criteria** (what must be TRUE):
+  1. User sees 4-column Kanban board (Tasks, In Progress, Sub-tasks, Done) with drag-and-drop
+  2. Task cards display state colors (pending=gray, running=blue, done=green) meeting WCAG AA contrast
+  3. Task state updates in real-time across multiple browser windows via Convex useQuery
+  4. User clicks task to open details modal with full task info and logs
+  5. User switches to dark mode and all colors maintain 4.5:1 contrast ratio
+  6. Convex subscriptions clean up explicitly when windows close to prevent memory leaks
+**Plans**: TBD
+
+Plans:
+- [ ] 17-01: Build 4-column Kanban layout with React
+- [ ] 17-02: Implement drag-and-drop using @dnd-kit
+- [ ] 17-03: Add task state indicators with WCAG AA compliant color coding
+- [ ] 17-04: Integrate Convex useQuery hooks for real-time task updates
+- [ ] 17-05: Implement in-progress spinners on active tasks
+- [ ] 17-06: Build task details modal showing full task info
+- [ ] 17-07: Create logs modal with real-time streaming, color-coded levels, and timestamps
+- [ ] 17-08: Add copy logs to clipboard functionality
+- [ ] 17-09: Build archive view with search by task name
+- [ ] 17-10: Implement archive restore and delete permanently actions
+- [ ] 17-11: Add dark mode toggle with WCAG compliance
+- [ ] 17-12: Implement explicit Convex subscription cleanup in useEffect
+
+### Phase 18: Polish
+**Goal**: Add differentiating features for agent workflow visualization and usability
+**Depends on**: Phase 17
+**Requirements**: POLI-09, POLI-10, POLI-11, POLI-12
+**Success Criteria** (what must be TRUE):
+  1. User sees distinct colors for auto-paused (orange) vs user-paused (purple) task states
+  2. Kanban board shows visual warning when 5 concurrent tasks running (WIP limit indicator)
+  3. User can expand parent task cards to view parallel sub-task execution
+  4. User can copy logs to clipboard with single button click
+  5. User can navigate Kanban board using keyboard shortcuts (optional)
+**Plans**: TBD
+
+Plans:
+- [ ] 18-01: Implement two-pause state distinction with different colors
+- [ ] 18-02: Add WIP limit indicators with visual warnings
+- [ ] 18-03: Build parallel sub-task visualization with expandable parent cards
+- [ ] 18-04: Implement keyboard shortcuts for common actions
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 13 → 14 → 15 → 16 → 17 → 18
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 13. Foundation | v1.0 | 0/5 | Not started | - |
+| 14. Template System | v1.0 | 0/9 | Not started | - |
+| 15. Agent Orchestration | v1.0 | 0/9 | Not started | - |
+| 16. Electron Main Process | v1.0 | 0/6 | Not started | - |
+| 17. Kanban UI | v1.0 | 0/12 | Not started | - |
+| 18. Polish | v1.0 | 0/4 | Not started | - |
+
+**v1.0 Progress: 0/45 plans (0%)**
+**Overall Progress: 14/59 plans (24%)**
