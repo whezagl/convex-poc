@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 7 of 9 in current phase (UI CRUD Templates)
-Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-07 (UI CRUD Templates)
+Plan: 9 of 9 in current phase (Seed Data Generator)
+Status: Phase complete
+Last activity: 2026-01-18 — Completed Plan 14-09 (Seed Data Generator)
 
-Progress: [██░░░░░░░░░] 22% (10/45 plans in v1.0)
+Progress: [███░░░░░░░░] 24% (11/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24 (14 from v0.3 + 10 from v1.0)
-- Average duration: 8.5 min
-- Total execution time: 200 minutes (3h 20m)
+- Total plans completed: 25 (14 from v0.3 + 11 from v1.0)
+- Average duration: 8.7 min
+- Total execution time: 212 minutes (3h 32m)
 
 **By Phase:**
 
@@ -34,11 +34,13 @@ Progress: [██░░░░░░░░░] 22% (10/45 plans in v1.0)
 | v1.0 Phase 14-05 | 1 | 2m | 2.0m |
 | v1.0 Phase 14-06 | 1 | 2m | 2.0m |
 | v1.0 Phase 14-07 | 1 | 3m | 3.0m |
+| v1.0 Phase 14-08 | 1 | 2m | 2.0m |
+| v1.0 Phase 14-09 | 1 | 12m | 12.0m |
 
 **Recent Trend:**
-- Last 5 plans: [2m, 4m, 2m, 2m, 3m]
-- Latest (14-07): 3m
-- Trend: Accelerating
+- Last 5 plans: [2m, 3m, 2m, 12m]
+- Latest (14-09): 12m
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -104,6 +106,12 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-07: Page component provides complete CRUD workflow with list, create, and edit views
 - v1.0 Phase 14-07: Hooks re-export from FE CRUD layer to maintain single source of truth
 - v1.0 Phase 14-07: Tailwind CSS utility classes for responsive layout and styling
+- v1.0 Phase 14-08: School ERP DDL with 24 tables for Indonesian school management
+- v1.0 Phase 14-08: Kurikulum Merdeka P5 projects with 8 themes and descriptive assessment scale
+- v1.0 Phase 14-09: npm run seeds script with @faker-js/faker v10.2.0 for Indonesian locale data generation
+- v1.0 Phase 14-09: Seed data generator with national ID validation (NISN=10, NIP=18, NUPTK=16, NPSN=8, NIK=16)
+- v1.0 Phase 14-09: SQL INSERT generation from JavaScript objects with proper array handling
+- v1.0 Phase 14-09: Indonesian locale (id_ID) for realistic names, addresses, phone numbers
 
 ### Pending Todos
 
@@ -112,11 +120,6 @@ None yet.
 ### Blockers/Concerns
 
 **From research - Gaps to validate:**
-- **Phase 14-09:** DDL parser must handle Indonesian language values in enums and check constraints
-- **Phase 14-09:** Array columns (phone_numbers[], attachments[], affected_classes[]) need proper parsing via array_data_type
-- **Phase 14-09:** Trigger function definitions and view definitions may need separate handling from table definitions
-- **Phase 14-10:** Seed data generation must respect national ID validation rules (10-digit NISN, 18-digit NIP, etc.)
-- **Phase 14-10:** P5 project seed data must use valid themes and descriptive assessments
 - **Phase 15:** Priority queue deadlock detection in concurrent agent execution
 - **Phase 16:** Electron packaging with workspace dependencies (workspace:*) may fail
 - **Phase 17:** Convex + Electron integration lacks official examples
@@ -140,10 +143,15 @@ None yet.
 **Resolved (Phase 14-08):**
 - ~~DDL parser edge cases for PostgreSQL 17 features (arrays, JSONB, enums)~~ — DDL created successfully with all features, ready for parser testing
 
+**Resolved (Phase 14-09):**
+- ~~Seed data generation must respect national ID validation rules~~ — Implemented with faker.string.numeric() for exact digit counts
+- ~~P5 project seed data must use valid themes and descriptive assessments~~ — Used all 8 official P5 themes with descriptive grading scale
+- ~~@faker-js/faker v10 API compatibility~~ — Fixed date.future() → date.soon(), userName → displayName for v10 compatibility
+
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-07 (UI CRUD Templates), ready for next plan in Phase 14
+Stopped at: Completed Plan 14-09 (Seed Data Generator), Phase 14 complete
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -157,3 +165,7 @@ Resume file: None
 **Completed Plan 14-06:** Frontend CRUD templates (types.ts.hbs, api.ts.hbs, hooks.ts.hbs, index.ts.hbs, README.md.hbs) for generating React code from DDL parser output. TanStack Query integration with query key factory pattern for efficient cache management. API client using fetch with proper error handling and query parameter support. Comprehensive README documentation with usage examples for all hooks.
 
 **Completed Plan 14-07:** UI CRUD templates (Page.tsx.hbs, schema.ts.hbs, form.tsx.hbs, table.tsx.hbs, hooks.ts.hbs, README.md.hbs) for generating React UI components from DDL parser output. React Hook Form integration with Zod validation for type-safe form handling. HTML input type mapping from PostgreSQL types. Table component with edit/delete actions and format helpers for display. Page component provides complete CRUD workflow with list, create, and edit views. Hooks re-export from FE CRUD layer for consistency. Tailwind CSS styling. Added capitalize and inputType helpers to template engine.
+
+**Completed Plan 14-08:** School ERP DDL with 24 tables for Indonesian school management. Kurikulum Merdeka P5 projects with 8 themes and descriptive assessment scale. Indonesian national ID validation with regex check constraints. PostgreSQL 17 features: identity columns, JSONB metadata, arrays, 19 custom enums. 87 indexes and 24 triggers for updated_at timestamps.
+
+**Completed Plan 14-09:** npm run seeds script with @faker-js/faker v10.2.0 for Indonesian locale data generation. Seed data generator with national ID validation (NISN=10, NIP=18, NUPTK=16, NPSN=8, NIK=16). SQL INSERT generation from JavaScript objects with proper array handling. Generates 200K+ INSERT statements across 24 tables with foreign key relationships. README with usage examples and Indonesian domain specifics.
