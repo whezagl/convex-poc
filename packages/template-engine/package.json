@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "handlebars": "^4.7.8",
-    "sql-parser-cst": "^0.38.2"
+    "sql-parser-cst": "^0.38.2",
+    "chokidar": "^4.0.0"
   },
   "devDependencies": {
     "@biomejs/js-api": "^4.0.0",
     "@types/handlebars": "^4.1.0",
-    "chokidar": "^4.0.0",
     "typescript": "^5.9.3",
     "@types/node": "^25.0.9",
     "vitest": "^4.0.17"

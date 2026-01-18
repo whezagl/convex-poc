@@ -1,6 +1,5 @@
 import chokidar from 'chokidar';
 import { promises as fs } from 'fs';
-import { join } from 'path';
 
 export interface WatcherOptions {
   templateDir: string;
@@ -29,7 +28,9 @@ export function watchTemplates(options: WatcherOptions): TemplateWatcher {
   } = options;
 
   // Create watcher with configuration
-  const watcher = chokidar.watch(join(templateDir, '**/*.hbs'), {
+  // Note: Watch the directory directly and filter by extension in event handlers
+  // Using glob patterns like '**/*.hbs' doesn't work reliably on all platforms
+  const watcher = chokidar.watch(templateDir, {
     persistent: true,
     ignoreInitial: true, // Don't fire on initial scan
     awaitWriteFinish: {
@@ -39,22 +40,28 @@ export function watchTemplates(options: WatcherOptions): TemplateWatcher {
     ignorePermissionErrors: true,
   });
 
-  // Handle file changes
+  // Handle file changes (only .hbs files)
   watcher.on('change', (filePath) => {
-    console.log(`[TemplateWatcher] Template changed: ${filePath}`);
-    onTemplateChange?.(filePath);
+    if (filePath.endsWith('.hbs')) {
+      console.log(`[TemplateWatcher] Template changed: ${filePath}`);
+      onTemplateChange?.(filePath);
+    }
   });
 
-  // Handle new templates
+  // Handle new templates (only .hbs files)
   watcher.on('add', (filePath) => {
-    console.log(`[TemplateWatcher] Template added: ${filePath}`);
-    onTemplateAdd?.(filePath);
+    if (filePath.endsWith('.hbs')) {
+      console.log(`[TemplateWatcher] Template added: ${filePath}`);
+      onTemplateAdd?.(filePath);
+    }
   });
 
-  // Handle deleted templates
+  // Handle deleted templates (only .hbs files)
   watcher.on('unlink', (filePath) => {
-    console.log(`[TemplateWatcher] Template deleted: ${filePath}`);
-    onTemplateUnlink?.(filePath);
+    if (filePath.endsWith('.hbs')) {
+      console.log(`[TemplateWatcher] Template deleted: ${filePath}`);
+      onTemplateUnlink?.(filePath);
+    }
   });
 
   // Handle errors
