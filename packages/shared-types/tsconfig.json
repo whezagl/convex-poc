@@ -5,17 +5,13 @@
     "moduleResolution": "nodenext",
     "strict": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@convex-poc/*": ["packages/*/src"]
-    }
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": []
+  "exclude": ["node_modules", "dist"]
 }
