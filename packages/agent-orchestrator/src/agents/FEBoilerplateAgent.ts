@@ -1,9 +1,9 @@
 // @convex-poc/agent-orchestrator/agents/FEBoilerplateAgent - Frontend boilerplate agent
 
-import { join } from "path";
+import { join, dirname } from "path";
 import { promises as fs } from "fs";
-import { dirname } from "path";
-import type { CRUDAgentConfig, type TableDefinition } from "./BaseCRUDAgent.js";
+import { BaseCRUDAgent } from "./BaseCRUDAgent.js";
+import type { CRUDAgentConfig, TableDefinition } from "./types.js";
 
 /**
  * FEBoilerplateAgent generates frontend project structure.
@@ -118,7 +118,7 @@ export class FEBoilerplateAgent extends BaseCRUDAgent {
       await this.updateProgress(4, "Writing frontend project files");
       for (const { template, outputPath, variables } of generatedFiles) {
         const code = template(variables);
-        await this.writeWithLock(undefined, code, outputPath);
+        await this.writeFileWithLock(outputPath, code);
       }
 
       // Step 5: Complete
@@ -130,15 +130,12 @@ export class FEBoilerplateAgent extends BaseCRUDAgent {
   }
 
   /**
-   * Overridden writeWithLock to support custom output paths.
+   * Writes file with locking for custom output paths.
    */
-  protected async writeWithLock(
-    _table: TableDefinition | undefined,
-    content: string,
-    customPath?: string
+  protected async writeFileWithLock(
+    outputPath: string,
+    content: string
   ): Promise<void> {
-    const outputPath = customPath || this.getOutputPath(_table);
-
     await fs.mkdir(dirname(outputPath), { recursive: true });
 
     await this.lockManager.withLock(outputPath, async () => {

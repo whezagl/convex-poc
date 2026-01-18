@@ -11,6 +11,8 @@
 import type * as agents from "../agents.js";
 import type * as model_agents from "../model/agents.js";
 import type * as model_workflows from "../model/workflows.js";
+import type * as subtasks from "../subtasks.js";
+import type * as tasks from "../tasks.js";
 import type * as workflows from "../workflows.js";
 
 import type {
@@ -23,6 +25,8 @@ declare const fullApi: ApiFromModules<{
   agents: typeof agents;
   "model/agents": typeof model_agents;
   "model/workflows": typeof model_workflows;
+  subtasks: typeof subtasks;
+  tasks: typeof tasks;
   workflows: typeof workflows;
 }>;
 
