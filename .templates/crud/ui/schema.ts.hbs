@@ -1,0 +1,61 @@
+/**
+ * {{pascalCase tableName}} Form Schemas
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+import { z } from 'zod';
+
+/**
+ * {{pascalCase tableName}} form validation schema
+ */
+export const {{camelCase tableName}}Schema = z.object({
+{{#each columns}}
+  {{#unless isPrimaryKey}}
+  {{name}}: {{#if (isRequired this)}}
+    {{#if (eq (typescriptType this) 'string')}}
+      z.string().min(1, "{{capitalize name}} is required")
+    {{else if (eq (typescriptType this) 'number')}}
+      z.number({{#if (eq type 'integer')}}int(){{else}}float(){{/if}})
+    {{else if (eq (typescriptType this) 'boolean')}}
+      z.boolean()
+    {{else if (eq (typescriptType this) 'Date')}}
+      z.date()
+    {{else}}
+      z.any()
+    {{/if}}
+  {{else}}
+    {{#if (eq (typescriptType this) 'string')}}
+      z.string().optional().nullable()
+    {{else if (eq (typescriptType this) 'number')}}
+      z.number().optional().nullable()
+    {{else if (eq (typescriptType this) 'boolean')}}
+      z.boolean().optional().nullable()
+    {{else if (eq (typescriptType this) 'Date')}}
+      z.date().optional().nullable()
+    {{else}}
+      z.any().optional().nullable()
+    {{/if}}
+  {{/if}}
+  {{/unless}}
+{{/each}}
+});
+
+/**
+ * {{pascalCase tableName}} create form schema
+ */
+export const create{{pascalCase tableName}}Schema = {{camelCase tableName}}Schema;
+
+/**
+ * {{pascalCase tableName}} update form schema
+ */
+export const update{{pascalCase tableName}}Schema = {{camelCase tableName}}Schema.partial();
+
+/**
+ * Infer types from schemas
+ */
+export type Create{{pascalCase tableName}}FormData = z.infer<typeof create{{pascalCase tableName}}Schema>;
+export type Update{{pascalCase tableName}}FormData = z.infer<typeof update{{pascalCase tableName}}Schema>;
