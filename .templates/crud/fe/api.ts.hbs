@@ -1,0 +1,130 @@
+/**
+ * {{pascalCase tableName}} API Client
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+import type {
+  {{pascalCase tableName}},
+  Create{{pascalCase tableName}}Input,
+  Update{{pascalCase tableName}}Input,
+  {{pascalCase tableName}}Filters,
+  {{pascalCase tableName}}ListResponse,
+  {{pascalCase tableName}}ApiError,
+} from './types.js';
+
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
+/**
+ * {{pascalCase tableName}} API client
+ */
+export const {{camelCase tableName}}Api = {
+  /**
+   * Get all {{camelCase tableName}} records
+   */
+  async findAll(
+    filters?: {{pascalCase tableName}}Filters,
+    limit = 100,
+    offset = 0
+  ): Promise<{{pascalCase tableName}}ListResponse> {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(v => params.append(key, String(v)));
+        } else if (value !== undefined) {
+          params.set(key, String(value));
+        }
+      });
+    }
+    params.set('limit', String(limit));
+    params.set('offset', String(offset));
+
+    const response = await fetch(`${BASE_URL}/{{tableName}}?${params}`);
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+    return response.json();
+  },
+
+  /**
+   * Get {{camelCase tableName}} by ID
+   */
+  async findById(id: string): Promise<{{pascalCase tableName}}> {
+    const response = await fetch(`${BASE_URL}/{{tableName}}/${id}`);
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+    return response.json();
+  },
+
+  /**
+   * Create new {{camelCase tableName}}
+   */
+  async create(input: Create{{pascalCase tableName}}Input): Promise<{{pascalCase tableName}}> {
+    const response = await fetch(`${BASE_URL}/{{tableName}}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!response.ok) {
+      const error: {{pascalCase tableName}}ApiError = await response.json();
+      throw error;
+    }
+    return response.json();
+  },
+
+  /**
+   * Update {{camelCase tableName}}
+   */
+  async update({ {{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}, changes }: Update{{pascalCase tableName}}Input): Promise<{{pascalCase tableName}}> {
+    const response = await fetch(`${BASE_URL}/{{tableName}}/${{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(changes),
+    });
+    if (!response.ok) {
+      const error: {{pascalCase tableName}}ApiError = await response.json();
+      throw error;
+    }
+    return response.json();
+  },
+
+  /**
+   * Delete {{camelCase tableName}}
+   */
+  async delete(id: string): Promise<void> {
+    const response = await fetch(`${BASE_URL}/{{tableName}}/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+  },
+
+  /**
+   * Count {{camelCase tableName}} records
+   */
+  async count(filters?: {{pascalCase tableName}}Filters): Promise<number> {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(v => params.append(key, String(v)));
+        } else if (value !== undefined) {
+          params.set(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(`${BASE_URL}/{{tableName}}/count?${params}`);
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+    const data = await response.json();
+    return data.count;
+  },
+};
