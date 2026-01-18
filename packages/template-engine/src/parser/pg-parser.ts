@@ -5,10 +5,13 @@ import {
   Column,
   ForeignKey,
   Index,
-  ParseResult,
-  ParseError,
   mapPostgreSQLTypeToTS,
+  type ParseResult,
+  type ParseError,
 } from './types.js';
+
+// Re-export types for module consumers
+export type { ParseResult, ParseError };
 
 /**
  * Parse PostgreSQL DDL and extract table definitions
