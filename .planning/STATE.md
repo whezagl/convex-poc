@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 15 of 18 (Agent Orchestration)
-Plan: 05 of 11 in current phase (Build AgentDispatcher with keyword routing)
+Plan: 01 of 11 in current phase (Build TaskQueue and FileLockManager)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 15-05 (Build AgentDispatcher with keyword routing)
+Last activity: 2026-01-18 — Completed Plan 15-01 (Build TaskQueue and FileLockManager)
 
 Progress: [██░░░░░░░░░] 36% (17/47 plans in v1.0)
 
@@ -38,11 +38,11 @@ Progress: [██░░░░░░░░░] 36% (17/47 plans in v1.0)
 | v1.0 Phase 14-09 | 1 | 12m | 12.0m |
 | v1.0 Phase 14-10 | 1 | 1m | 1.0m |
 | v1.0 Phase 14-11 | 1 | 7m | 7.0m |
-| v1.0 Phase 15-05 | 1 | 1m | 1.0m |
+| v1.0 Phase 15-01 | 1 | 4m | 4.0m |
 
 **Recent Trend:**
-- Last 5 plans: [12m, 1m, 7m, 1m]
-- Latest (15-05): 1m
+- Last 5 plans: [12m, 1m, 7m, 4m]
+- Latest (15-01): 4m
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -123,6 +123,11 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-11: Watch directory directly and filter by .hbs extension in event handlers for cross-platform compatibility
 - v1.0 Phase 14-11: Graceful shutdown with SIGINT handler and proper cleanup
 - v1.0 Phase 14-11: Chokidar moved to dependencies (runtime requirement for watcher module)
+- v1.0 Phase 15-01: TaskQueue with p-queue for priority-based task scheduling (concurrency: 5, timeout: 5min)
+- v1.0 Phase 15-01: FileLockManager with proper-lockfile for parallel file write protection
+- v1.0 Phase 15-01: QueueOptions.concurrency optional (not required) for flexible instantiation
+- v1.0 Phase 15-01: TaskOptions.taskId uses string type (Id type doesn't exist in shared-types)
+- v1.0 Phase 15-01: Package-level tsconfig.json with project references for workspace module resolution
 - v1.0 Phase 15-05: AgentDispatcher with hybrid keyword/LLM routing for task classification
 - v1.0 Phase 15-05: Keyword extraction first (90% confidence threshold) before LLM fallback for performance
 - v1.0 Phase 15-05: Claude Haiku (claude-3-haiku-20240307) for LLM classification (faster/cheaper than Opus)
@@ -172,7 +177,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 15-05 (Build AgentDispatcher with keyword routing)
+Stopped at: Completed Plan 15-01 (Build TaskQueue and FileLockManager)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -194,5 +199,7 @@ Resume file: None
 **Completed Plan 14-10:** TemplateEngine.load() method with file system integration, caching, and cache invalidation support. Synchronous file reading for simpler API. Cache key uses absolute file path. invalidateCache() method enables hot-reload integration. Templates can be loaded from .templates/ directory with automatic caching. Clear error messages when template files don't exist.
 
 **Completed Plan 14-11:** Hot-reload development server with working template watching and cache invalidation. Fixed chokidar glob pattern issue by watching directory directly and filtering by .hbs extension. Moved chokidar to dependencies for runtime availability. npm run dev:templates script for convenient development. Graceful shutdown with SIGINT handler. Automatic cache invalidation on template changes, additions, and deletions.
+
+**Completed Plan 15-01:** TaskQueue with p-queue for priority-based task scheduling (concurrency: 5, timeout: 5min). FileLockManager with proper-lockfile for parallel file write protection. Queue type definitions (TaskOptions, QueueOptions, FileLockOptions, QueueStats). Package exports for @convex-poc/agent-orchestrator/queue and ./types/queue. Fixed QueueOptions.concurrency to optional, TaskOptions.taskId to string type, added type assertion for TaskQueue.add() return type, created package-level tsconfig.json with project references.
 
 **Completed Plan 15-05:** AgentDispatcher with hybrid keyword/LLM routing for task classification to 5 CRUD agent types (BE/FE boilerplate, CRUD APIs, services, UI pages). Keyword extraction with 90% confidence threshold skips LLM for fast-path routing. Claude Haiku for LLM classification fallback. Console logging stub until updateClassification mutation is available in plan 15-06. Fire-and-forget Convex updates to avoid blocking. Configurable keyword patterns via DispatcherConfig.
