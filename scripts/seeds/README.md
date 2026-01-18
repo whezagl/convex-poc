@@ -1,352 +1,209 @@
-# School ERP Database Schema
+# School ERP Seed Data Generator
 
-## Overview
+Generates realistic seed data for Indonesian schools using @faker-js/faker with Indonesian locale.
 
-This schema supports Indonesian school management with full Kurikulum Merdeka curriculum support. It defines 24 tables covering student records, teacher management, class assignments, attendance tracking, grading (including P5 projects), fee management, and user accounts for portal access.
+## Usage
 
-**Purpose**: This DDL serves as the test case for DDL parser validation (Plan 14-09) and provides realistic domain schema for seed data generation.
-
-**Target Database**: PostgreSQL 17
-
-## Tables (24 total)
-
-### Core Tables (1-8)
-
-| Table | Description | Key Fields |
-|-------|-------------|------------|
-| `schools` | School information with NPSN (8-digit national school ID) | npsn, name, address, accreditation |
-| `students` | Student records with NISN (10-digit national student ID) | nisn, name, birth_date, enrollment_status |
-| `teachers` | Teacher records with NIP (18-digit) and NUPTK (16-digit) | nip, nuptk, name, subject, employment_status |
-| `parents` | Parent/guardian information with NIK (16-digit) | nik, name, relationship, phone |
-| `admins` | School admin staff | name, role, email, school_id |
-| `classes` | Class/group definitions | name, grade_level, academic_year, homeroom_teacher_id |
-| `subjects` | Subject offerings | code, name, curriculum_type, hours_per_week |
-| `class_teachers` | Junction table for teacher-class assignments | class_id, teacher_id, role |
-
-### Academic Tables (9-14)
-
-| Table | Description | Key Fields |
-|-------|-------------|------------|
-| `enrollments` | Student-class enrollment records | student_id, class_id, academic_year, semester |
-| `subject_teachers` | Teacher-subject assignments | teacher_id, subject_id, academic_year |
-| `class_subjects` | Subject offerings per class | class_id, subject_id, teacher_id, schedule |
-| `schedules` | Class schedule/time assignments | class_subject_id, day, start_time, end_time |
-| `attendance` | Student attendance records | student_id, class_id, date, status |
-| `grade_components` | Grading criteria (assignments, exams, projects) | subject_id, class_id, name, weight |
-
-### Assessment Tables (15-18)
-
-| Table | Description | Key Fields |
-|-------|-------------|------------|
-| `grades` | Student grade records per component | student_id, component_id, score |
-| `p5_projects` | Kurikulum Merdeka P5 project definitions | name, theme, duration_weeks, class_id |
-| `p5_enrollments` | Student participation in P5 projects | project_id, student_id, group_number |
-| `p5_assessments` | P5 descriptive grading | enrollment_id, dimension, assessment |
-
-### Administrative Tables (19-24)
-
-| Table | Description | Key Fields |
-|-------|-------------|------------|
-| `fees` | Student fee records (tuition, books, uniforms) | student_id, fee_type, amount, due_date |
-| `fee_payments` | Payment transaction records | fee_id, amount, payment_method, receipt_number |
-| `announcements` | School announcements and notices | title, content, announcement_type, priority |
-| `events` | School calendar events | title, event_type, start_date, end_date |
-| `documents` | Document storage (reports, certificates) | student_id, document_type, file_url |
-| `user_accounts` | System user accounts for portal access | username, email, password_hash, user_role |
-
-## Relationships
-
-```
-students (1) ----< (N) enrollments >---- (1) classes
-students (N) ----< (1) parents
-students (1) ----< (N) grades >---- (N) grade_components
-students (1) ----< (N) attendance
-students (1) ----< (N) fees >---- (N) fee_payments
-students (1) ----< (N) p5_enrollments >---- (1) p5_projects
-students (1) ----< (N) p5_assessments
-students (1) ----< (N) documents
-
-teachers (1) ----< (N) class_teachers >---- (1) classes
-teachers (1) ----< (N) subject_teachers >---- (1) subjects
-teachers (1) ----< (N) class_subjects
-teachers (1) ----< (N) p5_projects
-
-classes (1) ----< (N) enrollments >---- (1) students
-classes (1) ----< (N) class_teachers >---- (1) teachers
-classes (1) ----< (N) class_subjects >---- (1) subjects
-classes (1) ----< (N) attendance
-classes (1) ----< (N) grade_components
-classes (1) ----< (N) p5_projects
-
-subjects (1) ----< (N) subject_teachers >---- (1) teachers
-subjects (1) ----< (N) class_subjects >---- (1) classes
-subjects (1) ----< (N) grade_components
-
-schools (1) ----< (N) classes
-schools (1) ----< (N) admins
-schools (1) ----< (N) announcements
-schools (1) ----< (N) events
-
-p5_projects (1) ----< (N) p5_enrollments >---- (1) students
-p5_projects (1) ----< (N) p5_assessments >---- (1) p5_enrollments
-
-fees (1) ----< (N) fee_payments
-```
-
-## National ID Validation
-
-Indonesian national identification fields are validated with check constraints:
-
-| Field | Full Name | Format | Validation |
-|-------|-----------|--------|------------|
-| `npsn` | Nomor Pokok Sekolah Nasional | 8 digits | `^[0-9]{8}$` |
-| `nisn` | Nomor Induk Siswa Nasional | 10 digits | `^[0-9]{10}$` |
-| `nip` | Nomor Induk Pegawai | 18 digits | `^[0-9]{18}$` |
-| `nuptk` | Nomor Unik Pendidik dan Tenaga Kependidikan | 16 digits | `^[0-9]{16}$` |
-| `nik` | Nomor Induk Kependudukan | 16 digits | `^[0-9]{16}$` |
-
-**Examples:**
-- NPSN: `12345678`
-- NISN: `0012345678`
-- NIP: `198001012005011001` (format: YYYYMMDDXXXXXXX)
-- NUPTK: `1234567890123456`
-- NIK: `3201010101900001` (format: province(2) + regency(2) + district(2) + birth date(6) + sequence(4))
-
-## P5 Projects (Kurikulum Merdeka)
-
-P5 (Projek Penguatan Profil Pelajar Pancasila) is project-based learning in Indonesia's Kurikulum Merdeka curriculum.
-
-### Themes (8 themes)
-
-- `kebinekaan` - Diversity and pluralism
-- `gotong_royong` - Mutual cooperation
-- `berkarya` - Creativity and entrepreneurship
-- `berdoa` - Spiritual devotion
-- `sehat` - Health and wellness
-- `sadar_budaya` - Cultural awareness
-- `kreatif` - Creative thinking
-- `rekat` - Social cohesion
-
-### Assessment Scale (descriptive, not numeric)
-
-- `sangat_baik` - Excellent (exceeds expectations)
-- `baik` - Good (meets expectations)
-- `cukup` - Sufficient (meets minimum standards)
-- `perlu_bimbingan` - Needs guidance (below expectations)
-
-**Example P5 Project:**
-```sql
-INSERT INTO p5_projects (name, theme, duration_weeks, academic_year, semester, class_id, start_date, end_date)
-VALUES ('Kerajinan Daur Ulang', 'kreatif', 4, '2024/2025', 1, 1, '2024-08-01', '2024-08-29');
-```
-
-## PostgreSQL 17 Features Used
-
-### 1. Identity Columns
-Auto-incrementing primary keys using `GENERATED ALWAYS AS IDENTITY`:
-```sql
-id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY
-```
-
-### 2. JSONB Columns
-Flexible metadata storage for schema-less attributes:
-```sql
-metadata JSONB DEFAULT '{}'
-```
-
-### 3. Array Types
-Multiple values in single column:
-```sql
-phone_numbers VARCHAR(20)[],      -- Multiple phone numbers
-learning_objectives TEXT[],        -- Multiple learning objectives
-attachments TEXT[],                -- Multiple file URLs
-affected_classes INT[]             -- Multiple class IDs
-```
-
-### 4. Custom Enums
-Type-safe enumerated values:
-```sql
-CREATE TYPE gender_type AS ENUM ('Laki-laki', 'Perempuan');
-CREATE TYPE student_status AS ENUM ('aktif', 'non-aktif', 'lulus', 'keluar');
-CREATE TYPE p5_theme AS ENUM ('kebinekaan', 'gotong_royong', 'berkarya', ...);
-```
-
-### 5. Check Constraints
-Data validation using regex patterns:
-```sql
-CHECK (nisn ~ '^[0-9]{10}$')           -- NISN must be 10 digits
-CHECK (end_date > start_date)          -- Logical date validation
-CHECK (current_enrollment <= capacity) -- Business rule validation
-```
-
-### 6. Foreign Key Constraints
-Referential integrity with cascading actions:
-```sql
-parent_id BIGINT REFERENCES parents(id) ON DELETE SET NULL
-class_id BIGINT REFERENCES classes(id) ON DELETE CASCADE
-```
-
-### 7. Triggers
-Automatic timestamp updates:
-```sql
-CREATE TRIGGER update_students_updated_at BEFORE UPDATE ON students
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-```
-
-### 8. Views
-Pre-computed common queries:
-```sql
-CREATE VIEW active_students_details AS ...
-CREATE VIEW teacher_workload AS ...
-```
-
-## Indexes
-
-Indexes are created on:
-
-- **All national ID fields**: `npsn`, `nisn`, `nip`, `nuptk`, `nik`
-- **Foreign key columns**: All `*_id` columns
-- **Frequently queried fields**: `status`, `academic_year`, `date`, `email`
-- **Search fields**: `name`, `phone`
-
-**Index examples:**
-```sql
-CREATE INDEX idx_students_nisn ON students(nisn);
-CREATE INDEX idx_students_status ON students(enrollment_status);
-CREATE INDEX idx_attendance_date ON attendance(date);
-CREATE INDEX idx_fees_due_date ON fees(due_date);
-```
-
-## Usage Instructions
-
-### Load DDL into PostgreSQL
-
-**Using psql command line:**
-```bash
-psql -h localhost -p 5433 -U postgres -d school_erp -f scripts/seeds/school-erp.ddl
-```
-
-**Using Docker Compose (from project root):**
-```bash
-# Start PostgreSQL
-docker-compose -f docker-compose.dev.yml up -d postgres
-
-# Load DDL
-docker exec -i convex-poc-postgres-1 psql -U postgres -d school_erp < scripts/seeds/school-erp.ddl
-```
-
-**Verify database creation:**
-```bash
-# Connect to database
-psql -h localhost -p 5433 -U postgres -d school_erp
-
-# Check tables
-\dt
-
-# Count tables
-SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';
--- Should return 24
-
-# Check enums
-SELECT typname FROM pg_type WHERE typtype = 'e';
-```
-
-## Seed Data Generation
-
-After loading the DDL, generate seed data using the npm script (Plan 14-09):
+Generate seed data and save to SQL file:
 
 ```bash
-npm run seeds
+npm run seeds > scripts/seeds/data.sql
 ```
 
-This will:
-1. Parse the DDL to extract table structures
-2. Generate realistic Indonesian school data
-3. Insert seed data into all 24 tables
-4. Validate referential integrity
+Load seed data into PostgreSQL:
 
-## Domain Knowledge
+```bash
+psql -h localhost -p 5433 -U postgres -d school_erp -f scripts/seeds/data.sql
+```
 
-### School Levels
+Or via Docker Compose:
 
-Common Indonesian school levels:
-- `SD` - Sekolah Dasar (Grades 1-6)
-- `SMP` - Sekolah Menengah Pertama (Grades 7-9)
-- `SMA` - Sekolah Menengah Atas (Grades 10-12)
-- `SMK` - Sekolah Menengah Kejuruan (Vocational, Grades 10-12)
+```bash
+docker exec -i convex-poc-postgres-1 psql -U postgres -d school_erp < scripts/seeds/data.sql
+```
 
-### Academic Calendar
+## Generated Data
 
-- **Academic Year Format**: `2024/2025` (July - June)
-- **Semesters**: `1` (Ganjil, July-December), `2` (Genap, January-June)
-- **Schedule Days**: `Senin`, `Selasa`, `Rabu`, `Kamis`, `Jumat`, `Sabtu`
+| Table | Records | Description |
+|-------|---------|-------------|
+| schools | 1 | School information with NPSN (8-digit ID) |
+| students | 100 | Student records with NISN (10-digit ID) |
+| teachers | 20 | Teacher records with NIP (18-digit) and NUPTK (16-digit) |
+| parents | 100 | Parent/guardian information |
+| admins | 5 | School admin staff |
+| classes | 30 | Class definitions (X, XI, XII with majors) |
+| subjects | 15 | Subject offerings with Indonesian names |
+| class_teachers | 20 | Teacher-class assignments (wali kelas) |
+| subject_teachers | 20 | Teacher-subject assignments |
+| class_subjects | 50 | Subject offerings per class with schedules |
+| enrollments | 100 | Student-class enrollments |
+| p5_projects | 10 | Kurikulum Merdeka P5 projects |
+| p5_enrollments | 200 | Student participation in P5 projects |
+| p5_assessments | 800+ | P5 descriptive grading records |
+| attendance | 15,000 | Student attendance records |
+| grade_components | 1,800 | Grading criteria (tugas, UTS, UAS, proyek, partisipasi) |
+| grades | 180,000 | Student grade records |
+| fees | 400 | Student fee records (SPP, uang buku, uang seragam, etc.) |
+| fee_payments | 280 | Payment transaction records |
+| user_accounts | 50 | System user accounts for portal access |
+| announcements | 20 | School announcements and notices |
+| events | 15 | School calendar events |
+| documents | 50 | Document storage (rapor, sertifikat, ijazah) |
 
-### Employment Types
+## Indonesian Domain Specifics
 
-- `PNS` - Pegawai Negeri Sipil (Civil servant)
-- `PPPK` - Pegawai Pemerintah dengan Perjanjian Kerja (Contract government employee)
-- `Honorer` - Honorary staff
-- `Kontrak` - Contract employee
+### National IDs
 
-### Common Subjects
+- **NISN**: 10 digits (Nomor Induk Siswa Nasional) - National Student ID
+- **NIP**: 18 digits (Nomor Induk Pegawai) - Civil Servant ID for teachers/admins
+- **NUPTK**: 16 digits (Nomor Unik Pendidik dan Tenaga Kependidikan) - Unique Educator ID
+- **NPSN**: 8 digits (Nomor Pokok Sekolah Nasional) - National School ID
+- **NIK**: 16 digits (Nomor Induk Kependudukan) - National Population ID for parents
 
-- `MAT` - Matematika (Mathematics)
-- `BIN` - Bahasa Indonesia (Indonesian Language)
-- `ING` - Bahasa Inggris (English)
-- `IPA` - Ilmu Pengetahuan Alam (Natural Sciences)
-- `IPS` - Ilmu Pengetahuan Sosial (Social Sciences)
-- `PAI` - Pendidikan Agama Islam (Islamic Education)
-- `PKN` - Pendidikan Kewarganegaraan (Civic Education)
+All national IDs are validated using digit count validation in the DDL:
 
-## Data Constraints
+```sql
+CHECK (nisn ~ '^[0-9]{10}$')  -- NISN must be 10 digits
+CHECK (nip ~ '^[0-9]{18}$')   -- NIP must be 18 digits
+CHECK (nuptk ~ '^[0-9]{16}$') -- NUPTK must be 16 digits
+```
 
-### Business Rules
+### Kurikulum Merdeka P5 Projects
 
-- Class capacity cannot be exceeded
-- End dates must be after start dates
-- NISN, NIP, NUPTK must match digit requirements
-- Grade scores must be within component max_score
-- P5 assessment dimensions must be unique per enrollment
-- User accounts lock after 5 failed login attempts
+P5 (Projek Penguatan Profil Pelajar Pancasila) is a core component of Indonesia's Kurikulum Merdeka curriculum.
 
-### Referential Integrity
+**P5 Themes:**
+- kebinekaan (diversity)
+- gotong_royong (mutual cooperation)
+- berkarya (creativity)
+- berdoa (prayer)
+- sehat (health)
+- sadar_budaya (cultural awareness)
+- kreatif (creative)
+- rekat (cohesion)
 
-- Students must have parent (optional but recommended)
-- Teachers must be assigned to classes/subjects
-- Enrollments require valid student and class
-- Fees require valid student
-- Payments require valid fee record
-- All foreign keys use CASCADE or SET NULL appropriately
+### Descriptive Grading
 
-## Schema Statistics
+P5 assessments use descriptive grading (not numeric scores):
 
-- **Total Tables**: 24
-- **Core Tables**: 8
-- **Academic Tables**: 6
-- **Assessment Tables**: 4
-- **Administrative Tables**: 6
-- **Custom Enums**: 19
-- **Indexes**: 70+
-- **Foreign Keys**: 40+
-- **Views**: 2
-- **Triggers**: 24 (one per table for updated_at)
-- **Lines of DDL**: 762
+- **sangat_baik** (very good) - Exceeds expectations
+- **baik** (good) - Meets expectations
+- **cukup** (sufficient) - Adequate performance
+- **perlu_bimbingan** (needs guidance) - Requires improvement
 
-## Next Steps
+This aligns with Kurikulum Merdeka's emphasis on qualitative assessment over quantitative scores.
 
-1. **Plan 14-09**: Implement DDL parser to extract schema structure
-2. **Plan 14-10**: Generate seed data for all 24 tables
-3. **Plan 14-11**: Validate seed data quality and relationships
+### Indonesian Language Values
 
-## References
+The generator uses Indonesian language for:
 
-- **Kurikulum Merdeka**: https://kurikulum.kemdikbud.go.id/
-- **P5 Projects**: Projek Penguatan Profil Pelajar Pancasila
-- **PostgreSQL 17 Docs**: https://www.postgresql.org/docs/17/
+- **Gender**: Laki-laki (Male), Perempuan (Female)
+- **Religion**: Islam, Kristen, Katolik, Hindu, Buddha, Konghucu, Lainnya
+- **Student Status**: aktif (active), non-aktif (inactive), lulus (graduated), keluar (left)
+- **Teacher Status**: aktif, non-aktif, pensiun (retired), cuti (leave)
+- **Employment Type**: pns (civil servant), pppk (contract civil servant), honorer (honorary), kontrak (contract)
+- **Parent Relationship**: ayah (father), ibu (mother), wali (guardian), lainnya (other)
+- **Days**: Senin (Monday), Selasa (Tuesday), Rabu (Wednesday), Kamis (Thursday), Jumat (Friday), Sabtu (Saturday)
+- **Subjects**: Matematika, Bahasa Indonesia, Bahasa Inggris, IPA, IPS, PKN, Seni Budaya, PJOK, TIK
+- **Fee Types**: spp (tuition), uang_buku (book fees), uang_seragam (uniform fees), uang_kegiatan (activity fees)
 
----
+## Data Quality
 
-**File**: `scripts/seeds/school-erp.ddl`
-**Created**: 2026-01-18
-**Database**: PostgreSQL 17
-**Schema Version**: 1.0
+All generated data:
+
+- Uses Indonesian names, addresses, phone numbers via @faker-js/faker locale `id_ID`
+- Validates national ID digit counts (NISN=10, NIP=18, NUPTK=16, NPSN=8, NIK=16)
+- Respects foreign key relationships (enrollments link to students/classes, etc.)
+- Generates realistic dates and values (birth dates, hire dates, due dates)
+- Uses Indonesian language for enum values matching the DDL schema
+- Handles PostgreSQL array types (phone_parents[], learning_objectives[])
+- Generates proper academic year format (2024/2025)
+
+## Architecture
+
+The seed generator consists of:
+
+1. **Data Generators**: Functions for each table type (schools, students, teachers, etc.)
+2. **Relationship Generator**: Creates foreign key relationships between tables
+3. **SQL Generator**: Converts JavaScript objects to SQL INSERT statements
+4. **Indonesian Locale**: @faker-js/faker configured with `faker.locale = 'id_ID'`
+
+## Customization
+
+Edit `scripts/seeds/generate-seeds.ts` to adjust:
+
+- Number of records per table (change parameters in generator calls)
+- Data generation patterns (modify faker method calls)
+- Validation rules (add custom validation logic)
+- Foreign key relationships (adjust relationship generation)
+- Date ranges (modify faker.date.*() calls)
+
+## DDL Integration
+
+This script is designed to work with the School ERP DDL schema at `scripts/seeds/school-erp.ddl`.
+
+The DDL defines:
+- 24 tables with proper constraints and indexes
+- 19 custom enums for type safety
+- 87 indexes for query performance
+- 39 foreign key relationships
+- Automatic updated_at triggers on all tables
+- JSONB metadata columns for flexible schema evolution
+
+## Dependencies
+
+- **@faker-js/faker** (v10.1.0+) - Data generation with Indonesian locale support
+- **@convex-poc/template-engine** - DDL parser for schema-aware generation (planned)
+- **tsx** - TypeScript execution
+
+## Examples
+
+### Generate seeds for all tables (default):
+
+```bash
+npm run seeds > scripts/seeds/data.sql
+```
+
+### Load seeds into database:
+
+```bash
+# Using psql directly
+psql -h localhost -p 5433 -U postgres -d school_erp -f scripts/seeds/data.sql
+
+# Using Docker Compose
+docker exec -i convex-poc-postgres-1 psql -U postgres -d school_erp < scripts/seeds/data.sql
+```
+
+### Verify data loaded:
+
+```sql
+-- Check record counts
+SELECT 'schools' as table_name, COUNT(*) FROM schools
+UNION ALL
+SELECT 'students', COUNT(*) FROM students
+UNION ALL
+SELECT 'teachers', COUNT(*) FROM teachers
+UNION ALL
+SELECT 'classes', COUNT(*) FROM classes
+UNION ALL
+SELECT 'p5_projects', COUNT(*) FROM p5_projects;
+
+-- Check Indonesian locale data
+SELECT name, city FROM schools LIMIT 5;
+SELECT name, gender, religion FROM students LIMIT 5;
+SELECT name, subject FROM teachers LIMIT 5;
+```
+
+## Notes
+
+- All phone numbers are formatted for Indonesian locale (+62 country code)
+- Addresses use Indonesian city names and street formats
+- Names follow Indonesian naming conventions
+- Email addresses use realistic Indonesian domains
+- Academic years follow Indonesian format (2024/2025)
+- Semester values are 1 (Ganjil) or 2 (Genap)
+- All dates are in ISO 8601 format (YYYY-MM-DD)
+
+## License
+
+MIT
