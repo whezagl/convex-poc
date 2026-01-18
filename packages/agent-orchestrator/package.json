@@ -8,7 +8,10 @@
     "./planner": "./src/planner.ts",
     "./coder": "./src/coder.ts",
     "./reviewer": "./src/reviewer.ts",
-    "./dispatcher": "./src/dispatcher/index.ts"
+    "./dispatcher": "./src/dispatcher/index.ts",
+    "./queue": "./src/queue/index.ts",
+    "./types/queue": "./src/types/queue.ts",
+    "./agents": "./src/agents/index.ts"
   },
   "scripts": {
     "build": "tsc",
