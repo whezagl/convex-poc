@@ -7,21 +7,21 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 **Core value:** Demonstrate working multi-agent coordination with clean, reusable patterns.
 **Current focus:** Phase 15 - Agent Orchestration
 
+
 ## Current Position
 
 Phase: 15 of 18 (Agent Orchestration)
-Plan: 03 of 11 in current phase (Implement BE and FE boilerplate agents)
+Plan: 04 of 11 in current phase (Implement CRUD agents)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 15-03 (Implement BE and FE boilerplate agents)
+Last activity: 2026-01-18 — Completed Plan 15-04 (Implement CRUD agents)
 
-Progress: [██░░░░░░░░░] 40% (19/47 plans in v1.0)
-
+Progress: [██▓░░░░░░░░] 45% (22/47 plans in v1.0)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33 (14 from v0.3 + 19 from v1.0)
-- Average duration: 7.4 min
-- Total execution time: 237 minutes (3h 57m)
+- Total plans completed: 35 (14 from v0.3 + 21 from v1.0)
+- Average duration: 7.6 min
+- Total execution time: 264 minutes (4h 24m)
 
 **By Phase:**
 
@@ -41,10 +41,11 @@ Progress: [██░░░░░░░░░] 40% (19/47 plans in v1.0)
 | v1.0 Phase 15-01 | 1 | 4m | 4.0m |
 | v1.0 Phase 15-02 | 1 | 3m | 3.0m |
 | v1.0 Phase 15-03 | 1 | 3m | 3.0m |
+| v1.0 Phase 15-06 | 1 | 13m | 13.0m |
 
 **Recent Trend:**
-- Last 5 plans: [12m, 1m, 7m, 4m, 3m, 3m]
-- Latest (15-03): 3m
+- Last 5 plans: [7m, 4m, 3m, 3m, 13m]
+- Latest (15-06): 13m
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -143,11 +144,24 @@ Recent decisions affecting current work:
 - v1.0 Phase 15-03: Separate writeFileWithLock method to avoid base class writeWithLock signature conflict
 - v1.0 Phase 15-03: Template variables use projectName and description (dependencies hardcoded in templates per Phase 14 design)
 - v1.0 Phase 15-03: Both agents override execute method for multi-file generation (BaseCRUDAgent.execute designed for single-file CRUD operations)
+- v1.0 Phase 15-04: BECRUDAgent for backend CRUD code generation (5 files per table: types.ts, sql.ts, index.ts, README.md, index.http)
+- v1.0 Phase 15-04: FECRUDAgent for frontend service code generation (5 files per table: types.ts, api.ts, hooks.ts, index.ts, README.md)
+- v1.0 Phase 15-04: UICRUDAgent for UI component code generation (6 files per table: Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
+- v1.0 Phase 15-04: Export pascalCase and camelCase as standalone functions from template-engine (not just Handlebars helpers)
+- v1.0 Phase 15-04: Use table.name property from TableDefinition, map to 'tableName' variable for templates
 - v1.0 Phase 15-05: AgentDispatcher with hybrid keyword/LLM routing for task classification
 - v1.0 Phase 15-05: Keyword extraction first (90% confidence threshold) before LLM fallback for performance
 - v1.0 Phase 15-05: Claude Haiku (claude-3-haiku-20240307) for LLM classification (faster/cheaper than Opus)
 - v1.0 Phase 15-05: Fire-and-forget pattern for Convex classification storage to avoid blocking routing
 - v1.0 Phase 15-05: Configurable keyword patterns via DispatcherConfig for customization
+- v1.0 Phase 15-06: ParallelOrchestrator with priority-based task queue (max 5 concurrent tasks, 10min timeout)
+- v1.0 Phase 15-06: SubTaskManager for sub-task spawning (1 for boilerplate, N for CRUD where N=table count)
+- v1.0 Phase 15-06: Aggregate parent task status from sub-task statuses (done=cancelled if any failed, running if any running)
+- v1.0 Phase 15-06: Convex mutations for task status updates (create, updateStatus, updateClassification, listByStatus)
+- v1.0 Phase 15-06: Convex mutations for sub-task management (create, updateProgress, listByTask)
+- v1.0 Phase 15-06: Structured Convex client wrapper (convex.mutations.tasks.create, convex.queries.subtasks.listByTask)
+- v1.0 Phase 15-06: Separate create mutations for ParallelOrchestrator vs legacy Kanban (different signatures)
+- v1.0 Phase 15-06: Switch statement for agent instantiation instead of factory method (TypeScript type safety)
 
 ### Pending Todos
 
@@ -192,7 +206,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 15-03 (Implement BE and FE boilerplate agents)
+Stopped at: Completed Plan 15-06 (Build ParallelOrchestrator coordination)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -222,3 +236,5 @@ Resume file: None
 **Completed Plan 15-03:** BEBoilerplateAgent and FEBoilerplateAgent extending BaseCRUDAgent for multi-file project scaffolding using Phase 14 templates. BE agent generates 6 files (package.json, tsconfig.json, biome.json, README.md, .gitignore, src/index.ts). FE agent generates 8 files (package.json, tsconfig.json, vite.config.ts, src/main.tsx, src/App.tsx, src/index.css, index.html, README.md, .gitignore). Both agents override execute method for multi-file generation with custom output paths. File locking prevents write conflicts during parallel execution. Fixed import paths (CRUDAgentConfig, TableDefinition from types.js), added missing dirname import, created writeFileWithLock method to avoid base class signature conflict. Agents barrel export updated with BE and FE boilerplate agents.
 
 **Completed Plan 15-05:** AgentDispatcher with hybrid keyword/LLM routing for task classification to 5 CRUD agent types (BE/FE boilerplate, CRUD APIs, services, UI pages). Keyword extraction with 90% confidence threshold skips LLM for fast-path routing. Claude Haiku for LLM classification fallback. Console logging stub until updateClassification mutation is available in plan 15-06. Fire-and-forget Convex updates to avoid blocking. Configurable keyword patterns via DispatcherConfig.
+
+**Completed Plan 15-06:** ParallelOrchestrator with SubTaskManager for parallel task execution and sub-task coordination. Added Convex mutations for task status updates (create, updateStatus, updateClassification, listByStatus) and sub-task management (create, updateProgress, listByTask). Created structured Convex client wrapper with convex.mutations.* and convex.queries.* exports. ParallelOrchestrator supports max 5 concurrent tasks with 10min timeout. SubTaskManager spawns 1 sub-task for boilerplate agents, N sub-tasks for CRUD agents (N=table count). Aggregate parent task status from sub-task statuses (done=cancelled if any failed, running if any running). Updated AgentDispatcher to use convex.mutations.tasks.updateClassification for classification storage.
