@@ -52,8 +52,8 @@ export class BECRUDAgent extends BaseCRUDAgent {
     if (!table) throw new Error("BECRUDAgent requires table definition");
 
     return {
-      tableName: table.tableName,
-      TableName: pascalCase(table.tableName),
+      tableName: table.name,
+      TableName: pascalCase(table.name),
       table: table,
       columns: table.columns,
       primaryKeys: table.columns.filter(c => c.isPrimaryKey).map(c => c.name),
@@ -71,7 +71,7 @@ export class BECRUDAgent extends BaseCRUDAgent {
    */
   protected getOutputPath(table?: TableDefinition): string {
     if (!table) throw new Error("BECRUDAgent requires table definition");
-    return join(this.config.workspacePath, "src", "repositories", table.tableName);
+    return join(this.config.workspacePath, "src", "repositories", table.name);
   }
 
   /**
@@ -84,7 +84,7 @@ export class BECRUDAgent extends BaseCRUDAgent {
 
     try {
       // Step 1: Load templates (5 files)
-      await this.updateProgress(1, `Loading CRUD templates for ${table.tableName}`);
+      await this.updateProgress(1, `Loading CRUD templates for ${table.name}`);
 
       const templateFiles = [
         "types.ts.hbs",
@@ -101,11 +101,11 @@ export class BECRUDAgent extends BaseCRUDAgent {
       );
 
       // Step 2: Prepare variables
-      await this.updateProgress(2, `Preparing variables for ${table.tableName}`);
+      await this.updateProgress(2, `Preparing variables for ${table.name}`);
       const variables = await this.prepareTemplateVariables(table);
 
       // Step 3: Generate code
-      await this.updateProgress(3, `Generating CRUD code for ${table.tableName}`);
+      await this.updateProgress(3, `Generating CRUD code for ${table.name}`);
 
       const outputPath = this.getOutputPath(table);
       const generatedFiles = templates.map((template, index) => ({
@@ -115,7 +115,7 @@ export class BECRUDAgent extends BaseCRUDAgent {
       }));
 
       // Step 4: Write files with locking
-      await this.updateProgress(4, `Writing CRUD files for ${table.tableName}`);
+      await this.updateProgress(4, `Writing CRUD files for ${table.name}`);
 
       for (const { template, outputPath, variables } of generatedFiles) {
         const code = template(variables);
@@ -125,12 +125,12 @@ export class BECRUDAgent extends BaseCRUDAgent {
       // Step 5: Complete
       await this.updateProgress(
         totalSteps,
-        `CRUD APIs generated for ${table.tableName}`,
+        `CRUD APIs generated for ${table.name}`,
         "done"
       );
 
     } catch (error) {
-      await this.handleExecutionError(table.tableName, error);
+      await this.handleExecutionError(table.name, error);
     }
   }
 
