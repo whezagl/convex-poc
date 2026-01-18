@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 13 of 18 (Foundation)
-Plan: 2 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-18 — Completed 13-02-PLAN.md (Shared types with Zod schemas)
+Last activity: 2026-01-18 — Completed 13-03-PLAN.md (Convex backend schema and functions)
 
-Progress: [███░░░░░░░░] 4% (2/45 plans in v1.0)
+Progress: [███░░░░░░░░] 7% (3/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16 (14 from v0.3 + 2 from v1.0)
-- Average duration: 11.0 min
-- Total execution time: 176 minutes (2h 56m)
+- Total plans completed: 17 (14 from v0.3 + 3 from v1.0)
+- Average duration: 10.6 min
+- Total execution time: 180 minutes (3h 0m)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | v0.3 (Phases 1-12) | 14 | 172m | 12.3m |
-| v1.0 (Phases 13-18) | 2 | 4m | 2.0m |
+| v1.0 (Phases 13-18) | 3 | 8m | 2.7m |
 
 **Recent Trend:**
-- Last 5 plans: [11m, 14m, 12m, 16m, 3m, 2m]
+- Last 5 plans: [11m, 14m, 12m, 16m, 3m, 2m, 4m]
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 - v1.0: Use union types (literals) not enums for better serialization (13-02)
 - v1.0: Define Zod schemas alongside TypeScript types for runtime validation (13-02)
 - v1.0: Each package has its own tsconfig.json for isolated compilation (13-02)
+- v1.0: Embedded logs in task/subtask documents for simpler streaming (13-03)
+- v1.0: Convex indexes on status, priority for efficient Kanban queries (13-03)
+- v1.0: Bidirectional task-subtask linking via taskId and subTaskIds array (13-03)
 
 ### Pending Todos
 
@@ -72,8 +75,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T03:32:42Z
-Stopped at: Completed 13-02-PLAN.md (Shared types with Zod schemas)
+Last session: 2026-01-18T03:38:32Z
+Stopped at: Completed 13-03-PLAN.md (Convex backend schema and functions)
 Resume file: None
 
-**Ready for:** Plan 13-03 (Convex backend schema and functions)
+**Ready for:** Plan 13-04 (Convex client wrapper)
