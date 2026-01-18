@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 Phase: 13 of 18 (Foundation)
 Plan: 1 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-18 — Completed 13-05-PLAN.md (Docker Compose PostgreSQL)
+Last activity: 2026-01-18 — Completed 13-01-PLAN.md (Mono-repo pnpm workspace foundation)
 
 Progress: [██░░░░░░░░░] 2% (1/45 plans in v1.0)
 
@@ -20,18 +20,18 @@ Progress: [██░░░░░░░░░] 2% (1/45 plans in v1.0)
 
 **Velocity:**
 - Total plans completed: 15 (14 from v0.3 + 1 from v1.0)
-- Average duration: 11.9 min
-- Total execution time: 174 minutes (2h 54m)
+- Average duration: 11.5 min
+- Total execution time: 173 minutes (2h 53m)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | v0.3 (Phases 1-12) | 14 | 172m | 12.3m |
-| v1.0 (Phases 13-18) | 1 | 2m | 2.0m |
+| v1.0 (Phases 13-18) | 1 | 3m | 3.0m |
 
 **Recent Trend:**
-- Last 5 plans: [9m, 11m, 14m, 12m, 16m, 2m]
+- Last 5 plans: [9m, 11m, 14m, 12m, 16m, 3m]
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -48,8 +48,10 @@ Recent decisions affecting current work:
 - v0.3: Simplified agent pipeline (Planner->Coder->Reviewer) for learning
 - v1.0: Mono-repo structure with pnpm workspace for type safety
 - v1.0: 6-phase roadmap following research recommendations
-- v1.0: PostgreSQL 17 on custom port 5433 to avoid conflicts (13-05)
-- v1.0: Bind mounts for data persistence in Docker Compose (13-05)
+- v1.0: Turborepo 2.x uses "tasks" field instead of "pipeline" (13-01)
+- v1.0: Internal dependencies use workspace:* protocol, external use version ranges (13-01)
+- v1.0: package.json exports field for type sharing instead of barrel files (13-01)
+- v1.0: All packages use @convex-poc/* naming convention (13-01)
 
 ### Pending Todos
 
@@ -67,8 +69,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T03:27:49Z
-Stopped at: Completed 13-05-PLAN.md (Docker Compose PostgreSQL configuration)
+Last session: 2026-01-18T03:29:10Z
+Stopped at: Completed 13-01-PLAN.md (Mono-repo pnpm workspace foundation)
 Resume file: None
 
-**Ready for:** Plan 13-06 (Mono-repo pnpm workspace initialization)
+**Ready for:** Plan 13-02 (Convex schema with tasks, subtasks, and logs)
