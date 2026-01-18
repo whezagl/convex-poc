@@ -80,4 +80,30 @@ export function registerHelpers(engine: typeof Handlebars): void {
     if (!columns || !Array.isArray(columns)) return [];
     return columns.slice(0, n);
   });
+
+  // Capitalize first letter
+  engine.registerHelper('capitalize', (str: string) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  });
+
+  // Generate HTML input type from PostgreSQL type
+  engine.registerHelper('inputType', (pgType: string) => {
+    const typeMap: Record<string, string> = {
+      uuid: 'text',
+      text: 'textarea',
+      varchar: 'text',
+      integer: 'number',
+      bigint: 'number',
+      boolean: 'checkbox',
+      timestamp: 'datetime-local',
+      timestamptz: 'datetime-local',
+      date: 'date',
+      jsonb: 'textarea',
+      json: 'textarea',
+      decimal: 'number',
+      'double precision': 'number',
+    };
+    return typeMap[pgType] || 'text';
+  });
 }
