@@ -103,18 +103,15 @@ Plans:
   3. Task queue executes by priority while respecting max 5 concurrent tasks limit
   4. Sub-tasks execute in parallel up to 5 per task with proper file locking
   5. Agent progress updates Convex with current agent type and step number
-**Plans**: TBD
+**Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 15-01: Refactor existing SequentialOrchestrator to @repo/agent-orchestrator package
-- [ ] 15-02: Implement BE Boilerplate agent (spawns 1 sub-task for project setup)
-- [ ] 15-03: Implement FE Boilerplate agent (spawns 1 sub-task for project setup)
-- [ ] 15-04: Implement BE CRUD APIs agent (spawns N sub-tasks, one per table)
-- [ ] 15-05: Implement FE CRUD Services agent (spawns N sub-tasks, one per table)
-- [ ] 15-06: Implement UI CRUD Pages agent (spawns N sub-tasks, one per table)
-- [ ] 15-07: Build AgentDispatcher with keyword-based routing
-- [ ] 15-08: Implement TaskQueue with priority scheduling and concurrency limits
-- [ ] 15-09: Add file locking with proper-lockfile for parallel operations
+- [ ] 15-01-PLAN.md — Build TaskQueue and FileLockManager for parallel execution (Wave 1)
+- [ ] 15-02-PLAN.md — Create BaseCRUDAgent with template integration (Wave 1)
+- [ ] 15-03-PLAN.md — Implement BE and FE boilerplate agents (Wave 2)
+- [ ] 15-04-PLAN.md — Implement CRUD agents (BE APIs, FE Services, UI Pages) (Wave 2)
+- [ ] 15-05-PLAN.md — Build AgentDispatcher with keyword routing and LLM fallback (Wave 3)
+- [ ] 15-06-PLAN.md — Wire up ParallelOrchestrator with Convex integration (Wave 3)
 
 ### Phase 16: Electron Main Process
 **Goal**: Create secure Electron app with IPC handlers coordinating agents and templates
@@ -190,10 +187,13 @@ Phases execute in numeric order: 13 → 14 → 15 → 16 → 17 → 18
 |-------|-----------|----------------|--------|-----------|
 | 13. Foundation | v1.0 | 5/5 | ✓ Complete | 2026-01-18 |
 | 14. Template System | v1.0 | 11/11 | ✓ Complete | 2026-01-18 |
-| 15. Agent Orchestration | v1.0 | 0/9 | Not started | - |
+| 15. Agent Orchestration | v1.0 | 0/6 | Not started | - |
 | 16. Electron Main Process | v1.0 | 0/6 | Not started | - |
 | 17. Kanban UI | v1.0 | 0/12 | Not started | - |
 | 18. Polish | v1.0 | 0/4 | Not started | - |
 
-**v1.0 Progress: 16/47 plans (34%)**
-**Overall Progress: 30/61 plans (49%)**
+**v1.0 Progress: 16/53 plans (30%)**
+**Overall Progress: 30/67 plans (45%)**
+
+---
+*Last updated: 2026-01-18 after Phase 15 planning*
