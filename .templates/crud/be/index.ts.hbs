@@ -1,0 +1,103 @@
+/**
+ * {{pascalCase tableName}} CRUD Functions
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+import type { Pool, PoolClient } from 'pg';
+import type {
+  {{pascalCase tableName}},
+  Create{{pascalCase tableName}}Input,
+  Update{{pascalCase tableName}}Input,
+  {{pascalCase tableName}}Where,
+  {{pascalCase tableName}}QueryOptions,
+} from './types.js';
+import { {{camelCase tableName}}Queries, {{camelCase tableName}}Params } from './sql.js';
+
+/**
+ * {{pascalCase tableName}} CRUD operations
+ */
+export class {{pascalCase tableName}}Repository {
+  constructor(private db: Pool | PoolClient) {}
+
+  /**
+   * Find all {{camelCase tableName}} records
+   */
+  async findMany(
+    where?: {{pascalCase tableName}}Where,
+    options?: {{pascalCase tableName}}QueryOptions
+  ): Promise<{{pascalCase tableName}}[]> {
+    const filters = where ? Object.keys(where) : [];
+    const query = {{camelCase tableName}}Queries.SELECT_WHERE(filters);
+
+    const params = [
+      ...(where ? Object.values(where) : []),
+      options?.limit ?? 100,
+      options?.offset ?? 0,
+    ];
+
+    const result = await this.db.query(query, params);
+    return result.rows;
+  }
+
+  /**
+   * Find {{camelCase tableName}} by ID
+   */
+  async findById(id: string): Promise<{{pascalCase tableName}} | null> {
+    const result = await this.db.query({{camelCase tableName}}Queries.SELECT_BY_ID, [id]);
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Create new {{camelCase tableName}}
+   */
+  async create(input: Create{{pascalCase tableName}}Input): Promise<{{pascalCase tableName}}> {
+    const params = {{camelCase tableName}}Params.buildInsertParams(input);
+    const result = await this.db.query({{camelCase tableName}}Queries.INSERT, params);
+    return result.rows[0];
+  }
+
+  /**
+   * Update {{camelCase tableName}} by ID
+   */
+  async update(id: string, input: Update{{pascalCase tableName}}Input): Promise<{{pascalCase tableName}} | null> {
+    const params = {{camelCase tableName}}Params.buildUpdateParams(id, input);
+    const result = await this.db.query({{camelCase tableName}}Queries.UPDATE, params);
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Delete {{camelCase tableName}} by ID
+   */
+  async delete(id: string): Promise<{{pascalCase tableName}} | null> {
+    const result = await this.db.query({{camelCase tableName}}Queries.DELETE, [id]);
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Count {{camelCase tableName}} records
+   */
+  async count(where?: {{pascalCase tableName}}Where): Promise<number> {
+    const filters = where ? Object.keys(where) : [];
+    const whereClause = filters.map((f, i) => `"${f}" = $${i + 1}`).join(' AND ');
+    const query = `
+      SELECT COUNT(*) as count
+      FROM "{{tableName}}"
+      ${filters.length ? `WHERE ${whereClause}` : ''}
+    `;
+
+    const params = where ? Object.values(where) : [];
+    const result = await this.db.query(query, params);
+    return parseInt(result.rows[0].count, 10);
+  }
+}
+
+/**
+ * Create {{pascalCase tableName}} repository instance
+ */
+export function create{{pascalCase tableName}}Repository(db: Pool | PoolClient) {
+  return new {{pascalCase tableName}}Repository(db);
+}
