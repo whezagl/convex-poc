@@ -1,10 +1,13 @@
 import Handlebars from 'handlebars';
 import { registerHelpers } from './helpers.js';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 export interface TemplateEngine {
   compile(template: string): HandlebarsTemplateDelegate;
   render(template: string, context: Record<string, unknown>): string;
   load(templatePath: string): HandlebarsTemplateDelegate;
+  invalidateCache(templatePath?: string): void;
 }
 
 /**
@@ -31,9 +34,37 @@ export function createTemplateEngine(): TemplateEngine {
     },
 
     load(templatePath: string): HandlebarsTemplateDelegate {
-      // Templates will be loaded by file system in watcher
-      // This is a placeholder for the loader interface
-      throw new Error('Template loading requires file system access - use watcher module');
+      // Resolve path: if relative, join with .templates/ directory
+      const absolutePath = resolve(templatePath);
+
+      // Check cache first
+      const cached = templateCache.get(absolutePath);
+      if (cached) {
+        return cached;
+      }
+
+      // Load template from disk
+      let content: string;
+      try {
+        content = readFileSync(absolutePath, 'utf-8');
+      } catch (error) {
+        throw new Error(`Failed to load template ${absolutePath}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+
+      // Compile and cache
+      const compiled = engine.compile(content);
+      templateCache.set(absolutePath, compiled);
+
+      return compiled;
+    },
+
+    invalidateCache(templatePath?: string): void {
+      if (templatePath) {
+        const absolutePath = resolve(templatePath);
+        templateCache.delete(absolutePath);
+      } else {
+        templateCache.clear();
+      }
     },
   };
 }
