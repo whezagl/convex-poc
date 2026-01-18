@@ -9,12 +9,12 @@ Requirements for v1.0 milestone — Electron Kanban UI with specialized CRUD age
 
 ### Mono-Repo & Foundation
 
-- [ ] **MONO-01**: pnpm workspace configured with apps/ and packages/ directories
-- [ ] **MONO-02**: Turborepo for build orchestration and task running
-- [ ] **MONO-03**: @repo/shared-types package with TypeScript types (tasks, agents, templates)
-- [ ] **MONO-04**: Convex backend schema for tasks, subtasks, and logs
-- [ ] **MONO-05**: Docker Compose with Convex and PostgreSQL 17 containers
-- [ ] **MONO-06**: @repo/convex-client package with type-safe queries/mutations
+- [x] **MONO-01**: pnpm workspace configured with apps/ and packages/ directories
+- [x] **MONO-02**: Turborepo for build orchestration and task running
+- [x] **MONO-03**: @repo/shared-types package with TypeScript types (tasks, agents, templates)
+- [x] **MONO-04**: Convex backend schema for tasks, subtasks, and logs
+- [x] **MONO-05**: Docker Compose with Convex and PostgreSQL 17 containers
+- [x] **MONO-06**: @repo/convex-client package with type-safe queries/mutations
 
 ### Electron App Structure
 
@@ -133,12 +133,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MONO-01 | Phase 13 | Pending |
-| MONO-02 | Phase 13 | Pending |
-| MONO-03 | Phase 13 | Pending |
-| MONO-04 | Phase 13 | Pending |
-| MONO-05 | Phase 13 | Pending |
-| MONO-06 | Phase 13 | Pending |
+| MONO-01 | Phase 13 | Complete |
+| MONO-02 | Phase 13 | Complete |
+| MONO-03 | Phase 13 | Complete |
+| MONO-04 | Phase 13 | Complete |
+| MONO-05 | Phase 13 | Complete |
+| MONO-06 | Phase 13 | Complete |
 | ELEC-01 | Phase 16 | Pending |
 | ELEC-02 | Phase 16 | Pending |
 | ELEC-03 | Phase 16 | Pending |
