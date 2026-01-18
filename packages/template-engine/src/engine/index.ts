@@ -1,5 +1,5 @@
 export { createTemplateEngine, TemplateEngine } from './handlebars.js';
-export { registerHelpers } from './helpers.js';
+export { registerHelpers, pascalCase, camelCase } from './helpers.js';
 export {
   escapeSqlIdentifier,
   escapeSqlString,

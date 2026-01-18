@@ -1,24 +1,34 @@
 import Handlebars from 'handlebars';
 
 /**
+ * PascalCase transformation for TypeScript types
+ */
+export function pascalCase(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+    .replace(/^(.)/, (_, c) => c.toUpperCase());
+}
+
+/**
+ * camelCase transformation for variables
+ */
+export function camelCase(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+    .replace(/^(.)/, (_, c) => c.toLowerCase());
+}
+
+/**
  * Register custom Handlebars helpers for template rendering
  */
 export function registerHelpers(engine: typeof Handlebars): void {
   // PascalCase transformation for TypeScript types
-  engine.registerHelper('pascalCase', (str: string) => {
-    if (!str) return '';
-    return str
-      .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
-      .replace(/^(.)/, (_, c) => c.toUpperCase());
-  });
+  engine.registerHelper('pascalCase', pascalCase);
 
   // camelCase transformation for variables
-  engine.registerHelper('camelCase', (str: string) => {
-    if (!str) return '';
-    return str
-      .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
-      .replace(/^(.)/, (_, c) => c.toLowerCase());
-  });
+  engine.registerHelper('camelCase', camelCase);
 
   // Check if column is required (not null, no default)
   engine.registerHelper('isRequired', (column: any) => {
