@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 1 of 9 in current phase (Template Engine)
+Plan: 4 of 9 in current phase (Frontend Boilerplate Templates)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-01 (Template Engine)
+Last activity: 2026-01-18 — Completed Plan 14-04 (Frontend Boilerplate Templates)
 
-Progress: [███░░░░░░░░] 13% (6/45 plans in v1.0)
+Progress: [███░░░░░░░░] 16% (7/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20 (14 from v0.3 + 6 from v1.0)
-- Average duration: 9.7 min
-- Total execution time: 194 minutes (3h 14m)
+- Total plans completed: 21 (14 from v0.3 + 7 from v1.0)
+- Average duration: 9.3 min
+- Total execution time: 196 minutes (3h 16m)
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [███░░░░░░░░] 13% (6/45 plans in v1.0)
 |-------|-------|-------|----------|
 | v0.3 (Phases 1-12) | 14 | 172m | 12.3m |
 | v1.0 Phase 13 | 5 | 22m | 4.4m |
-| v1.0 Phase 14-01 | 1 | 2m | 2.0m |
+| v1.0 Phase 14 | 2 | 4m | 2.0m |
 
 **Recent Trend:**
 - Last 5 plans: [3m, 2m, 4m, 2m, 2m]
-- Latest (14-01): 2m
+- Latest (14-04): 2m
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -75,6 +75,9 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-08: JSONB metadata columns on all tables for flexible schema evolution
 - v1.0 Phase 14-08: Automatic updated_at triggers on all 24 tables for change tracking
 - v1.0 Phase 14-08: Foreign keys use CASCADE for dependents, SET NULL for optional references
+- v1.0 Phase 14-04: Frontend boilerplate templates with Vite + React 19 + TypeScript stack
+- v1.0 Phase 14-04: TanStack Query for frontend state management with React Router 7
+- v1.0 Phase 14-04: Auto-generated code warnings (DO NOT EDIT - Auto-generated on [date]) in all templates
 
 ### Pending Todos
 
@@ -109,9 +112,11 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-01 (Template Engine), ready for Plan 14-02 (DDL Parser)
+Stopped at: Completed Plan 14-04 (Frontend Boilerplate Templates), ready for Plan 14-05 (Backend Boilerplate Templates)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
 
 **Completed Plan 14-01:** Handlebars template engine with 8 custom helpers (pascalCase, camelCase, isRequired, typescriptType, formatDate, eq, ne, gt, lt), Biome formatter integration with singleton pattern, hot-reload template watcher with chokidar, security utilities for SQL identifier and template variable escaping.
+
+**Completed Plan 14-04:** Frontend boilerplate templates with 8 Handlebars templates for Vite + React 19 + TypeScript projects, including package.json, vite.config.ts, index.html, README.md, .gitignore, main.tsx, App.tsx, and index.css templates. All templates use Handlebars helpers (pascalCase, camelCase, formatDate) and include auto-generated warning headers.
