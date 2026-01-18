@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 
 ## Current Position
 
-Phase: 14 of 18 (Template System)
-Plan: 11 of 11 in current phase (Hot-Reload Development Server)
-Status: Phase complete
-Last activity: 2026-01-18 — Completed Plan 14-11 (Hot-Reload Development Server)
+Phase: 15 of 18 (Agent Orchestration)
+Plan: 05 of 11 in current phase (Build AgentDispatcher with keyword routing)
+Status: In progress
+Last activity: 2026-01-18 — Completed Plan 15-05 (Build AgentDispatcher with keyword routing)
 
-Progress: [██░░░░░░░░░] 34% (16/47 plans in v1.0)
+Progress: [██░░░░░░░░░] 36% (17/47 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30 (14 from v0.3 + 16 from v1.0)
-- Average duration: 8.0 min
-- Total execution time: 230 minutes (3h 50m)
+- Total plans completed: 31 (14 from v0.3 + 17 from v1.0)
+- Average duration: 7.8 min
+- Total execution time: 231 minutes (3h 51m)
 
 **By Phase:**
 
@@ -38,10 +38,11 @@ Progress: [██░░░░░░░░░] 34% (16/47 plans in v1.0)
 | v1.0 Phase 14-09 | 1 | 12m | 12.0m |
 | v1.0 Phase 14-10 | 1 | 1m | 1.0m |
 | v1.0 Phase 14-11 | 1 | 7m | 7.0m |
+| v1.0 Phase 15-05 | 1 | 1m | 1.0m |
 
 **Recent Trend:**
-- Last 5 plans: [12m, 1m, 7m]
-- Latest (14-11): 7m
+- Last 5 plans: [12m, 1m, 7m, 1m]
+- Latest (15-05): 1m
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -122,6 +123,11 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-11: Watch directory directly and filter by .hbs extension in event handlers for cross-platform compatibility
 - v1.0 Phase 14-11: Graceful shutdown with SIGINT handler and proper cleanup
 - v1.0 Phase 14-11: Chokidar moved to dependencies (runtime requirement for watcher module)
+- v1.0 Phase 15-05: AgentDispatcher with hybrid keyword/LLM routing for task classification
+- v1.0 Phase 15-05: Keyword extraction first (90% confidence threshold) before LLM fallback for performance
+- v1.0 Phase 15-05: Claude Haiku (claude-3-haiku-20240307) for LLM classification (faster/cheaper than Opus)
+- v1.0 Phase 15-05: Fire-and-forget pattern for Convex classification storage to avoid blocking routing
+- v1.0 Phase 15-05: Configurable keyword patterns via DispatcherConfig for customization
 
 ### Pending Todos
 
@@ -166,7 +172,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-11 (Hot-Reload Development Server), Phase 14 complete
+Stopped at: Completed Plan 15-05 (Build AgentDispatcher with keyword routing)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -188,3 +194,5 @@ Resume file: None
 **Completed Plan 14-10:** TemplateEngine.load() method with file system integration, caching, and cache invalidation support. Synchronous file reading for simpler API. Cache key uses absolute file path. invalidateCache() method enables hot-reload integration. Templates can be loaded from .templates/ directory with automatic caching. Clear error messages when template files don't exist.
 
 **Completed Plan 14-11:** Hot-reload development server with working template watching and cache invalidation. Fixed chokidar glob pattern issue by watching directory directly and filtering by .hbs extension. Moved chokidar to dependencies for runtime availability. npm run dev:templates script for convenient development. Graceful shutdown with SIGINT handler. Automatic cache invalidation on template changes, additions, and deletions.
+
+**Completed Plan 15-05:** AgentDispatcher with hybrid keyword/LLM routing for task classification to 5 CRUD agent types (BE/FE boilerplate, CRUD APIs, services, UI pages). Keyword extraction with 90% confidence threshold skips LLM for fast-path routing. Claude Haiku for LLM classification fallback. Console logging stub until updateClassification mutation is available in plan 15-06. Fire-and-forget Convex updates to avoid blocking. Configurable keyword patterns via DispatcherConfig.
