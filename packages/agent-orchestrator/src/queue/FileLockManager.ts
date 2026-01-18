@@ -1,102 +1,100 @@
-// @convex-poc/agent-orchestrator/queue/FileLockManager - File locking for parallel writes
+// @convex-poc/agent-orchestrator/queue/FileLockManager - File locking for parallel operations
 
 import lock from "proper-lockfile";
+import type { FileLockOptions } from "../types/queue.js";
 import { promises as fs } from "fs";
 
-/**
- * FileLockManager provides file locking to prevent write conflicts during parallel execution.
- *
- * Uses proper-lockfile library with:
- * - Automatic retry on lock acquisition
- * - Stale lock detection (locks expire after 10s)
- * - Graceful cleanup on process exit
- *
- * Example:
- * ```typescript
- * const lockManager = new FileLockManager();
- * await lockManager.withLock("/path/to/file", async () => {
- *   await fs.writeFile("/path/to/file", "content");
- * });
- * await lockManager.releaseAll();
- * ```
- */
 export class FileLockManager {
-  private locks: Map<string, () => Promise<boolean>> = new Map();
+  private locks = new Map<string, () => Promise<void>>();
+
+  /**
+   * Acquires a lock for the specified file path.
+   *
+   * @param filePath - Absolute path to the file
+   * @param options - Lock options with retries and stale detection
+   * @returns Release function that must be called when done
+   */
+  async acquireLock(
+    filePath: string,
+    options: FileLockOptions = {}
+  ): Promise<() => Promise<void>> {
+    const {
+      retries = 10,
+      stale = 10000, // 10 seconds
+      update = 2000, // Update every 2 seconds
+    } = options;
+
+    // Ensure file exists before locking
+    try {
+      await fs.access(filePath);
+    } catch {
+      // File doesn't exist, create empty file
+      await fs.writeFile(filePath, "");
+    }
+
+    // Acquire lock
+    const release = await lock(filePath, {
+      retries,
+      stale,
+      update,
+    });
+
+    this.locks.set(filePath, release);
+    return release;
+  }
+
+  /**
+   * Releases a lock for the specified file path.
+   *
+   * @param filePath - Absolute path to the file
+   */
+  async releaseLock(filePath: string): Promise<void> {
+    const release = this.locks.get(filePath);
+    if (release) {
+      await release();
+      this.locks.delete(filePath);
+    }
+  }
 
   /**
    * Executes a function while holding a file lock.
-   * Prevents concurrent writes to the same file.
+   * The lock is always released, even if the function throws.
    *
-   * @param filePath - Path to file to lock
+   * @param filePath - Absolute path to the file
    * @param fn - Async function to execute while holding lock
+   * @param options - Lock options
+   * @returns Result of the function
    */
-  async withLock<T>(filePath: string, fn: () => Promise<T>): Promise<T> {
-    // Acquire lock
-    const release = await lock.lock(filePath, {
-      retries: {
-        retries: 10,
-        minTimeout: 50,
-        maxTimeout: 200,
-      },
-      stale: 10000, // 10 seconds
-    });
-
-    // Store release function for cleanup
-    this.locks.set(filePath, release);
-
+  async withLock<T>(
+    filePath: string,
+    fn: () => Promise<T>,
+    options?: FileLockOptions
+  ): Promise<T> {
+    await this.acquireLock(filePath, options);
     try {
-      // Execute function while holding lock
       return await fn();
     } finally {
-      // Always release lock
       await this.releaseLock(filePath);
     }
   }
 
   /**
-   * Releases a specific file lock.
-   *
-   * @param filePath - Path to file to unlock
-   */
-  async releaseLock(filePath: string): Promise<void> {
-    const release = this.locks.get(filePath);
-    if (release) {
-      try {
-        await release();
-        this.locks.delete(filePath);
-      } catch (error) {
-        console.error(`[FileLockManager] Failed to release lock for ${filePath}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Releases all held locks.
-   * Call this when agent is done (even if it failed).
+   * Releases all active locks.
+   * Useful for cleanup on shutdown.
    */
   async releaseAll(): Promise<void> {
-    const releasePromises = Array.from(this.locks.entries()).map(
-      async ([filePath, release]) => {
-        try {
-          await release();
-        } catch (error) {
-          console.error(`[FileLockManager] Failed to release lock for ${filePath}:`, error);
-        }
-      }
+    const releasePromises = Array.from(this.locks.values()).map(release =>
+      release().catch(err => console.error(`[FileLockManager] Failed to release lock: ${err}`))
     );
-
     await Promise.all(releasePromises);
     this.locks.clear();
   }
 
   /**
-   * Checks if a file is currently locked.
-   *
-   * @param filePath - Path to file to check
-   * @returns True if file is locked
+   * Gets the count of active locks.
+   * Useful for monitoring potential deadlocks.
    */
-  async isLocked(filePath: string): Promise<boolean> {
-    const locked = await lock.check(filePath);
-    return locked;
+  getLockCount(): number {
+    return this.locks.size;
   }
 }
