@@ -171,20 +171,47 @@ export class ParallelOrchestrator {
         const subTaskIds = await subTaskManager.spawnSubTasks(tables, agentType);
 
         // Execute sub-tasks with appropriate agent
-        const AgentClass = this.getAgentClass(agentType);
-
         await subTaskManager.executeSubTasks(
           subTaskIds,
           tables,
           async (subTaskId: string, table: TableDefinition) => {
-            const agent = new AgentClass({
-              agentType,
-              subTaskId,
-              workspacePath,
-              ddlPath,
-              templateType: this.getTemplateType(agentType),
-              totalSteps: 5,
-            });
+            let agent: Agents.BaseCRUDAgent;
+            const templateType = this.getTemplateType(agentType) as "be/crud" | "fe/crud" | "ui/crud";
+
+            switch (agentType) {
+              case "BE CRUD APIs":
+                agent = new Agents.BECRUDAgent({
+                  agentType,
+                  subTaskId,
+                  workspacePath,
+                  ddlPath,
+                  templateType,
+                  totalSteps: 5,
+                });
+                break;
+              case "FE CRUD Services":
+                agent = new Agents.FECRUDAgent({
+                  agentType,
+                  subTaskId,
+                  workspacePath,
+                  ddlPath,
+                  templateType,
+                  totalSteps: 5,
+                });
+                break;
+              case "UI CRUD Pages":
+                agent = new Agents.UICRUDAgent({
+                  agentType,
+                  subTaskId,
+                  workspacePath,
+                  ddlPath,
+                  templateType,
+                  totalSteps: 5,
+                });
+                break;
+              default:
+                throw new Error(`Unknown CRUD agent type: ${agentType}`);
+            }
 
             await agent.execute(table);
             await agent.cleanup();
@@ -219,8 +246,8 @@ export class ParallelOrchestrator {
     const ddlContent = await readFile(ddlPath, "utf-8");
     const parseResult = parseDDL(ddlContent);
 
-    if (!parseResult.success) {
-      throw new Error(`DDL parsing failed: ${parseResult.errors.join(", ")}`);
+    if (parseResult.errors.length > 0) {
+      throw new Error(`DDL parsing failed: ${parseResult.errors.map(e => e.message).join(", ")}`);
     }
 
     return parseResult.tables;
@@ -229,7 +256,7 @@ export class ParallelOrchestrator {
   /**
    * Gets agent class for agent type.
    */
-  private getAgentClass(agentType: AgentType): typeof Agents.BECRUDAgent {
+  private getAgentClass(agentType: AgentType): typeof Agents.BECRUDAgent | typeof Agents.FECRUDAgent | typeof Agents.UICRUDAgent {
     switch (agentType) {
       case "BE CRUD APIs":
         return Agents.BECRUDAgent;

@@ -2,6 +2,7 @@
 
 import Client from "@anthropic-ai/sdk";
 import type { AgentType } from "@convex-poc/shared-types/agent";
+import { convex } from "@convex-poc/convex-client";
 import type {
   AgentClassification,
   KeywordPatterns,
@@ -261,9 +262,6 @@ Respond with JSON in this format:
    * Stores classification result in Convex.
    * Uses fire-and-forget pattern to avoid blocking.
    *
-   * Note: The updateClassification mutation is created in plan 15-06 task 1
-   * alongside the schema updates for classification fields.
-   *
    * @param taskId - Optional task ID
    * @param classification - Classification result
    */
@@ -273,8 +271,7 @@ Respond with JSON in this format:
   ): Promise<void> {
     if (!taskId) return;
 
-    // TODO: This will be available after plan 15-06 completes
-    // For now, we'll log to console
+    // Log to console for debugging
     console.log(`[AgentDispatcher] Classification for task ${taskId}:`, {
       agentType: classification.agentType,
       confidence: classification.confidence,
@@ -283,18 +280,18 @@ Respond with JSON in this format:
       reasoning: classification.reasoning,
     });
 
-    // Non-blocking Convex update (will be implemented in plan 15-06)
-    // convex.mutations.tasks.updateClassification({
-    //   taskId,
-    //   agentType: classification.agentType,
-    //   confidence: classification.confidence,
-    //   method: classification.method,
-    //   keywords: classification.keywords,
-    //   reasoning: classification.reasoning,
-    //   timestamp: Date.now(),
-    // }).catch(err => {
-    //   console.error(`[AgentDispatcher] Failed to store classification: ${err}`);
-    // });
+    // Non-blocking Convex update
+    convex.mutations.tasks.updateClassification({
+      taskId,
+      agentType: classification.agentType,
+      confidence: classification.confidence,
+      method: classification.method,
+      keywords: classification.keywords,
+      reasoning: classification.reasoning,
+      timestamp: Date.now(),
+    }).catch(err => {
+      console.error(`[AgentDispatcher] Failed to store classification: ${err}`);
+    });
   }
 
   /**

@@ -2,11 +2,32 @@
 
 export { createConvexClient, getConvexClient, closeConvexClient } from "./client.js";
 
-// Export all task functions
-export * from "./tasks.js";
+// Export task functions with renamed create to avoid conflicts
+export {
+  create as createTask,
+  createTask as createTaskLegacy,
+  getTasks,
+  getTasksByStatus,
+  updateTaskStatus,
+  addTaskLog,
+  getTask,
+  updateStatus,
+  updateClassification,
+  listByStatus,
+} from "./tasks.js";
 
-// Export all subtask functions
-export * from "./subtasks.js";
+// Export subtask functions with renamed create to avoid conflicts
+export {
+  create as createSubTask,
+  createSubTask as createSubTaskLegacy,
+  getSubTasksByTask,
+  updateSubTaskStatus,
+  updateSubTaskProgress,
+  addSubTaskLog,
+  getSubTask,
+  updateProgress,
+  listByTask,
+} from "./subtasks.js";
 
 // Create a structured convex object for easy access (matching the pattern used in ParallelOrchestrator)
 import { getConvexClient } from "./client.js";
