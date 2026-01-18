@@ -42,7 +42,7 @@ See MILESTONES.md for full milestone details.
 **Milestone Goal:** Add Electron UI with 4-column Kanban board for visual task management and specialized CRUD agents for template-based code generation.
 
 - ✅ **Phase 13: Foundation** - Mono-repo structure, Convex backend, shared types (completed 2026-01-18)
-- [ ] **Phase 14: Template System** - Handlebars engine, DDL parser, code templates
+- 🚧 **Phase 14: Template System** - Handlebars engine, DDL parser, code templates (gap closure)
 - [ ] **Phase 15: Agent Orchestration** - CRUD agents, keyword routing, parallel execution
 - [ ] **Phase 16: Electron Main Process** - IPC handlers, security, agent coordination
 - [ ] **Phase 17: Kanban UI** - 4-column board, real-time sync, drag-and-drop
@@ -78,18 +78,20 @@ Plans:
   3. Template engine renders templates with variables and proper HTML/SQL escaping
   4. School ERP DDL (24 tables) parses completely and generates seed data via npm run seeds
   5. Template changes hot-reload without restarting the application
-**Plans**: TBD
+**Plans**: 11 plans in 1 wave (9 original + 2 gap closure)
 
 Plans:
-- [ ] 14-01: Build @repo/template-engine with Handlebars integration
-- [ ] 14-02: Implement DDL parser using pgsql-parser for PostgreSQL 17
-- [ ] 14-03: Create BE boilerplate templates (project structure files)
-- [ ] 14-04: Create FE boilerplate templates (project structure files)
-- [ ] 14-05: Create BE CRUD templates (index.ts, sql.ts, types.ts, README.md, index.http)
-- [ ] 14-06: Create FE CRUD templates (index.ts, types.ts, api.ts, hooks.ts, README.md)
-- [ ] 14-07: Create UI CRUD templates (Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
-- [ ] 14-08: Build School ERP DDL with 24 tables for Indonesian schools
-- [ ] 14-09: Implement npm run seeds with @faker-js/faker (Indonesian locale)
+- [x] 14-01-PLAN.md — Build @repo/template-engine with Handlebars integration
+- [x] 14-02-PLAN.md — Implement DDL parser using pgsql-parser for PostgreSQL 17
+- [x] 14-03-PLAN.md — Create BE boilerplate templates (project structure files)
+- [x] 14-04-PLAN.md — Create FE boilerplate templates (project structure files)
+- [x] 14-05-PLAN.md — Create BE CRUD templates (index.ts, sql.ts, types.ts, README.md, index.http)
+- [x] 14-06-PLAN.md — Create FE CRUD templates (index.ts, types.ts, api.ts, hooks.ts, README.md)
+- [x] 14-07-PLAN.md — Create UI CRUD templates (Page.tsx, schema.ts, form.tsx, table.tsx, hooks.ts, README.md)
+- [x] 14-08-PLAN.md — Build School ERP DDL with 24 tables for Indonesian schools
+- [x] 14-09-PLAN.md — Implement npm run seeds with @faker-js/faker (Indonesian locale)
+- [ ] 14-10-PLAN.md — Implement template auto-loading with file system integration (Gap Closure)
+- [ ] 14-11-PLAN.md — Wire up hot-reload with development server (Gap Closure)
 
 ### Phase 15: Agent Orchestration
 **Goal**: Implement specialized CRUD agents with parallel execution and keyword routing
@@ -187,11 +189,11 @@ Phases execute in numeric order: 13 → 14 → 15 → 16 → 17 → 18
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 13. Foundation | v1.0 | 5/5 | ✓ Complete | 2026-01-18 |
-| 14. Template System | v1.0 | 0/9 | Not started | - |
+| 14. Template System | v1.0 | 9/11 | Gap Closure | In progress |
 | 15. Agent Orchestration | v1.0 | 0/9 | Not started | - |
 | 16. Electron Main Process | v1.0 | 0/6 | Not started | - |
 | 17. Kanban UI | v1.0 | 0/12 | Not started | - |
 | 18. Polish | v1.0 | 0/4 | Not started | - |
 
-**v1.0 Progress: 5/45 plans (11%)**
-**Overall Progress: 19/59 plans (32%)**
+**v1.0 Progress: 14/47 plans (30%)**
+**Overall Progress: 28/61 plans (46%)**
