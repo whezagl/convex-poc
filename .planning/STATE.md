@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 2 of 9 in current phase (DDL Parser)
+Plan: 5 of 9 in current phase (Backend CRUD Templates)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-02 (DDL Parser)
+Last activity: 2026-01-18 — Completed Plan 14-05 (Backend CRUD Templates)
 
-Progress: [██░░░░░░░░░] 16% (7/45 plans in v1.0)
+Progress: [██░░░░░░░░░] 18% (8/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21 (14 from v0.3 + 7 from v1.0)
-- Average duration: 9.2 min
-- Total execution time: 193 minutes (3h 13m)
+- Total plans completed: 22 (14 from v0.3 + 8 from v1.0)
+- Average duration: 9.0 min
+- Total execution time: 195 minutes (3h 15m)
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: [██░░░░░░░░░] 16% (7/45 plans in v1.0)
 | v1.0 Phase 13 | 5 | 22m | 4.4m |
 | v1.0 Phase 14-01 | 1 | 2m | 2.0m |
 | v1.0 Phase 14-02 | 1 | 3m | 3.0m |
+| v1.0 Phase 14-05 | 1 | 2m | 2.0m |
 
 **Recent Trend:**
-- Last 5 plans: [3m, 2m, 4m, 2m, 3m]
-- Latest (14-02): 3m
+- Last 5 plans: [3m, 2m, 4m, 2m, 2m]
+- Latest (14-05): 2m
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-04: Frontend boilerplate templates with Vite + React 19 + TypeScript stack
 - v1.0 Phase 14-04: TanStack Query for frontend state management with React Router 7
 - v1.0 Phase 14-04: Auto-generated code warnings (DO NOT EDIT - Auto-generated on [date]) in all templates
+- v1.0 Phase 14-05: Backend CRUD templates with repository pattern (findMany, findById, create, update, delete, count)
+- v1.0 Phase 14-05: Parameterized queries ($1, $2) for all SQL to prevent injection attacks
+- v1.0 Phase 14-05: Handlebars helpers (add, filterColumns, findColumn, takeColumns) for template column manipulation
 
 ### Pending Todos
 
@@ -126,7 +130,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-02 (DDL Parser), ready for Plan 14-03 (Backend Boilerplate Templates)
+Stopped at: Completed Plan 14-05 (Backend CRUD Templates), ready for Plan 14-06 (Frontend CRUD Templates)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -134,3 +138,5 @@ Resume file: None
 **Completed Plan 14-01:** Handlebars template engine with 8 custom helpers (pascalCase, camelCase, isRequired, typescriptType, formatDate, eq, ne, gt, lt), Biome formatter integration with singleton pattern, hot-reload template watcher with chokidar, security utilities for SQL identifier and template variable escaping.
 
 **Completed Plan 14-02:** PostgreSQL DDL parser using sql-parser-cst AST library (not regex), handles PostgreSQL 17 features (arrays, timestamp with timezone, identity columns), extracts table definitions with columns, foreign keys, indexes, and constraints. Indonesian national ID validators: NISN (10 digits), NIP (18 digits), NUPTK (16 digits) with basic digit-count validation. PostgreSQL to TypeScript type mapping for common types. Parser module exported via @convex-poc/template-engine/parser.
+
+**Completed Plan 14-05:** Backend CRUD templates (types.ts.hbs, sql.ts.hbs, index.ts.hbs, README.md.hbs, index.http.hbs) for generating database access code from DDL parser output. Repository pattern with findMany, findById, create, update, delete, count methods. Parameterized queries ($1, $2) for SQL injection prevention. JSDoc comments from column descriptions. Additional Handlebars helpers: add, filterColumns, findColumn, takeColumns.
