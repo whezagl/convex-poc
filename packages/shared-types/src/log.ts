@@ -15,6 +15,7 @@ export const LogSchema = z.object({
   timestamp: z.number(),
   message: z.string(),
   level: LogLevelSchema,
+  source: z.string().optional(), // "agent" or "system"
 });
 
 export type Log = z.infer<typeof LogSchema>;

@@ -3,12 +3,22 @@
 
 import { z } from "zod";
 
+export const TemplateTypeSchema = z.union([
+  z.literal("BE boilerplate"),
+  z.literal("FE boilerplate"),
+  z.literal("BE CRUD"),
+  z.literal("FE CRUD"),
+  z.literal("UI CRUD"),
+]);
+
+export type TemplateType = z.infer<typeof TemplateTypeSchema>;
+
 export const TemplateSchema = z.object({
-  id: z.string(),
   name: z.string(),
-  description: z.string().optional(),
-  template: z.string(),
-  variables: z.array(z.string()),
+  type: TemplateTypeSchema,
+  path: z.string(), // .templates/ directory path
+  content: z.string(), // Handlebars template
+  variables: z.array(z.string()), // Required variable names
 });
 
 export type Template = z.infer<typeof TemplateSchema>;

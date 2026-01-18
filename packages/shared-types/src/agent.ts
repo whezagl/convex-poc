@@ -3,27 +3,26 @@
 
 import { z } from "zod";
 
-export const AgentRoleSchema = z.union([
-  z.literal("planner"),
-  z.literal("coder"),
-  z.literal("reviewer"),
+export const AgentTypeSchema = z.union([
+  z.literal("BE Boilerplate"),
+  z.literal("FE Boilerplate"),
+  z.literal("BE CRUD APIs"),
+  z.literal("FE CRUD Services"),
+  z.literal("UI CRUD Pages"),
 ]);
 
-export type AgentRole = z.infer<typeof AgentRoleSchema>;
-
-export const AgentStatusSchema = z.union([
-  z.literal("idle"),
-  z.literal("working"),
-  z.literal("error"),
-]);
-
-export type AgentStatus = z.infer<typeof AgentStatusSchema>;
+export type AgentType = z.infer<typeof AgentTypeSchema>;
 
 export const AgentSchema = z.object({
-  id: z.string(),
-  role: AgentRoleSchema,
-  status: AgentStatusSchema,
-  model: z.string(),
+  agentType: AgentTypeSchema,
+  currentStep: z.number(),
+  totalSteps: z.number(),
+  status: z.union([
+    z.literal("idle"),
+    z.literal("running"),
+    z.literal("done"),
+    z.literal("failed"),
+  ]),
 });
 
 export type Agent = z.infer<typeof AgentSchema>;
