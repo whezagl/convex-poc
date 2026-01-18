@@ -1,0 +1,31 @@
+/**
+ * {{pascalCase tableName}} Module
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+// Types
+export type {
+  {{pascalCase tableName}},
+  Create{{pascalCase tableName}}Input,
+  Update{{pascalCase tableName}}Input,
+  {{pascalCase tableName}}Filters,
+  {{pascalCase tableName}}ListResponse,
+  {{pascalCase tableName}}ApiError,
+} from './types.js';
+
+// API client
+export { {{camelCase tableName}}Api } from './api.js';
+
+// React hooks
+export {
+  use{{pascalCase tableName}}All,
+  use{{pascalCase tableName}},
+  useCreate{{pascalCase tableName}},
+  useUpdate{{pascalCase tableName}},
+  useDelete{{pascalCase tableName}},
+  use{{pascalCase tableName}}Count,
+} from './hooks.js';

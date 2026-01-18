@@ -1,0 +1,170 @@
+# {{pascalCase tableName}} Frontend Module
+
+⚠️ **DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}**
+
+Database table: `{{tableName}}`
+
+## Overview
+
+This module provides type-safe React hooks and API client for the `{{tableName}}` table. Built with TanStack Query for server state management.
+
+## Installation
+
+This module is auto-generated. No installation needed.
+
+## Usage
+
+### React Hooks
+
+```typescript
+import {
+  use{{pascalCase tableName}}All,
+  use{{pascalCase tableName}},
+  useCreate{{pascalCase tableName}},
+  useUpdate{{pascalCase tableName}},
+  useDelete{{pascalCase tableName}},
+} from './{{camelCase tableName}}';
+
+// Fetch all records
+function {{pascalCase tableName}}List() {
+  const { data, isLoading, error } = use{{pascalCase tableName}}All();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data?.data.map(item => (
+        <li key={item.{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}}>{item.{{#findColumn columns 'name'}}{{name}}{{/findColumn}}}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Fetch single record
+function {{pascalCase tableName}}Details({ id }: { id: string }) {
+  const { data, isLoading, error } = use{{pascalCase tableName}}(id);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>{{pascalCase tableName}}: {data?.{{#findColumn columns 'name'}}{{name}}{{/findColumn}}}</div>;
+}
+
+// Create record
+function Create{{pascalCase tableName}}Form() {
+  const create{{pascalCase tableName}} = useCreate{{pascalCase tableName}}();
+
+  const handleSubmit = (data: Create{{pascalCase tableName}}Input) => {
+    create{{pascalCase tableName}}.mutate(data, {
+      onSuccess: () => {
+        alert('{{pascalCase tableName}} created!');
+      },
+    });
+  };
+
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      handleSubmit({ /* form data */ });
+    }}>
+      {/* form fields */}
+      <button type="submit" disabled={create{{pascalCase tableName}}.isPending}>
+        {create{{pascalCase tableName}}.isPending ? 'Creating...' : 'Create'}
+      </button>
+    </form>
+  );
+}
+
+// Update record
+function Update{{pascalCase tableName}}Form({ id }: { id: string }) {
+  const { data } = use{{pascalCase tableName}}(id);
+  const update{{pascalCase tableName}} = useUpdate{{pascalCase tableName}}();
+
+  const handleSubmit = (changes: Partial<{{pascalCase tableName}}>) => {
+    update{{pascalCase tableName}}.mutate({
+      {{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}: id,
+      changes,
+    });
+  };
+
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      handleSubmit({ /* changes */ });
+    }}>
+      {/* form fields */}
+      <button type="submit" disabled={update{{pascalCase tableName}}.isPending}>
+        {update{{pascalCase tableName}}.isPending ? 'Updating...' : 'Update'}
+      </button>
+    </form>
+  );
+}
+
+// Delete record
+function Delete{{pascalCase tableName}}Button({ id }: { id: string }) {
+  const delete{{pascalCase tableName}} = useDelete{{pascalCase tableName}}();
+
+  return (
+    <button
+      onClick={() => delete{{pascalCase tableName}}.mutate(id)}
+      disabled={delete{{pascalCase tableName}}.isPending}
+    >
+      {delete{{pascalCase tableName}}.isPending ? 'Deleting...' : 'Delete'}
+    </button>
+  );
+}
+```
+
+### API Client
+
+If you need direct API access (without React hooks):
+
+```typescript
+import { {{camelCase tableName}}Api } from './{{camelCase tableName}}';
+
+// Fetch all
+const all = await {{camelCase tableName}}Api.findAll();
+
+// Fetch by ID
+const one = await {{camelCase tableName}}Api.findById('id');
+
+// Create
+const created = await {{camelCase tableName}}Api.create({ /* data */ });
+
+// Update
+const updated = await {{camelCase tableName}}Api.update({
+  {{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}: 'id',
+  changes: { /* changes */ }
+});
+
+// Delete
+await {{camelCase tableName}}Api.delete('id');
+```
+
+## Types
+
+See `types.ts` for complete type definitions:
+
+- `{{pascalCase tableName}}` - Data model
+- `Create{{pascalCase tableName}}Input` - Create input
+- `Update{{pascalCase tableName}}Input` - Update input
+- `{{pascalCase tableName}}Filters` - Query filters
+- `{{pascalCase tableName}}ListResponse` - List response
+- `{{pascalCase tableName}}ApiError` - API error
+
+## Table Schema
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+{{#each columns}}
+| `{{name}}` | {{type}} | {{#if nullable}}Yes{{else}}No{{/if}} | {{#if comment}}{{{comment}}}{{else}}-{{/if}} |
+{{/each}}
+
+## Environment Variables
+
+Ensure `VITE_API_URL` is set in your `.env` file:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+```
