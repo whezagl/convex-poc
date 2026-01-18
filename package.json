@@ -1,13 +1,14 @@
 {
-  "name": "convex-poc",
+  "name": "convex-poc-monorepo",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "description": "AI Agents POC with Claude Agent SDK and Convex state backend",
   "scripts": {
-    "dev": "tsx",
-    "build": "tsup",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
   },
   "engines": {
     "node": ">=20"
@@ -27,6 +28,7 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "turbo": "^2.4.2",
     "@types/node": "^25.0.9",
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",

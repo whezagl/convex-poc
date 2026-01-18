@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+pnpm-lock.yaml
 
 # Environment variables (contains actual admin key)
 .env
@@ -7,6 +8,10 @@ node_modules/
 
 # Docker volume data (local Docker volume data)
 convex_data/
+
+# Persisted data
+data/
+!data/.gitkeep
 
 # Convex auto-generated files
 convex/_generated/
