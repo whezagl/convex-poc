@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 8 of 9 in current phase
+Plan: 1 of 9 in current phase (Template Engine)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-08 (School ERP DDL Schema)
+Last activity: 2026-01-18 — Completed Plan 14-01 (Template Engine)
 
 Progress: [███░░░░░░░░] 13% (6/45 plans in v1.0)
 
@@ -20,8 +20,8 @@ Progress: [███░░░░░░░░] 13% (6/45 plans in v1.0)
 
 **Velocity:**
 - Total plans completed: 20 (14 from v0.3 + 6 from v1.0)
-- Average duration: 9.8 min
-- Total execution time: 196 minutes (3h 16m)
+- Average duration: 9.7 min
+- Total execution time: 194 minutes (3h 14m)
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [███░░░░░░░░] 13% (6/45 plans in v1.0)
 |-------|-------|-------|----------|
 | v0.3 (Phases 1-12) | 14 | 172m | 12.3m |
 | v1.0 Phase 13 | 5 | 22m | 4.4m |
-| v1.0 Phase 14-08 | 1 | 2m | 2.0m |
+| v1.0 Phase 14-01 | 1 | 2m | 2.0m |
 
 **Recent Trend:**
 - Last 5 plans: [3m, 2m, 4m, 2m, 2m]
-- Latest (14-08): 2m
+- Latest (14-01): 2m
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -64,6 +64,11 @@ Recent decisions affecting current work:
 - v1.0: Type-safe wrapper functions matching backend function names exactly
 - v1.0: Optional client injection parameter for testing flexibility
 - v1.0: PostgreSQL 17 on port 5433 to avoid conflicts with local installations
+- v1.0 Phase 14-01: Handlebars template engine with custom helpers for code generation
+- v1.0 Phase 14-01: Biome formatter with singleton pattern for WASM efficiency
+- v1.0 Phase 14-01: Chokidar hot-reload with 100ms stability threshold
+- v1.0 Phase 14-01: Security utilities for SQL identifier and template variable escaping
+- v1.0 Phase 14-01: HTML escaping ON by default (use {{{var}}} for trusted content)
 - v1.0 Phase 14-08: Indonesian national IDs validated with regex (NPSN: 8, NISN: 10, NIP: 18, NUPTK: 16 digits)
 - v1.0 Phase 14-08: Kurikulum Merdeka P5 projects use 8 themes with descriptive assessment (sangat_baik, baik, cukup, perlu_bimbingan)
 - v1.0 Phase 14-08: All tables use identity columns with GENERATED ALWAYS AS IDENTITY for PostgreSQL 17
@@ -92,15 +97,21 @@ None yet.
 **Resolved (Phase 13):**
 - ~~pnpm workspace dependency hoisting conflicts may arise~~ — No issues found, all dependencies resolved correctly
 
+**Resolved (Phase 14-01):**
+- ~~@types/handlebars version compatibility~~ — Used 4.1.0 (latest available)
+- ~~HandlebarsTemplateDelegate type export~~ — Used ReturnType<typeof Handlebars.compile> workaround
+- ~~Biome API usage~~ — Updated to Biome.create() factory with singleton pattern
+- ~~Chokidar error type casting~~ — Added type guards for unknown → Error conversion
+
 **Resolved (Phase 14-08):**
 - ~~DDL parser edge cases for PostgreSQL 17 features (arrays, JSONB, enums)~~ — DDL created successfully with all features, ready for parser testing
 
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-08 (School ERP DDL Schema)
+Stopped at: Completed Plan 14-01 (Template Engine), ready for Plan 14-02 (DDL Parser)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
 
-**Completed Plan 14-08:** School ERP DDL with 24 tables for Indonesian school management, PostgreSQL 17 features (identity columns, JSONB, arrays, 19 enums, check constraints), Kurikulum Merdeka P5 project support, 87 indexes, 39 foreign keys, 24 triggers for updated_at, comprehensive documentation.
+**Completed Plan 14-01:** Handlebars template engine with 8 custom helpers (pascalCase, camelCase, isRequired, typescriptType, formatDate, eq, ne, gt, lt), Biome formatter integration with singleton pattern, hot-reload template watcher with chokidar, security utilities for SQL identifier and template variable escaping.
