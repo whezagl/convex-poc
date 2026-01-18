@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 15 of 18 (Agent Orchestration)
-Plan: 02 of 11 in current phase (Create BaseCRUDAgent abstract class)
+Plan: 03 of 11 in current phase (Implement BE and FE boilerplate agents)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 15-02 (Create BaseCRUDAgent abstract class)
+Last activity: 2026-01-18 — Completed Plan 15-03 (Implement BE and FE boilerplate agents)
 
-Progress: [██░░░░░░░░░] 38% (18/47 plans in v1.0)
+Progress: [██░░░░░░░░░] 40% (19/47 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32 (14 from v0.3 + 18 from v1.0)
-- Average duration: 7.6 min
-- Total execution time: 234 minutes (3h 54m)
+- Total plans completed: 33 (14 from v0.3 + 19 from v1.0)
+- Average duration: 7.4 min
+- Total execution time: 237 minutes (3h 57m)
 
 **By Phase:**
 
@@ -40,10 +40,11 @@ Progress: [██░░░░░░░░░] 38% (18/47 plans in v1.0)
 | v1.0 Phase 14-11 | 1 | 7m | 7.0m |
 | v1.0 Phase 15-01 | 1 | 4m | 4.0m |
 | v1.0 Phase 15-02 | 1 | 3m | 3.0m |
+| v1.0 Phase 15-03 | 1 | 3m | 3.0m |
 
 **Recent Trend:**
-- Last 5 plans: [12m, 1m, 7m, 4m, 3m]
-- Latest (15-02): 3m
+- Last 5 plans: [12m, 1m, 7m, 4m, 3m, 3m]
+- Latest (15-03): 3m
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -136,6 +137,12 @@ Recent decisions affecting current work:
 - v1.0 Phase 15-02: File locking pattern with withLock() for exclusive access during parallel writes
 - v1.0 Phase 15-02: CRUDAgentConfig.subTaskId uses string type (matches Convex ID format)
 - v1.0 Phase 15-02: Check parseResult.errors.length for parser errors (continue-on-error pattern from Phase 14-02)
+- v1.0 Phase 15-03: BEBoilerplateAgent extends BaseCRUDAgent for backend project scaffolding (6 files: package.json, tsconfig.json, biome.json, README.md, .gitignore, src/index.ts)
+- v1.0 Phase 15-03: FEBoilerplateAgent extends BaseCRUDAgent for frontend project scaffolding (8 files: package.json, tsconfig.json, vite.config.ts, src/main.tsx, src/App.tsx, src/index.css, index.html, README.md, .gitignore)
+- v1.0 Phase 15-03: Import CRUDAgentConfig and TableDefinition from types.js (not BaseCRUDAgent.js) for proper type exports
+- v1.0 Phase 15-03: Separate writeFileWithLock method to avoid base class writeWithLock signature conflict
+- v1.0 Phase 15-03: Template variables use projectName and description (dependencies hardcoded in templates per Phase 14 design)
+- v1.0 Phase 15-03: Both agents override execute method for multi-file generation (BaseCRUDAgent.execute designed for single-file CRUD operations)
 - v1.0 Phase 15-05: AgentDispatcher with hybrid keyword/LLM routing for task classification
 - v1.0 Phase 15-05: Keyword extraction first (90% confidence threshold) before LLM fallback for performance
 - v1.0 Phase 15-05: Claude Haiku (claude-3-haiku-20240307) for LLM classification (faster/cheaper than Opus)
@@ -185,7 +192,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 15-02 (Create BaseCRUDAgent abstract class)
+Stopped at: Completed Plan 15-03 (Implement BE and FE boilerplate agents)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
@@ -211,5 +218,7 @@ Resume file: None
 **Completed Plan 15-01:** TaskQueue with p-queue for priority-based task scheduling (concurrency: 5, timeout: 5min). FileLockManager with proper-lockfile for parallel file write protection. Queue type definitions (TaskOptions, QueueOptions, FileLockOptions, QueueStats). Package exports for @convex-poc/agent-orchestrator/queue and ./types/queue. Fixed QueueOptions.concurrency to optional, TaskOptions.taskId to string type, added type assertion for TaskQueue.add() return type, created package-level tsconfig.json with project references.
 
 **Completed Plan 15-02:** BaseCRUDAgent abstract class with template engine integration for all CRUD agents (BE/FE boilerplate, CRUD APIs, services, UI pages). Template Method Pattern with abstract methods (selectTemplate, prepareTemplateVariables, getOutputPath) and concrete execute() workflow (parse, load, prepare, generate, write). Integrated with convex-client for real-time progress tracking (updateSubTaskProgress, updateSubTaskStatus). File locking pattern with withLock() for exclusive access during parallel writes. Fixed type compatibility by re-exporting TableDefinition from template-engine parser. Fixed proper-lockfile import (named instead of default) and Anthropic SDK import (default instead of named). Agents barrel export created with BaseCRUDAgent and types.
+
+**Completed Plan 15-03:** BEBoilerplateAgent and FEBoilerplateAgent extending BaseCRUDAgent for multi-file project scaffolding using Phase 14 templates. BE agent generates 6 files (package.json, tsconfig.json, biome.json, README.md, .gitignore, src/index.ts). FE agent generates 8 files (package.json, tsconfig.json, vite.config.ts, src/main.tsx, src/App.tsx, src/index.css, index.html, README.md, .gitignore). Both agents override execute method for multi-file generation with custom output paths. File locking prevents write conflicts during parallel execution. Fixed import paths (CRUDAgentConfig, TableDefinition from types.js), added missing dirname import, created writeFileWithLock method to avoid base class signature conflict. Agents barrel export updated with BE and FE boilerplate agents.
 
 **Completed Plan 15-05:** AgentDispatcher with hybrid keyword/LLM routing for task classification to 5 CRUD agent types (BE/FE boilerplate, CRUD APIs, services, UI pages). Keyword extraction with 90% confidence threshold skips LLM for fast-path routing. Claude Haiku for LLM classification fallback. Console logging stub until updateClassification mutation is available in plan 15-06. Fire-and-forget Convex updates to avoid blocking. Configurable keyword patterns via DispatcherConfig.
