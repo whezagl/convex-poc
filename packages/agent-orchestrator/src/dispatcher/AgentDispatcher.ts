@@ -1,6 +1,6 @@
 // @convex-poc/agent-orchestrator/dispatcher/AgentDispatcher - Agent dispatcher with routing
 
-import { Client } from "@anthropic-ai/sdk";
+import Client from "@anthropic-ai/sdk";
 import type { AgentType } from "@convex-poc/shared-types/agent";
 import type {
   AgentClassification,

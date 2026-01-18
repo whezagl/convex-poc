@@ -1,6 +1,6 @@
 // @convex-poc/agent-orchestrator/queue/FileLockManager - File locking for parallel operations
 
-import lock from "proper-lockfile";
+import { lock } from "proper-lockfile";
 import type { FileLockOptions } from "../types/queue.js";
 import { promises as fs } from "fs";
 

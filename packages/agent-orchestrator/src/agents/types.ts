@@ -1,10 +1,8 @@
 // @convex-poc/agent-orchestrator/agents/types - CRUD agent type definitions
 
-import type { Id } from "@convex-poc/shared-types/subtask";
 import type { AgentType } from "@convex-poc/shared-types/agent";
 
-// Table definition from DDL parser
-// Re-exporting from template-engine for convenience
+// Re-export TableDefinition from template-engine to ensure type compatibility
 export type { TableDefinition } from "@convex-poc/template-engine/parser";
 
 // Template types matching Phase 14 templates
@@ -18,7 +16,7 @@ export type TemplateType =
 // CRUD agent configuration
 export interface CRUDAgentConfig {
   agentType: AgentType;
-  subTaskId: Id;
+  subTaskId: string; // Subtask ID from Convex
   workspacePath: string;
   ddlPath?: string; // Optional: path to DDL file for CRUD agents
   templateType: TemplateType;
