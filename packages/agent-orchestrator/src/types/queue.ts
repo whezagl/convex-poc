@@ -1,15 +1,13 @@
 // @convex-poc/agent-orchestrator/types/queue - Queue type definitions
 
-import type { Id } from "@convex-poc/shared-types/task";
-
 export interface TaskOptions {
-  taskId: Id;
+  taskId: string;
   priority: number; // 1 (low) to 10 (high)
   timeout?: number; // milliseconds, default 300000 (5 min)
 }
 
 export interface QueueOptions {
-  concurrency: number; // Max concurrent tasks, default 5
+  concurrency?: number; // Max concurrent tasks, default 5
   autoStart?: boolean; // Auto-start queue, default true
   timeout?: number; // Default timeout per task, default 300000
   throwOnTimeout?: boolean; // Throw when timeout, default true

@@ -47,13 +47,13 @@ export class TaskQueue {
     taskFn: () => Promise<T>,
     options: TaskOptions
   ): Promise<T> {
-    const { priority, taskId, timeout } = options;
+    const { priority } = options;
 
     this.taskCount++;
 
     return this.queue.add(taskFn, {
       priority, // Higher priority = executes first
-    });
+    }) as Promise<T>;
   }
 
   /**
