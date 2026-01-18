@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./orchestrator": "./src/orchestrator.ts",
+    "./orchestrator": "./src/orchestrator/index.ts",
     "./planner": "./src/planner.ts",
     "./coder": "./src/coder.ts",
     "./reviewer": "./src/reviewer.ts",
