@@ -4,17 +4,22 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./generator": "./src/generator.ts"
+    "./engine": "./src/engine/index.js",
+    "./generator": "./src/generator/index.js",
+    "./watcher": "./src/watcher/index.js"
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@convex-poc/shared-types": "workspace:*"
+    "handlebars": "^4.7.8"
   },
   "devDependencies": {
+    "@biomejs/js-api": "^4.0.0",
+    "@types/handlebars": "^4.1.0",
+    "chokidar": "^4.0.0",
     "typescript": "^5.9.3",
     "@types/node": "^25.0.9",
     "vitest": "^4.0.17"
