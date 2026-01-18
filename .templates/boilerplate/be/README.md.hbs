@@ -1,0 +1,134 @@
+# {{pascalCase projectName}}
+
+⚠️ **DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}**
+
+{{{description}}}
+
+## Prerequisites
+
+- Node.js >= 20.0.0
+- PostgreSQL >= 17
+
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Copy environment variables:
+```bash
+cp .env.example .env
+```
+
+3. Update `.env` with your database credentials:
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/{{camelCase projectName}}
+PORT=3000
+```
+
+4. Run database migrations:
+```bash
+npm run db:migrate
+```
+
+5. Seed database (optional):
+```bash
+npm run db:seed
+```
+
+## Development
+
+Start development server with hot-reload:
+```bash
+npm run dev
+```
+
+The server will start on http://localhost:3000
+
+## Building
+
+Compile TypeScript to JavaScript:
+```bash
+npm run build
+```
+
+Output will be in `dist/` directory.
+
+## Testing
+
+Run tests:
+```bash
+npm test
+```
+
+Run tests in watch mode:
+```bash
+npm run test:watch
+```
+
+## Code Quality
+
+Lint code:
+```bash
+npm run lint
+```
+
+Fix linting issues:
+```bash
+npm run lint:fix
+```
+
+Format code:
+```bash
+npm run format
+```
+
+## API Documentation
+
+API endpoints are documented using OpenAPI/Swagger. Visit http://localhost:3000/docs for interactive API documentation.
+
+## Database
+
+### Migrations
+
+Create a new migration:
+```bash
+npm run db:migrate:create migration_name
+```
+
+Run migrations:
+```bash
+npm run db:migrate
+```
+
+### Schema
+
+Database schema is defined in `src/db/schema.ts`.
+
+## Project Structure
+
+```
+src/
+├── index.ts           # Entry point
+├── db/                # Database layer
+│   ├── schema.ts      # Database schema
+│   ├── migrate.ts     # Migration runner
+│   └── seed.ts        # Seed data
+├── routes/            # API routes
+├── services/          # Business logic
+├── middleware/        # Express middleware
+└── utils/             # Utility functions
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| DATABASE_URL | PostgreSQL connection string | - |
+| PORT | Server port | 3000 |
+| NODE_ENV | Environment (development/production) | development |
+
+## License
+
+MIT
