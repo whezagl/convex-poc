@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A learning-focused proof-of-concept for building autonomous coding agents using the Claude Agent SDK integrated with Convex for persistent state management. The project demonstrates multi-agent coordination patterns where specialized agents (Planner, Coder, Reviewer) collaborate to complete coding tasks autonomously, with Convex providing real-time agent state storage and orchestration tracking.
+A multi-agent autonomous coding system using Claude Agent SDK integrated with Convex, now with an Electron Kanban UI for visual task management. The system combines specialized CRUD agents (BE/FE/UI) with general-purpose agents (Planner→Coder→Reviewer) to scaffold full-stack applications from DDL, featuring parallel sub-task execution, real-time progress tracking, and template-based code generation.
 
 ## Core Value
 
@@ -29,13 +29,28 @@ If everything else fails, the agent orchestration pattern must work and the code
 
 ### Active
 
-(None — project complete)
+## Current Milestone: v1.0 Electron Kanban Board
+
+**Goal:** Add Electron UI with 4-column Kanban board for visual task management and specialized CRUD agents for template-based code generation.
+
+**Target features:**
+- Electron Kanban UI with 4 columns (Tasks, In Progress, Sub-tasks, Done)
+- 5 Specialized CRUD agents: BE Boilerplate, FE Boilerplate, BE CRUD APIs, FE CRUD Services, UI CRUD Pages
+- Keyword-based agent detection (auto-parse task description)
+- Parallel sub-task execution with priority-based ordering
+- Real-time progress tracking via Convex
+- Template system with `.templates/` directory (user-customizable)
+- Sample School-ERP DDL with 20+ tables and npm run seeds
+- PostgreSQL in Docker for development
+- Task limits (max 5 concurrent tasks, 5 sub-tasks per task)
+- Logs modal with real-time streaming output
+- Archive view for completed tasks
+- Dark mode support
 
 ### Out of Scope
 
 - **Graphiti memory system** — Convex provides persistent state; no additional memory system needed
 - **Git worktree isolation** — Simplified workspace management; focus on agent patterns
-- **Electron UI** — CLI-first design; UI is separate concern
 - **Python backend** — Architecture decision to use pure TypeScript/Node with Convex
 - **MCP integrations** — Focus on Claude SDK agent patterns; external integrations add scope
 - **Production-grade security** — Learning environment; security patterns can be added later
@@ -95,4 +110,4 @@ The Auto-Claude architecture shows a proven pattern: Planner → Coder → QA Re
 | No cloud Convex deployment | Self-hosted only for POC; cloud deployment adds complexity | ✓ Good — Local development environment complete |
 
 ---
-*Last updated: 2026-01-17 after v0.3 milestone completion*
+*Last updated: 2026-01-18 after starting v1.0 milestone*
