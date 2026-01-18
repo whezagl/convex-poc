@@ -1,0 +1,117 @@
+/**
+ * {{pascalCase tableName}} SQL Queries
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ *
+ * All queries use parameterized statements to prevent SQL injection.
+ * Never interpolate user input directly into SQL strings.
+ */
+
+import { {{pascalCase tableName}}, Create{{pascalCase tableName}}Input, Update{{pascalCase tableName}}Input, {{pascalCase tableName}}Where } from './types.js';
+
+/**
+ * SQL query templates for {{pascalCase tableName}}
+ */
+export const {{camelCase tableName}}Queries = {
+  /**
+   * Select all {{camelCase tableName}} records
+   */
+  SELECT_ALL: `
+    SELECT *
+    FROM "{{tableName}}"
+    ORDER BY {{#each (filterColumns columns 'isPrimaryKey')}}{{#if @first}}{{name}}{{else}}, {{name}}{{/if}}{{/each}}
+  `,
+
+  /**
+   * Select {{camelCase tableName}} by ID
+   */
+  SELECT_BY_ID: `
+    SELECT *
+    FROM "{{tableName}}"
+    WHERE "{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}" = $1
+  `,
+
+  /**
+   * Insert new {{camelCase tableName}}
+   */
+  INSERT: `
+    INSERT INTO "{{tableName}}" (
+      {{#each (filterColumns columns 'isPrimaryKey')}}
+      "{{name}}"{{#unless @last}}, {{/unless}}
+      {{/each}}
+    )
+    VALUES (
+      {{#each (filterColumns columns 'isPrimaryKey')}}
+      ${{add @index 1}}{{#unless @last}}, {{/unless}}
+      {{/each}}
+    )
+    RETURNING *
+  `,
+
+  /**
+   * Update {{camelCase tableName}} by ID
+   */
+  UPDATE: `
+    UPDATE "{{tableName}}"
+    SET
+      {{#each (filterColumns columns 'isPrimaryKey')}}
+      "{{name}}" = ${{add (filterColumns (filterColumns columns 'isPrimaryKey') 'isPrimaryKey').length 1}}{{#unless @last}}, {{/unless}}
+      {{/each}}
+    WHERE "{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}" = $1
+    RETURNING *
+  `,
+
+  /**
+   * Delete {{camelCase tableName}} by ID
+   */
+  DELETE: `
+    DELETE FROM "{{tableName}}"
+    WHERE "{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}" = $1
+    RETURNING *
+  `,
+
+  /**
+   * Select {{camelCase tableName}} with filters
+   */
+  SELECT_WHERE: (filters: string[]) => {
+    const whereClause = filters.map((f, i) => `"${f}" = $${i + 1}`).join(' AND ');
+    return `
+      SELECT *
+      FROM "{{tableName}}"
+      ${filters.length ? `WHERE ${whereClause}` : ''}
+      ORDER BY "{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}" DESC
+      LIMIT $${filters.length + 1} OFFSET $${filters.length + 2}
+    `;
+  },
+};
+
+/**
+ * Parameter builders for {{pascalCase tableName}} queries
+ */
+export const {{camelCase tableName}}Params = {
+  /**
+   * Build insert parameters from input
+   */
+  buildInsertParams: (input: Create{{pascalCase tableName}}Input): any[] => {
+    return [
+{{#each (filterColumns columns 'isPrimaryKey')}}
+      input.{{camelCase name}},
+{{/each}}
+    ].filter(p => p !== undefined);
+  },
+
+  /**
+   * Build update parameters from input and ID
+   */
+  buildUpdateParams: (id: string, input: Update{{pascalCase tableName}}Input): any[] => {
+    return [
+      id,
+{{#each (filterColumns columns 'isPrimaryKey')}}
+      input.{{camelCase name}},
+{{/each}}
+    ].filter(p => p !== undefined);
+  },
+};
