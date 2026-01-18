@@ -18,3 +18,6 @@ convex/_generated/
 
 # Build outputs
 dist/
+
+# Turborepo cache
+.turbo/

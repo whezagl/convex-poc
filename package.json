@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "AI Agents POC with Claude Agent SDK and Convex state backend",
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
