@@ -53,7 +53,7 @@ export class SubTaskManager {
       tables.map((table, index) =>
         convex.mutations.subtasks.create({
           taskId: this.parentTaskId,
-          title: `${agentType}: ${table.tableName}`,
+          title: `${agentType}: ${table.name}`,
           status: "pending",
           agentType,
           stepNumber: 0,
@@ -131,7 +131,7 @@ export class SubTaskManager {
     console.log(`[SubTaskManager] Spawned boilerplate sub-task: ${subTaskId}`);
 
     // Execute sub-task
-    await this.subTaskQueue.add(agentFactory, {
+    await this.subTaskQueue.add(() => agentFactory(subTaskId), {
       taskId: subTaskId,
       priority: 10, // High priority for boilerplate
     });
