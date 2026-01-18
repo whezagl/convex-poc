@@ -1,0 +1,124 @@
+/**
+ * {{pascalCase tableName}} CRUD Page
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+import { useState } from 'react';
+import type { {{pascalCase tableName}} } from './types.js';
+import { {{pascalCase tableName}}Form } from './form.js';
+import { {{pascalCase tableName}}Table } from './table.js';
+import {
+  use{{pascalCase tableName}}All,
+  useCreate{{pascalCase tableName}},
+  useUpdate{{pascalCase tableName}},
+  useDelete{{pascalCase tableName}},
+} from './hooks.js';
+
+export function {{pascalCase tableName}}Page() {
+  const [mode, setMode] = useState<'list' | 'create' | 'edit'>('list');
+  const [selectedItem, setSelectedItem] = useState<{{pascalCase tableName}} | null>(null);
+
+  const { data, isLoading, error, refetch } = use{{pascalCase tableName}}All();
+  const create{{pascalCase tableName}} = useCreate{{pascalCase tableName}}();
+  const update{{pascalCase tableName}} = useUpdate{{pascalCase tableName}}();
+  const delete{{pascalCase tableName}} = useDelete{{pascalCase tableName}}();
+
+  const handleSubmit = async (formData: any) => {
+    try {
+      if (mode === 'create') {
+        await create{{pascalCase tableName}}.mutateAsync(formData);
+      } else if (mode === 'edit' && selectedItem) {
+        await update{{pascalCase tableName}}.mutateAsync({
+          {{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}: selectedItem.{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}},
+          changes: formData,
+        });
+      }
+      setMode('list');
+      setSelectedItem(null);
+      refetch();
+    } catch (error) {
+      console.error('Error saving {{camelCase tableName}}:', error);
+    }
+  };
+
+  const handleEdit = (item: {{pascalCase tableName}}) => {
+    setSelectedItem(item);
+    setMode('edit');
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this {{camelCase tableName}}?')) {
+      try {
+        await delete{{pascalCase tableName}}.mutateAsync(id);
+        refetch();
+      } catch (error) {
+        console.error('Error deleting {{camelCase tableName}}:', error);
+      }
+    }
+  };
+
+  if (error) {
+    return <div className="text-red-600">Error: {error.message}</div>;
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        {{pascalCase tableName}} Management
+      </h1>
+
+      {mode === 'list' && (
+        <>
+          <div className="mb-4">
+            <button
+              onClick={() => setMode('create')}
+              className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+            >
+              Add New {{pascalCase tableName}}
+            </button>
+          </div>
+
+          <{{pascalCase tableName}}Table
+            data={data?.data || []}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isLoading={isLoading}
+          />
+        </>
+      )}
+
+      {(mode === 'create' || mode === 'edit') && (
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-4">
+            <button
+              onClick={() => {
+                setMode('list');
+                setSelectedItem(null);
+              }}
+              className="text-indigo-600 hover:text-indigo-900"
+            >
+              &larr; Back to list
+            </button>
+          </div>
+
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">
+              {mode === 'create' ? 'Create New' : 'Edit'} {{pascalCase tableName}}
+            </h2>
+
+            <{{pascalCase tableName}}Form
+              mode={mode}
+              initialData={selectedItem || undefined}
+              onSubmit={handleSubmit}
+              isLoading={create{{pascalCase tableName}}.isPending || update{{pascalCase tableName}}.isPending}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

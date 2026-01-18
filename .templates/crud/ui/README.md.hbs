@@ -1,0 +1,77 @@
+# {{pascalCase tableName}} UI Components
+
+⚠️ **DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}**
+
+Database table: `{{tableName}}`
+
+## Overview
+
+This module provides React UI components for {{pascalCase tableName}} CRUD operations.
+
+## Components
+
+### {{pascalCase tableName}}Page
+
+Main page component with list, create, and edit views.
+
+```tsx
+import { {{pascalCase tableName}}Page } from './{{camelCase tableName}}/Page';
+
+function App() {
+  return <{{pascalCase tableName}}Page />;
+}
+```
+
+### {{pascalCase tableName}}Form
+
+Form component with validation using React Hook Form and Zod.
+
+```tsx
+import { {{pascalCase tableName}}Form } from './{{camelCase tableName}}/form';
+
+<{{pascalCase tableName}}Form
+  mode="create"
+  onSubmit={(data) => console.log(data)}
+  isLoading={false}
+/>
+```
+
+### {{pascalCase tableName}}Table
+
+Table component with sorting, pagination, and actions.
+
+```tsx
+import { {{pascalCase tableName}}Table } from './{{camelCase tableName}}/table';
+
+<{{pascalCase tableName}}Table
+  data={items}
+  onEdit={(item) => console.log('Edit', item)}
+  onDelete={(id) => console.log('Delete', id)}
+  isLoading={false}
+/>
+```
+
+## Features
+
+- **Validation**: Zod schemas with React Hook Form
+- **Type Safety**: Full TypeScript support
+- **Loading States**: Skeleton and loading indicators
+- **Error Handling**: User-friendly error messages
+- **Responsive**: Mobile-friendly layout
+- **Actions**: Create, read, update, delete operations
+
+## Styling
+
+Components use Tailwind CSS utility classes. Customize by modifying class names in templates.
+
+## Routing
+
+Add to your React Router:
+
+```tsx
+import { {{pascalCase tableName}}Page } from './{{camelCase tableName}}/Page';
+
+<Routes>
+  <Route path="/{{tableName}}" element={<{{pascalCase tableName}}Page />} />
+</Routes>
+```
