@@ -1,0 +1,28 @@
+{
+  "name": "@convex-poc/agent-orchestrator",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./orchestrator": "./src/orchestrator.ts",
+    "./planner": "./src/planner.ts",
+    "./coder": "./src/coder.ts",
+    "./reviewer": "./src/reviewer.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.7",
+    "openai": "^6.16.0",
+    "@convex-poc/shared-types": "workspace:*",
+    "@convex-poc/convex-client": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^25.0.9",
+    "vitest": "^4.0.17"
+  }
+}

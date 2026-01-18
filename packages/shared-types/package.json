@@ -1,0 +1,26 @@
+{
+  "name": "@convex-poc/shared-types",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./task": "./src/task.ts",
+    "./subtask": "./src/subtask.ts",
+    "./log": "./src/log.ts",
+    "./agent": "./src/agent.ts",
+    "./template": "./src/template.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^25.0.9",
+    "vitest": "^4.0.17"
+  }
+}

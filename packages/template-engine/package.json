@@ -1,0 +1,22 @@
+{
+  "name": "@convex-poc/template-engine",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./generator": "./src/generator.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@convex-poc/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^25.0.9",
+    "vitest": "^4.0.17"
+  }
+}
