@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 14 of 18 (Template System)
-Plan: 4 of 9 in current phase (Frontend Boilerplate Templates)
+Plan: 3 of 9 in current phase (Backend Boilerplate Templates)
 Status: In progress
-Last activity: 2026-01-18 — Completed Plan 14-04 (Frontend Boilerplate Templates)
+Last activity: 2026-01-18 — Completed Plan 14-03 (Backend Boilerplate Templates)
 
-Progress: [███░░░░░░░░] 16% (7/45 plans in v1.0)
+Progress: [██░░░░░░░░░] 13% (6/45 plans in v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21 (14 from v0.3 + 7 from v1.0)
-- Average duration: 9.3 min
-- Total execution time: 196 minutes (3h 16m)
+- Total plans completed: 20 (14 from v0.3 + 6 from v1.0)
+- Average duration: 9.5 min
+- Total execution time: 190 minutes (3h 10m)
 
 **By Phase:**
 
@@ -29,11 +29,12 @@ Progress: [███░░░░░░░░] 16% (7/45 plans in v1.0)
 |-------|-------|-------|----------|
 | v0.3 (Phases 1-12) | 14 | 172m | 12.3m |
 | v1.0 Phase 13 | 5 | 22m | 4.4m |
-| v1.0 Phase 14 | 2 | 4m | 2.0m |
+| v1.0 Phase 14 | 1 | 2m | 2.0m |
+| v1.0 Phase 14-03 | 1 | 3m | 3.0m |
 
 **Recent Trend:**
-- Last 5 plans: [3m, 2m, 4m, 2m, 2m]
-- Latest (14-04): 2m
+- Last 5 plans: [3m, 2m, 4m, 2m, 3m]
+- Latest (14-03): 3m
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -69,6 +70,10 @@ Recent decisions affecting current work:
 - v1.0 Phase 14-01: Chokidar hot-reload with 100ms stability threshold
 - v1.0 Phase 14-01: Security utilities for SQL identifier and template variable escaping
 - v1.0 Phase 14-01: HTML escaping ON by default (use {{{var}}} for trusted content)
+- v1.0 Phase 14-03: Backend boilerplate templates with Express 5.0.0, Zod 4.0.0, pg 8.13.0
+- v1.0 Phase 14-03: TypeScript ES2022 target for Node.js 20+ compatibility in backend templates
+- v1.0 Phase 14-03: Biome formatter with 2-space indent, 80 char line width for backend code style
+- v1.0 Phase 14-03: Auto-generated warnings (DO NOT EDIT - Auto-generated on [date]) in backend templates
 - v1.0 Phase 14-08: Indonesian national IDs validated with regex (NPSN: 8, NISN: 10, NIP: 18, NUPTK: 16 digits)
 - v1.0 Phase 14-08: Kurikulum Merdeka P5 projects use 8 themes with descriptive assessment (sangat_baik, baik, cukup, perlu_bimbingan)
 - v1.0 Phase 14-08: All tables use identity columns with GENERATED ALWAYS AS IDENTITY for PostgreSQL 17
@@ -112,11 +117,11 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed Plan 14-04 (Frontend Boilerplate Templates), ready for Plan 14-05 (Backend Boilerplate Templates)
+Stopped at: Completed Plan 14-03 (Backend Boilerplate Templates), ready for Plan 14-04 (Frontend Boilerplate Templates)
 Resume file: None
 
 **Completed Phase 13:** Mono-repo foundation with pnpm workspace, Turborepo, @convex-poc/shared-types, Convex backend with tasks/subtasks, @convex-poc/convex-client wrapper, Docker Compose with PostgreSQL 17.
 
 **Completed Plan 14-01:** Handlebars template engine with 8 custom helpers (pascalCase, camelCase, isRequired, typescriptType, formatDate, eq, ne, gt, lt), Biome formatter integration with singleton pattern, hot-reload template watcher with chokidar, security utilities for SQL identifier and template variable escaping.
 
-**Completed Plan 14-04:** Frontend boilerplate templates with 8 Handlebars templates for Vite + React 19 + TypeScript projects, including package.json, vite.config.ts, index.html, README.md, .gitignore, main.tsx, App.tsx, and index.css templates. All templates use Handlebars helpers (pascalCase, camelCase, formatDate) and include auto-generated warning headers.
+**Completed Plan 14-03:** Backend boilerplate templates with 6 Handlebars templates for Node.js backend projects, including package.json, tsconfig.json, biome.json, README.md, .gitignore, and src/index.ts templates. All templates use Handlebars helpers (pascalCase, camelCase, formatDate) and include auto-generated warning headers. Templates configured for Express 5.0.0, Zod 4.0.0, pg 8.13.0 with TypeScript ES2022 target.
