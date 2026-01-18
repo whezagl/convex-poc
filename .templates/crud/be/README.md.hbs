@@ -1,0 +1,83 @@
+# {{pascalCase tableName}} CRUD Module
+
+⚠️ **DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}**
+
+Database table: `{{tableName}}`
+
+## Overview
+
+This module provides CRUD (Create, Read, Update, Delete) operations for the `{{tableName}}` table.
+
+## Type Definitions
+
+See `types.ts` for complete type definitions:
+
+- `{{pascalCase tableName}}` - Main record type
+- `Create{{pascalCase tableName}}Input` - Input for creating records
+- `Update{{pascalCase tableName}}Input` - Input for updating records
+- `{{pascalCase tableName}}Where` - Filter conditions
+- `{{pascalCase tableName}}QueryOptions` - Query options (limit, offset, orderBy)
+
+## Usage
+
+```typescript
+import { create{{pascalCase tableName}}Repository } from './index.js';
+import type { Pool } from 'pg';
+
+// Initialize repository
+const repo = create{{pascalCase tableName}}Repository(pool);
+
+// Find all records
+const records = await repo.findMany();
+
+// Find with filters
+const filtered = await repo.findMany(
+  { {{#each (takeColumns columns 3)}}{{#unless isPrimaryKey}}{{camelCase name}}: 'value',{{/unless}}{{/each}} },
+  { limit: 10, offset: 0 }
+);
+
+// Find by ID
+const record = await repo.findById('id');
+
+// Create new record
+const created = await repo.create({
+{{#each (takeColumns (filterColumns columns 'isPrimaryKey') 5)}}
+  {{camelCase name}}: 'value',
+{{/each}}
+});
+
+// Update record
+const updated = await repo.update('id', {
+  {{#each (takeColumns (filterColumns columns 'isPrimaryKey') 1)}}{{camelCase name}}: 'new value',{{/each}}
+});
+
+// Delete record
+const deleted = await repo.delete('id');
+
+// Count records
+const count = await repo.count();
+```
+
+## Table Schema
+
+| Column | Type | Nullable | Description |
+|--------|------|----------|-------------|
+{{#each columns}}
+| `{{name}}` | {{type}} | {{#if nullable}}Yes{{else}}No{{/if}} | {{#if comment}}{{{comment}}}{{else}}-{{/if}} |
+{{/each}}
+
+## SQL Queries
+
+All queries use parameterized statements to prevent SQL injection.
+
+See `sql.ts` for:
+- `{{camelCase tableName}}Queries.SELECT_ALL` - Select all records
+- `{{camelCase tableName}}Queries.SELECT_BY_ID` - Select by primary key
+- `{{camelCase tableName}}Queries.INSERT` - Insert new record
+- `{{camelCase tableName}}Queries.UPDATE` - Update existing record
+- `{{camelCase tableName}}Queries.DELETE` - Delete record
+- `{{camelCase tableName}}Queries.SELECT_WHERE` - Select with filters
+
+## Testing
+
+Use `index.http` for REST Client testing in VS Code.

@@ -1,0 +1,37 @@
+### {{pascalCase tableName}} HTTP Tests
+### ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+
+@baseUrl = http://localhost:3000/api
+@tableName = {{tableName}}
+
+### Find all {{camelCase tableName}}
+GET {{baseUrl}}/{{tableName}}
+Content-Type: application/json
+
+### Find {{camelCase tableName}} by ID
+@id = 1
+GET {{baseUrl}}/{{tableName}}/{{id}}
+
+### Create {{camelCase tableName}}
+POST {{baseUrl}}/{{tableName}}
+Content-Type: application/json
+
+{
+{{#each (takeColumns (filterColumns columns 'isPrimaryKey') 5)}}
+  "{{name}}": {{#if (eq (typescriptType this) 'string')}}"value"{{else}}0{{/if}}{{#unless @last}},{{/unless}}
+{{/each}}
+}
+
+### Update {{camelCase tableName}}
+PUT {{baseUrl}}/{{tableName}}/{{id}}
+Content-Type: application/json
+
+{
+  "{{#each (takeColumns (filterColumns columns 'isPrimaryKey') 1)}}{{name}}{{/each}}": "updated value"
+}
+
+### Delete {{camelCase tableName}}
+DELETE {{baseUrl}}/{{tableName}}/{{id}}
+
+### Count {{camelCase tableName}}
+GET {{baseUrl}}/{{tableName}}/count
