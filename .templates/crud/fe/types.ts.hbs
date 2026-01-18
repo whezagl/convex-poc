@@ -1,0 +1,66 @@
+/**
+ * {{pascalCase tableName}} Types
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+/**
+ * {{pascalCase tableName}} data model
+ */
+export interface {{pascalCase tableName}} {
+{{#each columns}}
+  /** {{#if (isRequired this)}}Required{{else}}Optional{{/if}} {{name}} ({{type}}) */
+  {{name}}: {{#if (isRequired this)}}{{typescriptType this}}{{else}}{{typescriptType this}} | null{{/if}};
+{{/each}}
+}
+
+/**
+ * Create {{pascalCase tableName}} input
+ */
+export interface Create{{pascalCase tableName}}Input {
+{{#each columns}}
+  {{#unless isPrimaryKey}}
+  {{name}}?: {{typescriptType this}};
+  {{/unless}}
+{{/each}}
+}
+
+/**
+ * Update {{pascalCase tableName}} input
+ */
+export interface Update{{pascalCase tableName}}Input {
+  {{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}: string;
+  changes: Partial<Omit<{{pascalCase tableName}}, '{{#findColumn columns 'isPrimaryKey'}}{{name}}{{/findColumn}}'>>;
+}
+
+/**
+ * {{pascalCase tableName}} query filters
+ */
+export interface {{pascalCase tableName}}Filters {
+{{#each columns}}
+  {{#unless isPrimaryKey}}
+  {{name}}?: {{#if (eq (typescriptType this) 'string')}}string | string[]{{else}}{{typescriptType this}}{{/if}};
+  {{/unless}}
+{{/each}}
+}
+
+/**
+ * {{pascalCase tableName}} list response
+ */
+export interface {{pascalCase tableName}}ListResponse {
+  data: {{pascalCase tableName}}[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/**
+ * {{pascalCase tableName}} API error response
+ */
+export interface {{pascalCase tableName}}ApiError {
+  message: string;
+  errors?: Record<string, string[]>;
+}
