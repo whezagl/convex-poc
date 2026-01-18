@@ -4,10 +4,10 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./engine": "./src/engine/index.js",
-    "./generator": "./src/generator/index.js",
-    "./watcher": "./src/watcher/index.js",
-    "./parser": "./src/parser/index.js"
+    "./engine": "./dist/engine/index.js",
+    "./generator": "./dist/generator/index.js",
+    "./watcher": "./dist/watcher/index.js",
+    "./parser": "./dist/parser/index.js"
   },
   "scripts": {
     "build": "tsc",
