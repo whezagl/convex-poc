@@ -10,7 +10,8 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "seeds": "tsx scripts/seeds/generate-seeds.ts"
+    "seeds": "tsx scripts/seeds/generate-seeds.ts",
+    "dev:templates": "tsx scripts/dev/template-dev-server.ts"
   },
   "engines": {
     "node": ">=20"
