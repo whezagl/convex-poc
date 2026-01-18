@@ -61,6 +61,17 @@ export default defineSchema({
       level: v.union(v.literal("info"), v.literal("warning"), v.literal("error")),
       source: v.optional(v.string()),
     })),
+    // Classification fields for AgentDispatcher
+    classification: v.optional(v.object({
+      agentType: v.string(),
+      confidence: v.number(),
+      method: v.string(),
+      keywords: v.array(v.string()),
+      reasoning: v.optional(v.string()),
+    })),
+    classifiedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   })
     .index("by_status", ["status"])
     .index("by_priority", ["priority"]),
@@ -84,6 +95,8 @@ export default defineSchema({
       level: v.union(v.literal("info"), v.literal("warning"), v.literal("error")),
       source: v.optional(v.string()),
     })),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   })
     .index("by_task", ["taskId"])
     .index("by_status", ["status"]),

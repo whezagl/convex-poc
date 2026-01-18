@@ -90,3 +90,54 @@ export async function getSubTask(
   const subtask = await convex.query("api/subtasks:getSubTask" as any, { subtaskId });
   return subtask;
 }
+
+/**
+ * Create sub-task (for SubTaskManager)
+ */
+export async function create(
+  args: {
+    taskId: string;
+    title: string;
+    status: SubTaskStatus;
+    agentType: string;
+    stepNumber: number;
+    totalSteps: number;
+    createdAt: number;
+    updatedAt: number;
+  },
+  client?: ConvexClient
+): Promise<string> {
+  const convex = client || getConvexClient();
+  const subtaskId = await convex.mutation("api/subtasks:create" as any, args);
+  return subtaskId;
+}
+
+/**
+ * Update sub-task progress (for SubTaskManager)
+ */
+export async function updateProgress(
+  args: {
+    subTaskId: string;
+    stepNumber: number;
+    totalSteps: number;
+    message: string;
+    status?: "running" | "done" | "failed";
+    error?: string;
+    timestamp: number;
+  },
+  client?: ConvexClient
+): Promise<void> {
+  const convex = client || getConvexClient();
+  await convex.mutation("api/subtasks:updateProgress" as any, args);
+}
+
+/**
+ * List sub-tasks by task (for SubTaskManager)
+ */
+export async function listByTask(
+  taskId: string,
+  client?: ConvexClient
+): Promise<SubTask[]> {
+  const convex = client || getConvexClient();
+  return await convex.query("api/subtasks:listByTask" as any, { taskId });
+}

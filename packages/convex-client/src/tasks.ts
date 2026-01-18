@@ -85,3 +85,74 @@ export async function getTask(
   const task = await convex.query("api/tasks:getTask" as any, { taskId });
   return task;
 }
+
+/**
+ * Create a new task (for ParallelOrchestrator)
+ */
+export async function create(
+  args: {
+    title: string;
+    description?: string;
+    status: TaskStatus;
+    priority: TaskPriority;
+    workspacePath?: string;
+    createdAt: number;
+    updatedAt: number;
+  },
+  client?: ConvexClient
+): Promise<string> {
+  const convex = client || getConvexClient();
+  const taskId = await convex.mutation("api/tasks:create" as any, args);
+  return taskId;
+}
+
+/**
+ * Update task status (for ParallelOrchestrator)
+ */
+export async function updateStatus(
+  args: {
+    taskId: string;
+    status: TaskStatus;
+    subTaskIds?: string[];
+    progress?: {
+      completed: number;
+      total: number;
+      failed?: number;
+    };
+    updatedAt: number;
+  },
+  client?: ConvexClient
+): Promise<void> {
+  const convex = client || getConvexClient();
+  await convex.mutation("api/tasks:updateStatus" as any, args);
+}
+
+/**
+ * Update task with classification result (for AgentDispatcher)
+ */
+export async function updateClassification(
+  args: {
+    taskId: string;
+    agentType: string;
+    confidence: number;
+    method: string;
+    keywords: string[];
+    reasoning?: string;
+    timestamp: number;
+  },
+  client?: ConvexClient
+): Promise<void> {
+  const convex = client || getConvexClient();
+  await convex.mutation("api/tasks:updateClassification" as any, args);
+}
+
+/**
+ * List tasks by status (for ParallelOrchestrator)
+ */
+export async function listByStatus(
+  status: TaskStatus,
+  client?: ConvexClient
+): Promise<Task[]> {
+  const convex = client || getConvexClient();
+  return await convex.query("api/tasks:listByStatus" as any, { status });
+}

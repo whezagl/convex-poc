@@ -1,7 +1,38 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Create a new subtask
+// Create sub-task (for SubTaskManager)
+export const create = mutation({
+  args: {
+    taskId: v.id("tasks"),
+    title: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("running"),
+      v.literal("done"),
+      v.literal("failed")
+    ),
+    agentType: v.string(),
+    stepNumber: v.number(),
+    totalSteps: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const subTaskId = await ctx.db.insert("subtasks", {
+      taskId: args.taskId,
+      title: args.title,
+      status: args.status,
+      agentType: args.agentType,
+      stepNumber: args.stepNumber,
+      totalSteps: args.totalSteps,
+      logs: [],
+    });
+    return subTaskId;
+  },
+});
+
+// Create a new subtask (legacy, for Kanban board)
 export const createSubTask = mutation({
   args: {
     taskId: v.id("tasks"),
@@ -18,6 +49,8 @@ export const createSubTask = mutation({
       stepNumber: 1,
       totalSteps: args.totalSteps,
       logs: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
 
     // Add subtask ID to parent task
@@ -106,5 +139,43 @@ export const getSubTask = query({
   handler: async (ctx, args) => {
     const subtask = await ctx.db.get(args.subtaskId);
     return subtask;
+  },
+});
+
+// Update sub-task progress (for SubTaskManager)
+export const updateProgress = mutation({
+  args: {
+    subTaskId: v.id("subtasks"),
+    stepNumber: v.number(),
+    totalSteps: v.number(),
+    message: v.string(),
+    status: v.optional(v.union(
+      v.literal("running"),
+      v.literal("done"),
+      v.literal("failed")
+    )),
+    error: v.optional(v.string()),
+    timestamp: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { subTaskId, timestamp, ...updates } = args;
+    await ctx.db.patch(subTaskId, {
+      ...updates,
+      updatedAt: timestamp,
+    });
+  },
+});
+
+// List sub-tasks by task (for SubTaskManager)
+export const listByTask = query({
+  args: {
+    taskId: v.id("tasks"),
+  },
+  handler: async (ctx, args) => {
+    const subTasks = await ctx.db
+      .query("subtasks")
+      .withIndex("by_task", (q) => q.eq("taskId", args.taskId))
+      .collect();
+    return subTasks;
   },
 });

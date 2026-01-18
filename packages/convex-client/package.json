@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "exports": {
+    ".": "./src/index.ts",
     "./client": "./src/client.ts",
     "./tasks": "./src/tasks.ts",
     "./subtasks": "./src/subtasks.ts"
