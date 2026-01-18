@@ -1,0 +1,64 @@
+/**
+ * {{pascalCase tableName}} Types
+ *
+ * ⚠️ DO NOT EDIT — Auto-generated on {{formatDate (new Date)}}
+ *
+ * Database: {{databaseName}}
+ * Table: {{tableName}}
+ */
+
+/**
+ * {{pascalCase tableName}} database record
+ */
+export interface {{pascalCase tableName}} {
+{{#each columns}}
+  /**
+   * {{#if (isRequired this)}}Required{{else}}Optional{{/if}} {{name}}
+   * Type: {{type}}
+{{#if comment}}
+   * Description: {{{comment}}}
+{{/if}}
+   */
+  {{name}}: {{#if (isRequired this)}}{{typescriptType this}}{{else}}{{typescriptType this}} | null{{/if}};
+{{/each}}
+}
+
+/**
+ * Create {{pascalCase tableName}} input (all fields optional)
+ */
+export interface Create{{pascalCase tableName}}Input {
+{{#each columns}}
+  {{name}}?: {{typescriptType this}};
+{{/each}}
+}
+
+/**
+ * Update {{pascalCase tableName}} input (all fields optional)
+ */
+export interface Update{{pascalCase tableName}}Input {
+{{#each columns}}
+  {{name}}?: {{typescriptType this}};
+{{/each}}
+}
+
+/**
+ * {{pascalCase tableName}} query filters
+ */
+export interface {{pascalCase tableName}}Where {
+  id?: string;
+{{#each columns}}
+  {{#unless isPrimaryKey}}
+  {{name}}?: {{#if (eq (typescriptType this) 'string')}}string | string[]{{else}}{{typescriptType this}}{{/if}};
+  {{/unless}}
+{{/each}}
+}
+
+/**
+ * {{pascalCase tableName}} query options
+ */
+export interface {{pascalCase tableName}}QueryOptions {
+  limit?: number;
+  offset?: number;
+  orderBy?: keyof {{pascalCase tableName}};
+  orderDirection?: 'ASC' | 'DESC';
+}
